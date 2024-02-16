@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Events.Player;
+using Impostor.Api.Events.Player;
 using Impostor.Api.Games;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;

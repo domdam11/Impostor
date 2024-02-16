@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,6 +31,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
+using Impostor.Api.Net.Manager;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -57,8 +58,8 @@ namespace Impostor.Tools.ServerReplay
                 .CreateLogger();
 
             var stopwatch = Stopwatch.StartNew();
-
-            foreach (var file in Directory.GetFiles(args[0], "*.dat"))
+         
+            foreach (var file in Directory.GetFiles("..\\..\\..\\sessions\\", "*.dat"))
             {
                 // Clear.
                 Connections.Clear();
@@ -109,8 +110,9 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddSingleton<MockGameCodeFactory>();
             services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
-
+            services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
             services.AddSingleton<ClientManager>();
+            
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
             services.AddSingleton<IEventManager, EventManager>();
 
