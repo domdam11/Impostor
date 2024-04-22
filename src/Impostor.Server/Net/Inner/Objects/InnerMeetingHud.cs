@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -44,7 +44,7 @@ namespace Impostor.Server.Net.Inner.Objects
                 try
                 {
                     const float AnimationTime = 0.25f + 0.5f + 0.4f + 3f + 0.75f + 5f;
-                    if (Game.Options.GameMode == GameModes.Normal)
+                    if (Game.Options.GameMode is GameModes.Normal or GameModes.NormalFools)
                     {
                         var options = (NormalGameOptions)Game.Options;
                         await Task.Delay(TimeSpan.FromSeconds(AnimationTime + options.DiscussionTime + options.VotingTime), _timerToken.Token);
@@ -204,7 +204,7 @@ namespace Impostor.Server.Net.Inner.Objects
 
             if (playerId != sender.Character!.PlayerId)
             {
-                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
+                if (await sender.Client.ReportCheatAsync(RpcCalls.CastVote, CheatCategory.Ownership, $"Client sent {nameof(RpcCalls.CastVote)} to an unowned {nameof(InnerPlayerControl)}"))
                 {
                     return false;
                 }
