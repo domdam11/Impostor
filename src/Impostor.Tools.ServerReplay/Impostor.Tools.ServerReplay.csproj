@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Impostor.Plugins.Example\Impostor.Plugins.Example.csproj" />
     <ProjectReference Include="..\Impostor.Server\Impostor.Server.csproj" />
   </ItemGroup>
 

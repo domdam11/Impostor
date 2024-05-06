@@ -32,6 +32,8 @@ using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
 using Impostor.Api.Net.Manager;
+using Impostor.Api.Events;
+using Impostor.Plugins.Example.Handlers;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -120,6 +122,11 @@ namespace Impostor.Tools.ServerReplay
             services.AddHazel();
             services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
             services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+
+            services.AddSingleton<IEventListener, GameEventListener>();
+            services.AddSingleton<IEventListener, ClientEventListener>();
+            services.AddSingleton<IEventListener, PlayerEventListener>();
+            services.AddSingleton<IEventListener, MeetingEventListener>();
 
             return services.BuildServiceProvider();
         }

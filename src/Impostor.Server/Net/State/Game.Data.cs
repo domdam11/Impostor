@@ -355,7 +355,7 @@ namespace Impostor.Server.Net.State
                 {
                     foreach (var player in _players.Values)
                     {
-                        if (GameNet.ShipStatus != null)
+                        if (GameNet.ShipStatus != null && player.Character != null)
                         {
                             await player.Character!.NetworkTransform.SetPositionAsync(player, GameNet.ShipStatus.GetSpawnLocation(player.Character, PlayerCount, false));
                         }
