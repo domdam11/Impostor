@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Text.Json;
 using CSharpPoet;
@@ -62,7 +63,7 @@ public sealed class MapDataGenerator : BaseGenerator
                 var id = pair.Key;
                 var task = pair.Value;
 
-                writer.WriteLine($"[{id}] = new({id}, TaskTypes.{task.TaskType}, TaskCategories.{task.Length}Task),");
+                writer.WriteLine($"[{id}] = new({id}, TaskTypes.{task.TaskType}, TaskCategories.{task.Length}Task, {task.Consoles.Select(a=>a.Position).ToArray().ToCSharpString()} ),");
             }
         });
 

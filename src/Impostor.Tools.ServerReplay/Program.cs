@@ -34,6 +34,7 @@ using ILogger = Serilog.ILogger;
 using Impostor.Api.Net.Manager;
 using Impostor.Api.Events;
 using Impostor.Plugins.Example.Handlers;
+using Impostor.Plugins.Example;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -49,7 +50,7 @@ namespace Impostor.Tools.ServerReplay
         private static MockGameCodeFactory _gameCodeFactory;
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
-        private static FakeDateTimeProvider _fakeDateTimeProvider;
+        public static FakeDateTimeProvider _fakeDateTimeProvider;
 
         private static async Task Main(string[] args)
         {
@@ -122,11 +123,9 @@ namespace Impostor.Tools.ServerReplay
             services.AddHazel();
             services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
             services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
-
-            services.AddSingleton<IEventListener, GameEventListener>();
-            services.AddSingleton<IEventListener, ClientEventListener>();
-            services.AddSingleton<IEventListener, PlayerEventListener>();
-            services.AddSingleton<IEventListener, MeetingEventListener>();
+            //Manually invoke the ConfigureServices method of the SemanticAnnotatorPluginStartup class
+            var semanticAnnotatorPluginStartup = new SemanticAnnotatorPluginStartup();
+            semanticAnnotatorPluginStartup.ConfigureServices(services);
 
             return services.BuildServiceProvider();
         }
@@ -153,6 +152,7 @@ namespace Impostor.Tools.ServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
+                    Console.WriteLine(_fakeDateTimeProvider.UtcNow);
                     await ParsePacket(readerInner);
                 }
             }

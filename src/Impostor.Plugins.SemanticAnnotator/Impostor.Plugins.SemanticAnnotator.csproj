@@ -1,0 +1,35 @@
+
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <StartupObject>Impostor.Plugins.SemanticAnnotator.Utils.CowlWrapper</StartupObject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CppSharp" Version="1.1.5.3168" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="amongus.owl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="cowl.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CowlWrapper\" />
+  </ItemGroup>
+
+</Project>
