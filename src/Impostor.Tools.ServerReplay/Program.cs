@@ -35,6 +35,7 @@ using Impostor.Api.Net.Manager;
 using Impostor.Api.Events;
 using Impostor.Plugins.Example.Handlers;
 using Impostor.Plugins.Example;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -152,7 +153,8 @@ namespace Impostor.Tools.ServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
-                    Console.WriteLine(_fakeDateTimeProvider.UtcNow);
+                    CsvUtility.TimeStamp = _fakeDateTimeProvider.UtcNow;
+                    //Console.WriteLine(_fakeDateTimeProvider.UtcNow);
                     await ParsePacket(readerInner);
                 }
             }

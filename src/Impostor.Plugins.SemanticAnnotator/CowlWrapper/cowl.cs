@@ -876,10 +876,10 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern sbyte* Ustring(__IntPtr @string, ulong length);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?ustring_assign_buf@@YA?AUUString@@PEBD@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_assign_buf", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UstringAssignBuf(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?ustring_copy_buf@@YA?AUUString@@PEBD@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_copy_buf", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UstringCopyBuf(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_wrap_buf", CallingConvention = __CallingConvention.Cdecl)]
@@ -19897,7 +19897,7 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_cls_assert_axiom@@YAPEAUCowlClsAssertAxiom@@PEAX0PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_cls_assert_axiom", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlClsAssertAxiom(__IntPtr exp, __IntPtr ind, __IntPtr annot);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_cls_assert_axiom_get_cls_exp@@YAPEAUCowlClsExp@@PEAUCowlClsAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -26535,7 +26535,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_named_ind@@YAPEAUCowlNamedInd@@PEAUCowlIRI@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNamedInd(__IntPtr iri);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_named_ind_from_string@@YAPEAUCowlNamedInd@@UUString@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_named_ind_from_string", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNamedIndFromString(global::cowl.UString.__Internal @string);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_named_ind_get_iri@@YAPEAUCowlIRI@@PEAUCowlNamedInd@@@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -26690,13 +26690,13 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_nary_bool@@YAPEAUCowlNAryBool@@W4CowlNAryType@@PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_nary_bool", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNaryBool(global::cowl.CowlNAryType type, __IntPtr operands);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_nary_bool_get_type@@YA?AW4CowlNAryType@@PEAUCowlNAryBool@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_nary_bool_get_type", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.CowlNAryType CowlNaryBoolGetType(__IntPtr exp);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_nary_bool_get_operands@@YAPEAUCowlVector@@PEAUCowlNAryBool@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_nary_bool_get_operands", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNaryBoolGetOperands(__IntPtr exp);
         }
 
@@ -27913,7 +27913,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_obj_prop@@YAPEAUCowlObjProp@@PEAUCowlIRI@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlObjProp(__IntPtr iri);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_obj_prop_from_string@@YAPEAUCowlObjProp@@UUString@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_obj_prop_from_string", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlObjPropFromString(global::cowl.UString.__Internal @string);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_obj_prop_get_iri@@YAPEAUCowlIRI@@PEAUCowlObjProp@@@Z", CallingConvention = __CallingConvention.Cdecl)]

@@ -1,4 +1,5 @@
-﻿using Impostor.Api.Events;
+using Impostor.Api.Events;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -44,6 +45,7 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnGameStarted(IGameStartedEvent e)
         {
+            CsvUtility.CsvGeneratorStartGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > started", e.Game.Code);
 
             foreach (var player in e.Game.Players)
@@ -57,6 +59,7 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnGameEnded(IGameEndedEvent e)
         {
+            CsvUtility.CsvGeneratorEndGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > ended because {reason}", e.Game.Code, e.GameOverReason);
         }
 

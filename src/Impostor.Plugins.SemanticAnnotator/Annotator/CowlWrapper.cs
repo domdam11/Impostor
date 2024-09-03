@@ -44,31 +44,77 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             CowlManager manager = cowl_manager.CowlManager();
             
             var onto = cowl_manager.CowlManagerGetOntology(manager, cowl_ontology_id.CowlOntologyIdAnonymous());
-            var stringClass = UString.UstringWrapBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Player");
-            var cls = cowl_class.CowlClassFromString(stringClass);
-            var axiom = cowl_decl_axiom.CowlDeclAxiom(cls.__Instance, null);
-            cowl_ontology.CowlOntologyAddAxiom(onto, axiom.__Instance);
-            
-            /*string absoluteHeaderDirectory = "amongus.owl";
-            
-            var string1 = UString.UstringWrapBuf(absoluteHeaderDirectory);
-            CowlOntology onto = cowl_manager.CowlManagerReadPath(manager, string1);
-            var count = cowl_ontology.CowlOntologyAxiomCount(onto, false);
-  
-            string playerIri = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Player";
-            var string2 = UString.UstringWrapBuf(playerIri);
-            CowlClass cls = cowl_class.CowlClassFromString(string2);
-            
-            */
 
+            var playerClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CrewMateAlive");
+           
+            var objQuant =  CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Electrical_Sabotage" });
+
+            var resultCreateInd = CreateIndividual(onto, "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Player1", new[] { playerClass }, new[] { objQuant });
+            
             string absoluteHeaderDirectory2 = "amongus2.owl";
-            var string3 = UString.UstringWrapBuf(absoluteHeaderDirectory2);
+            var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory2);
+            cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
             cowl_manager.CowlManagerWritePath(manager, onto, string3);
+
             cowl_object.CowlRelease(manager.__Instance);
             cowl_object.CowlRelease(onto.__Instance);
-            cowl_object.CowlRelease(cls.__Instance);
-            cowl_object.CowlRelease(axiom.__Instance);
+
+            foreach (var instance in instancesToRelease)
+            {
+                cowl_object.CowlRelease(instance);
+            }
+  
             //ConsoleDriver.Run(new CowlWrapper());
+        }
+        public static List<nint> instancesToRelease = new List<nint>();
+        public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri, IEnumerable<CowlObjQuant> objQuantsIri)
+        {
+            var operands = new UVecCowlObjectPtr();
+            foreach (var classIri in classesIri)
+            {
+                cowl_vector.UvecPushCowlObjectPtr(operands, classIri.__Instance);
+            }
+            foreach (var objQuant in objQuantsIri)
+            {
+                cowl_vector.UvecPushCowlObjectPtr(operands, objQuant.__Instance);
+            }
+
+            CowlVector vec = cowl_vector.CowlVector(operands);
+            var exp = cowl_nary_bool.CowlNaryBool(CowlNAryType.COWL_NT_INTERSECT, vec);
+            instancesToRelease.Add(exp.__Instance);
+            var ind = cowl_named_ind.CowlNamedIndFromString(UString.UstringCopyBuf(individualIri));
+            instancesToRelease.Add(ind.__Instance);
+            var axiom = cowl_cls_assert_axiom.CowlClsAssertAxiom(exp.__Instance, ind.__Instance, null);
+            instancesToRelease.Add(axiom.__Instance);
+            return cowl_ontology.CowlOntologyAddAxiom(onto, axiom.__Instance);
+        }
+
+        public static CowlClass CreateClassFromIri(string classIri)
+        {
+            var classObj = cowl_class.CowlClassFromString(UString.UstringCopyBuf(classIri));
+            instancesToRelease.Add(classObj.__Instance);
+            return classObj;
+        }
+
+        public static CowlObjQuant CreateAllValuesRestriction(string propertyIri, IEnumerable<string> fillerClassesIri)
+        {
+            var fillerVector = new UVecCowlObjectPtr();
+
+            foreach (var fillerClassIri in fillerClassesIri)
+            {
+                var fillerClass = cowl_class.CowlClassFromString(UString.UstringCopyBuf(fillerClassIri));
+                cowl_vector.UvecPushCowlObjectPtr(fillerVector, fillerClass.__Instance);
+            }
+   
+            var operandsRole = cowl_vector.CowlVector(fillerVector);
+            instancesToRelease.Add(operandsRole.__Instance);
+            var closure = cowl_nary_bool.CowlNaryBool(CowlNAryType.COWL_NT_INTERSECT, operandsRole);
+            instancesToRelease.Add(closure.__Instance);
+            var taskRole = cowl_obj_prop.CowlObjPropFromString(UString.UstringCopyBuf(propertyIri));
+            instancesToRelease.Add(taskRole.__Instance);
+            var obj_quant = cowl_obj_quant.CowlObjQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, closure.__Instance);
+            instancesToRelease.Add(obj_quant.__Instance);
+            return obj_quant;
         }
         public void Example()
         {

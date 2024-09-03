@@ -5,6 +5,7 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers
@@ -14,6 +15,8 @@ namespace Impostor.Plugins.Example.Handlers
         private readonly Random _random = new Random();
 
         private readonly ILogger<PlayerEventListener> _logger;
+
+        
 
         public PlayerEventListener(ILogger<PlayerEventListener> logger)
         {
@@ -66,8 +69,9 @@ namespace Impostor.Plugins.Example.Handlers
                 }
                
             }
-            _logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
-          
+            
+            //_logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
+            CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(), e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position.X.ToString(), e.PlayerControl.NetworkTransform.Position.Y.ToString());
         }
 
         [EventListener]

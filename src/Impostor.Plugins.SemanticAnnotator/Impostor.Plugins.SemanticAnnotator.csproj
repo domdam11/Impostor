@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Coravel" Version="5.0.4" />
     <PackageReference Include="CppSharp" Version="1.1.5.3168" />
   </ItemGroup>
 
