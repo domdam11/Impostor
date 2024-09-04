@@ -33,8 +33,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impostor.Api.Innersloth.Gen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Impostor.Plugins.SemanticAnnotator", "Impostor.Plugins.SemanticAnnotator\Impostor.Plugins.SemanticAnnotator.csproj", "{828873CC-02E9-4B6A-9AD1-315793457E39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Boot.Metrics", "..\..\Boot.Metrics\Boot.Metrics\Boot.Metrics.csproj", "{30F2F616-53A6-4712-8646-95DA2E275168}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,14 +137,6 @@ Global
 		{828873CC-02E9-4B6A-9AD1-315793457E39}.Release|Any CPU.Build.0 = Release|Any CPU
 		{828873CC-02E9-4B6A-9AD1-315793457E39}.Release|x86.ActiveCfg = Release|Any CPU
 		{828873CC-02E9-4B6A-9AD1-315793457E39}.Release|x86.Build.0 = Release|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Debug|x86.Build.0 = Debug|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Release|x86.ActiveCfg = Release|Any CPU
-		{30F2F616-53A6-4712-8646-95DA2E275168}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

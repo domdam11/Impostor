@@ -50,12 +50,19 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             var objQuant =  CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Electrical_Sabotage" });
 
             var resultCreateInd = CreateIndividual(onto, "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Player1", new[] { playerClass }, new[] { objQuant });
-            
+            //write to file
             string absoluteHeaderDirectory2 = "amongus2.owl";
             var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory2);
             cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
             cowl_manager.CowlManagerWritePath(manager, onto, string3);
 
+            //alternative output -> write to string
+            UVec_char chars = new UVec_char();
+            cowl_manager.CowlManagerWriteStrbuf(manager, onto, chars);
+            var sbyteArray = new sbyte[uvec_builtin.UvecCountChar(chars)];
+            uvec_builtin.UvecCopyToArrayChar(chars, sbyteArray);
+            byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
+            string result = System.Text.Encoding.UTF8.GetString(byteArray);
             cowl_object.CowlRelease(manager.__Instance);
             cowl_object.CowlRelease(onto.__Instance);
 

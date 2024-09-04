@@ -9220,7 +9220,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_size_char@@YAIPEBUUVec_char@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern uint UvecSizeChar(__IntPtr vec);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_count_char@@YAIPEBUUVec_char@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "uvec_count_char", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern uint UvecCountChar(__IntPtr vec);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?p_uvec_set_count_char@@YAXPEAUUVec_char@@I@Z", CallingConvention = __CallingConvention.Cdecl)]
