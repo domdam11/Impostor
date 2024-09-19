@@ -57,12 +57,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             cowl_manager.CowlManagerWritePath(manager, onto, string3);
 
             //alternative output -> write to string
-            UVec_char chars = new UVec_char();
+            UVec_char chars = uvec_builtin.UvecChar();
             cowl_manager.CowlManagerWriteStrbuf(manager, onto, chars);
             var sbyteArray = new sbyte[uvec_builtin.UvecCountChar(chars)];
             uvec_builtin.UvecCopyToArrayChar(chars, sbyteArray);
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
+            Console.WriteLine(result);
             cowl_object.CowlRelease(manager.__Instance);
             cowl_object.CowlRelease(onto.__Instance);
 
@@ -76,7 +77,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         public static List<nint> instancesToRelease = new List<nint>();
         public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri, IEnumerable<CowlObjQuant> objQuantsIri)
         {
-            var operands = new UVecCowlObjectPtr();
+            var operands = cowl_vector.UvecCowlObjectPtr();
             foreach (var classIri in classesIri)
             {
                 cowl_vector.UvecPushCowlObjectPtr(operands, classIri.__Instance);
@@ -105,7 +106,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
         public static CowlObjQuant CreateAllValuesRestriction(string propertyIri, IEnumerable<string> fillerClassesIri)
         {
-            var fillerVector = new UVecCowlObjectPtr();
+            var fillerVector = cowl_vector.UvecCowlObjectPtr();
 
             foreach (var fillerClassIri in fillerClassesIri)
             {

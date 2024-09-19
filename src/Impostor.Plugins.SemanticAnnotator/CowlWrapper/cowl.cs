@@ -9205,7 +9205,7 @@ namespace cowl
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool UvecMinHeapqRemoveChar(__IntPtr vec, sbyte item);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_char@@YA?AUUVec_char@@XZ", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "uvec_char", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UvecChar(__IntPtr @return);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_assign_char@@YA?AUUVec_char@@PEADI@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -18869,7 +18869,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "uvec_push_unique_CowlObjectPtr", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.UvecRet UvecPushUniqueCowlObjectPtr(__IntPtr vec, __IntPtr item);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_CowlObjectPtr@@YA?AUUVec_CowlObjectPtr@@XZ", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "uvec_CowlObjectPtr", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UvecCowlObjectPtr(__IntPtr @return);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?uvec_assign_CowlObjectPtr@@YA?AUUVec_CowlObjectPtr@@PEAPEAXI@Z", CallingConvention = __CallingConvention.Cdecl)]
