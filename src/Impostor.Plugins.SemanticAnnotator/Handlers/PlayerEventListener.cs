@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Impostor.Api.Games;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth.Customization;
@@ -8,46 +9,48 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class PlayerEventListener : IEventListener
     {
         private readonly Random _random = new Random();
-
         private readonly ILogger<PlayerEventListener> _logger;
+        private readonly GameEventCacheManager _eventCacheManager;
 
-        
-
-        public PlayerEventListener(ILogger<PlayerEventListener> logger)
+        public PlayerEventListener(ILogger<PlayerEventListener> logger, GameEventCacheManager eventCacheManager)
         {
             _logger = logger;
+            _eventCacheManager = eventCacheManager;
         }
 
         [EventListener]
-        public void OnPlayerSpawned(IPlayerSpawnedEvent e)
+        public async Task OnPlayerSpawned(IPlayerSpawnedEvent e)
         {
             _logger.LogInformation("Player {player} > spawned", e.PlayerControl.PlayerInfo.PlayerName);
 
-            // Need to make a local copy because it might be possible that
-            // the event gets changed after being handled.
-            var clientPlayer = e.ClientPlayer;
-            var playerControl = e.PlayerControl;
+            // Crea un dizionario per rappresentare le informazioni sull'evento
+            var spawnEventData = new Dictionary<string, object>
+            {
+                { "EventId", Guid.NewGuid().ToString() },  // Usa un GUID come EventId
+                { "GameCode", e.Game.Code },                // Codice del gioco
+                { "EventType", "PlayerSpawned" },           // Tipo di evento
+                { "Timestamp", DateTime.UtcNow },           // Timestamp dell'evento
+                { "PlayerSpawned", e.PlayerControl.PlayerInfo.PlayerName }  
+            };
+
+            // Salva l'evento nella cache
+            await _eventCacheManager.AddEventAsync(e.Game.Code, spawnEventData);
 
             Task.Run(async () =>
             {
                 _logger.LogDebug("Starting player task");
 
-                // Give the player time to load.
                 await Task.Delay(TimeSpan.FromSeconds(3));
 
-                while (clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected)
+                while (e.ClientPlayer.Client.Connection != null && e.ClientPlayer.Client.Connection.IsConnected)
                 {
-                    // Modify player properties.
-                    await playerControl.SetColorAsync((ColorType)_random.Next(1, 9));
-                    // TODO Rewrite using cosmetics source generator
-                    // await playerControl.SetHatAsync((HatType)_random.Next(1, 9));
-                    // await playerControl.SetSkinAsync((SkinType)_random.Next(1, 9));
-                    // await playerControl.SetPetAsync((PetType)_random.Next(1, 9));
+                    // Modifica le proprietà del giocatore
+                    await e.PlayerControl.SetColorAsync((ColorType)_random.Next(1, 9));
 
                     await Task.Delay(TimeSpan.FromMilliseconds(5000));
                 }
@@ -59,19 +62,26 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerMovement(IPlayerMovementEvent e)
         {
-            foreach (var player in e.Game.Players)
+            // Log dei movimenti del giocatore e aggiunta alla cache
+            var movementEventData = new Dictionary<string, object>
             {
-                if (player != null) {
-                    if (e.PlayerControl.NetworkTransform.Position.X == player.Character?.NetworkTransform.Position.X)
-                    {
+                { "EventId", Guid.NewGuid().ToString() },  // Usa un GUID come EventId
+                { "GameCode", e.Game.Code },                // Codice del gioco
+                { "EventType", "PlayerMovement" },          // Tipo di evento
+                { "Timestamp", DateTime.UtcNow },           // Timestamp dell'evento
+                { "PlayerName", e.PlayerControl.PlayerInfo.PlayerName },
+                { "X", e.PlayerControl.NetworkTransform.Position.X},
+                { "Y", e.PlayerControl.NetworkTransform.Position.Y} 
+            };
 
-                    }
-                }
-               
-            }
-            
-            //_logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
-            CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(), e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position.X.ToString(), e.PlayerControl.NetworkTransform.Position.Y.ToString());
+            // Aggiungi l'evento alla cache
+            _eventCacheManager.AddEventAsync(e.Game.Code, movementEventData);
+
+            // Opzionale: Generazione CSV
+            CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(),
+                                     e.PlayerControl.PlayerInfo.PlayerName,
+                                     e.PlayerControl.NetworkTransform.Position.X.ToString(),
+                                     e.PlayerControl.NetworkTransform.Position.Y.ToString());
         }
 
         [EventListener]
@@ -85,6 +95,7 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogInformation("Player {player} > said {message}", e.PlayerControl.PlayerInfo.PlayerName, e.Message);
 
+            // Risponde a comandi specifici nella chat
             if (e.Message == "test")
             {
                 e.Game.Options.NumImpostors = 2;
@@ -119,7 +130,6 @@ namespace Impostor.Plugins.Example.Handlers
                 }
             }
 
-            //await e.PlayerControl.SetNameAsync(e.PlayerControl.PlayerInfo.PlayerName);
             await e.PlayerControl.SendChatAsync(e.Message);
         }
 
@@ -133,6 +143,21 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerEnterVentEvent(IPlayerEnterVentEvent e)
         {
             _logger.LogInformation("Player {player} entered the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
+            
+            // Crea un dizionario per rappresentare le informazioni sull'evento
+            var playerEnterVentEventData = new Dictionary<string, object>
+            {
+                { "EventId", Guid.NewGuid().ToString() },  // Usa un GUID come EventId
+                { "GameCode", e.Game.Code },                // Codice del gioco
+                { "EventType", "PlayerEnterVentEvent" },           // Tipo di evento
+                { "Timestamp", DateTime.UtcNow },           // Timestamp dell'evento
+                { "Player", e.PlayerControl.PlayerInfo.PlayerName },
+                { "VentName", e.Vent.Name },
+                { "VentId", e.Vent.Id }
+            };
+
+            // Salva l'evento nella cache
+            await _eventCacheManager.AddEventAsync(e.Game.Code, playerEnterVentEventData);
         }
 
         [EventListener]
@@ -156,7 +181,8 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
         {
-            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, 
+                e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
         }
     }
 }
