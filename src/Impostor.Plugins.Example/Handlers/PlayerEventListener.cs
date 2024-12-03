@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
@@ -98,7 +98,7 @@ namespace Impostor.Plugins.Example.Handlers
                 }
             }
 
-            await e.PlayerControl.SetNameAsync(e.Message);
+            //await e.PlayerControl.SetNameAsync(e.PlayerControl.PlayerInfo.PlayerName);
             await e.PlayerControl.SendChatAsync(e.Message);
         }
 

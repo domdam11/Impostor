@@ -1,4 +1,4 @@
-﻿using Impostor.Api.Events;
+using Impostor.Api.Events;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.Example.Handlers

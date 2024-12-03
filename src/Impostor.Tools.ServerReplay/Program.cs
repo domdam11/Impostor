@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,6 +31,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
+using Impostor.Api.Net.Manager;
+using Impostor.Api.Events;
+using Impostor.Plugins.Example.Handlers;
+using Impostor.Plugins.Example;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -46,7 +51,7 @@ namespace Impostor.Tools.ServerReplay
         private static MockGameCodeFactory _gameCodeFactory;
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
-        private static FakeDateTimeProvider _fakeDateTimeProvider;
+        public static FakeDateTimeProvider _fakeDateTimeProvider;
 
         private static async Task Main(string[] args)
         {
@@ -57,8 +62,8 @@ namespace Impostor.Tools.ServerReplay
                 .CreateLogger();
 
             var stopwatch = Stopwatch.StartNew();
-
-            foreach (var file in Directory.GetFiles(args[0], "*.dat"))
+         
+            foreach (var file in Directory.GetFiles("..\\..\\..\\sessions\\", "*.dat"))
             {
                 // Clear.
                 Connections.Clear();
@@ -109,8 +114,9 @@ namespace Impostor.Tools.ServerReplay
 
             services.AddSingleton<MockGameCodeFactory>();
             services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
-
+            services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
             services.AddSingleton<ClientManager>();
+            
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
             services.AddSingleton<IEventManager, EventManager>();
 
@@ -118,6 +124,9 @@ namespace Impostor.Tools.ServerReplay
             services.AddHazel();
             services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
             services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+            //Manually invoke the ConfigureServices method of the SemanticAnnotatorPluginStartup class
+            var semanticAnnotatorPluginStartup = new SemanticAnnotatorPluginStartup();
+            semanticAnnotatorPluginStartup.ConfigureServices(services);
 
             return services.BuildServiceProvider();
         }
@@ -144,6 +153,8 @@ namespace Impostor.Tools.ServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
+                    CsvUtility.TimeStamp = _fakeDateTimeProvider.UtcNow;
+                    //Console.WriteLine(_fakeDateTimeProvider.UtcNow);
                     await ParsePacket(readerInner);
                 }
             }
@@ -206,6 +217,8 @@ namespace Impostor.Tools.ServerReplay
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
+                        EventUtility.CallAnnotate(_fakeDateTimeProvider.UtcNow);
+
                     }
 
                     break;
@@ -217,6 +230,8 @@ namespace Impostor.Tools.ServerReplay
                     await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
+                    EventUtility.SetTime(_fakeDateTimeProvider.UtcNow);
+
                     break;
 
                 default:
