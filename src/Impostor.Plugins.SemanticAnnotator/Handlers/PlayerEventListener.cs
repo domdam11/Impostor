@@ -72,7 +72,7 @@ namespace Impostor.Plugins.Example.Handlers
             
             //_logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
             CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(), e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position.X.ToString(), e.PlayerControl.NetworkTransform.Position.Y.ToString());
-            //EventUtility.SaveEvent(e);
+            //if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
@@ -127,22 +127,22 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerStartMeetingEvent(IPlayerStartMeetingEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogInformation("Player {player} > started meeting, reason: {reason}", e.PlayerControl.PlayerInfo.PlayerName, e.Body == null ? "Emergency call button" : "Found the body of the player " + e.Body.PlayerInfo.PlayerName);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
         public void OnPlayerEnterVentEvent(IPlayerEnterVentEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogInformation("Player {player} entered the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
         public void OnPlayerExitVentEvent(IPlayerExitVentEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogInformation("Player {player} exited the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
@@ -154,21 +154,22 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPlayerVoted(IPlayerVotedEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogDebug("Player {player} voted for {type} {votedFor}", e.PlayerControl.PlayerInfo.PlayerName, e.VoteType, e.VotedFor?.PlayerInfo.PlayerName);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
+        [EventListener]
         public void OnPlayerMurder(IPlayerMurderEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogDebug("Player {player} killed {killedCrewmate}", e.PlayerControl.PlayerInfo.PlayerName, e.Victim.PlayerInfo.PlayerName);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
         public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
         {
-            EventUtility.SaveEvent(e);
             _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
     }
 }

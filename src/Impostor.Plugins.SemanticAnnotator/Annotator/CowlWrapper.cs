@@ -17,6 +17,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 
 namespace Impostor.Plugins.SemanticAnnotator.Utils
@@ -29,7 +30,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         /// </summary>
         /// <returns>The annotation.</returns>
 
-        public (Dictionary<byte, string>, string) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, string> playerStates, string gameState, int num_annot)
+        public (Dictionary<byte, PlayerStruct>, string) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, PlayerStruct> playerStates, string gameState, int num_annot, int numRestarts)
         {
             // You must always initialize the library before use.
             try
@@ -43,9 +44,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 throw;
             }
 
-            if (num_annot == 7) {
-                Console.WriteLine("Hello");
-            }
 
             var instancesToRelease = new List<nint>();
 
@@ -66,46 +64,85 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
             // create a list to hold the players
             List<Player> players = new List<Player>();
-            if (playerStates.Count == 0)
+
+           foreach (var p in game.Players)
             {
-                foreach(var p in game.Players) {
-                // Aggiungi una nuova coppia chiave/valore se il dizionario è vuoto 
-                    playerStates[p.Character.PlayerId] = "none";
+                if (p == null) break;  // Se un giocatore è null, saltiamo l'iterazione
+                if (p.Character == null) break;
+                // Se il giocatore non è già nel dizionario, lo aggiungiamo
+                if (!playerStates.ContainsKey(p.Character.PlayerId))
+                {
+                    PlayerStruct playerStruct = new PlayerStruct
+                    {
+                        State = "none",  // Stato iniziale del giocatore
+                        Movements = new List<System.Numerics.Vector2> { p.Character.NetworkTransform.Position }, // Aggiungi la posizione iniziale
+                        VoteCount = 0 // Contatore dei voti iniziale
+                    };
+
+                    playerStates.Add(p.Character.PlayerId, playerStruct);
                 }
             }
+            // Rimuovere giocatori che non sono più nel gioco
+            var playerIdsInGame = new HashSet<byte>(
+                game.Players
+                    .Where(p => p != null && p.Character != null)  // Verifica che il giocatore e il suo Character non siano null
+                    .Select(p => p.Character.PlayerId)
+            );
+
+            // Trova gli ID dei giocatori che sono nel dizionario ma non più nel gioco
+            var playerIdsToRemove = playerStates.Keys
+                .Where(playerId => !playerIdsInGame.Contains(playerId))
+                .ToList();
+
+            // Rimuovi i giocatori che non sono più nel gioco
+            foreach (var playerId in playerIdsToRemove)
+            {
+                playerStates.Remove(playerId);
+            }
+
+            foreach (var playerId in playerIdsToRemove)
+            {
+                playerStates.Remove(playerId);
+            }
+
             foreach (var p in game.Players)
             {
-                //assign class to players involved in the game
-                CowlClass cls = crewmateClass;
-                switch(p.Character.PlayerInfo.RoleType) {
-                    case RoleTypes.CrewmateGhost:
-                        cls = crewmateDeadClass;
-                        break;
-                    case RoleTypes.ImpostorGhost:
-                        cls = impostorDeadClass;
-                        break;
-                    case RoleTypes.Impostor:
-                        cls = impostorClass;
-                        break;
-                    case RoleTypes.Shapeshifter:
-                        cls = shapeshifterClass;
-                        break;
-                    default:
-                        break;
+                if (p is null) {
+                    break;
+                } else if (p.Character is null) {
+                    break;
+                } else if (p.Character.PlayerInfo is null) {
+                    break;
+                } else if (p.Character.PlayerInfo.PlayerName is null) {
+                    break;
+                }else if (p.Character.PlayerInfo.PlayerName.Replace(" ", "") == "") {
+                    break;
+                } else {
+                    //assign class to players involved in the game
+                    CowlClass cls = crewmateClass;
+                    switch(p.Character.PlayerInfo.RoleType) {
+                        case RoleTypes.CrewmateGhost:
+                            cls = crewmateDeadClass;
+                            break;
+                        case RoleTypes.ImpostorGhost:
+                            cls = impostorDeadClass;
+                            break;
+                        case RoleTypes.Impostor:
+                            cls = impostorClass;
+                            break;
+                        case RoleTypes.Shapeshifter:
+                            cls = shapeshifterClass;
+                            break;
+                        default:
+                            break;
+                    }
+                    // instantiate player: id, name, class, status, list of positions, lists of obj and data properties 
+                    Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, playerStates[p.Character.PlayerId].Movements, p.Character.NetworkTransform.Position, playerStates[p.Character.PlayerId].State, playerStates[p.Character.PlayerId].VoteCount); 
+                    players.Add(player);
                 }
-                // instantiate player: id, name, class, status, list of positions, lists of obj and data properties 
-                Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, p.Character.NetworkTransform.Position, playerStates[p.Character.PlayerId]); 
-                players.Add(player);
             }
 
             // game
-
-            // Mostrare tutti gli eventi nella lista
-            Console.WriteLine("Lista degli Eventi:");
-            foreach (var evento in events)
-            {
-                Console.WriteLine(evento);
-            }
 
             // scan player events
             foreach (var ev in events) 
@@ -113,7 +150,21 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 // identify the player the event refers to by Id
                 Player player = null;
                 if (ev is IPlayerEvent playerEvent) {
-                    player = players.Find(p => p.Id == playerEvent.ClientPlayer.Character.PlayerId);
+                    if (playerEvent is null){
+                        break;
+                    } else if (playerEvent.ClientPlayer is null) {
+                        break;
+                    } else if (playerEvent.ClientPlayer.Character is null) {
+                        break;
+                    } else if (playerEvent.ClientPlayer.Character.PlayerInfo is null) {
+                        break;
+                    } else if (playerEvent.ClientPlayer.Character.PlayerInfo.PlayerName is null) {
+                        break;
+                    } else if (playerEvent.ClientPlayer.Character.PlayerInfo.PlayerName.Replace(" ", "") == "") {
+                        break;
+                    } else {
+                        player = players.Find(p => p.Id == playerEvent.ClientPlayer.Character.PlayerId);
+                    }
                 }
                 switch (ev)
                 {   
@@ -164,7 +215,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                                     if (dist < 3) {
                                         //so there is at least one crewmate who have seen the player doing the task
                                         player.State = "trusted";
-                                        var dataQuantPlayerState =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasStatus", "trusted", "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+                                        var dataQuantPlayerState =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasStatus", new[] { "trusted" }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
                                         player.dataQuantRestrictionsPlayer.Add(dataQuantPlayerState);  
                                     }
                                 }
@@ -175,7 +226,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                     // Vote
                     case IPlayerVotedEvent votedEvent:
-                        if (votedEvent.VotedFor.PlayerInfo.PlayerName != "" && votedEvent.VotedFor != null){
+                        if (votedEvent.VotedFor is null) {
+                            break;
+                        } else if (votedEvent.VotedFor.PlayerInfo.PlayerName.ToString().Replace(" ", "") == "") {
+                            break;
+                        } else {
                             var votedIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{votedEvent.VotedFor.PlayerInfo.PlayerName.Replace(" ", "")}";  
                             var objHasValueVote = CreateObjHasValue("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Voted", votedIri, instancesToRelease);
                             
@@ -183,8 +238,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             //update count of votes got by player in current round
                             Player votedPlayer = players.Find(ot => ot.Id == votedEvent.VotedFor.PlayerId);
                             votedPlayer.IncrementScore();
+                            break;
                         }
-                        break;
 
                     // StartMeeting
                     case IPlayerStartMeetingEvent startMeetingEvent: 
@@ -207,20 +262,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         }
                         break;
 
-                    // Exile
-                    case IPlayerExileEvent exileEvent:
-                        var exiledIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{exileEvent.PlayerControl.PlayerInfo.PlayerName.Replace(" ", "")}";  
-                        var dataQuantExiled =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/gotExiled", "true", "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
-                        
-                        Player exiledPlayer = players.Find(ex => ex.Id == exileEvent.PlayerControl.PlayerId);
-                        if (exiledPlayer.Cls == crewmateClass) {
-                            exiledPlayer.Cls = crewmateDeadClass;
-                        } else {
-                            exiledPlayer.Cls = impostorDeadClass;
-                        }  
-                        exiledPlayer.dataQuantRestrictionsPlayer.Add(dataQuantExiled);
-                        break;
-                    
                     // RepairSystem
                      case IPlayerRepairSystemEvent repairSystemEvent:
                         var repairediri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{repairSystemEvent.SystemType}";
@@ -327,38 +368,51 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         }
                         // set a status for each player (trusted/suspected/none)
                         foreach (var p in players) {
-                            if (p.voteCount == (nAlivePlayers/2)-1) {
+                            if (p.VoteCount == (nAlivePlayers/2)-1 && p.State != "trusted") {
                                 p.State = "suspected";
-                                var dataQuantPlayerState =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasStatus", "suspected", "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+                                var dataQuantPlayerState =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasStatus", new[] { "suspected" }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
                                 p.dataQuantRestrictionsPlayer.Add(dataQuantPlayerState); 
                             }
                             p.resetVoteCount();
+                            p.resetMovements();
                         }
                         // if no tie update state of the exiled player
                         if (meetingEndedEvent.IsTie == false)
                         {
+                            var dataQuantExiled =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/gotExiled", new[] { "true" }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+
+                            if (meetingEndedEvent.Exiled is null) {
+                                break;
+                            } else if (meetingEndedEvent.Exiled.PlayerInfo.PlayerName.Replace(" ", "") == "") {
+                                break;
+                            }
                             Player playerExiled = players.Find(p => p.Id == meetingEndedEvent.Exiled.PlayerId);
                             if (meetingEndedEvent.Exiled.PlayerInfo.IsImpostor == false) {
-                                playerExiled.Cls = crewmateDeadClass;
+                                playerExiled.Cls = crewmateDeadClass;  
                             } else {
                                 playerExiled.Cls = impostorDeadClass;
                             }
+                            playerExiled.dataQuantRestrictionsPlayer.Add(dataQuantExiled);
                         }
                         break;
 
 
                 }
+                Console.WriteLine(ev);
             } 
 
             // when all events have been analyzed, for each player create the individual with all collected properties
             foreach (var player in players)
             {
+                /*
                 //counter of players in FOV
                 int count = 0;
                 
                 foreach (var obj in player.objHasValueRestrictionsPlayer)
                 {   
-                    var temp = cowl_obj_prop_exp.CowlObjPropExpGetProp(cowl_obj_has_value.CowlObjHasValueGetProp(obj).__Instance);
+                    var pippo = cowl_obj_has_value.CowlObjHasValueGetProp(obj);
+                    var temp = cowl_obj_prop_exp.CowlObjPropExpGetProp(pippo.__Instance);
+                    instancesToRelease.Add(pippo.__Instance);
                     if (cowl_obj_prop.CowlObjPropGetIri(temp).ToString() == "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV")
                     {
                         count++;
@@ -366,13 +420,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 }
                 var dataQuantNPlayersFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/hasNPlayersInFOV", count.ToString(), "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
                 player.dataQuantRestrictionsPlayer.Add(dataQuantNPlayersFOV);
-
+                */
 
                 var dim = player.Movements.Count();
                 
                 // if no movement, player is in a fixed position (maybe AFK?)
                 if (player.Movements.Count() == 1) {                     
-                    var dataQuantPos =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/isFixed", "true", "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+                    var dataQuantPos =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/isFixed", new[] { "true" }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
                     player.dataQuantRestrictionsPlayer.Add(dataQuantPos);
                 } else { 
                     // check movement trajectories to see if he's getting near someone. THIS METHOD DOESN'T CONSIDER WALLS
@@ -387,7 +441,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                                     newDistance = calcDistance(player.Movements[i], p.Movements[i]);
                                 } else { 
                                     // the other player is fixed
-                                    newDistance = calcDistance(player.Movements[i], p.Movements[player.Movements.Count()-1]);
+                                    newDistance = calcDistance(player.Movements[i], p.Movements[p.Movements.Count()-1]);
                                 }
                                 //FIND A THRESHOLD
                                 if ((newDistance+5) < initDistance) {
@@ -413,7 +467,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             var lastDist = 0.0;
                             for (var j=0; j < player.Movements.Count(); j++) {
                                 // euclidean distance
-                                var dist = calcDistance(player.Movements[i], coordsTask); 
+                                var dist = calcDistance(player.Movements[j], coordsTask); 
                                 // set a threshold
                                 if (dist < 0.5) {
                                     nextTo = true;
@@ -470,15 +524,25 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 var resultCreatePlayer  = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls }, player.objHasValueRestrictionsPlayer.Distinct().ToArray(), player.objQuantRestrictionsPlayer.Distinct().ToArray(), player.dataQuantRestrictionsPlayer.Distinct().ToArray(), instancesToRelease);
             }
             
-            var dataQuantRestrictionsGame = CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CurrentState", gameState, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
-            var resultCreateGame = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, null, new[] { dataQuantRestrictionsGame }, instancesToRelease, false);
-            //there are MANY ROOMS SO SAME AS PLAYERS
-            //var resultRoom = CreateIndividual(onto,"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorAnnotatedRoom", new[] { genericRoomClass }, objHasValueRestrictionsRoom.ToArray(), objQuantRestrictionsRoom.ToArray(), dataQuantRestrictionsRoom.ToArray());
+            var alive = 0;
+            foreach (var p in players) {
+                if (p.Cls == impostorClass || p.Cls == crewmateClass) {
+                    //he's alive
+                    alive++;
+                }
+            }
 
+            var dataQuantRestrictionState = CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CurrentState", new[] { gameState }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+            var dataQuantRestrictionNPlayers = CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { alive.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+            
+            var resultCreateGame = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers }, instancesToRelease, false);
+            
             //write to file
             string folderPath = $"gameSession{game.Code}";
             if (!Directory.Exists(folderPath)) {
                 Directory.CreateDirectory(folderPath); 
+            } else if (numRestarts != 0) {
+                folderPath = $"gameSession{game.Code}{numRestarts}";
             }
             string absoluteHeaderDirectory = Path.Combine(folderPath, $"amongus{num_annot}.owl");
             var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory);
@@ -503,9 +567,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             cowl_object.CowlRelease(manager.__Instance);
             
             // create a dictionary of player states updates and return that
-            Dictionary<byte, string> pStates = new Dictionary<byte, string>();
+            Dictionary<byte, PlayerStruct> pStates = new Dictionary<byte, PlayerStruct>();
             foreach (var p in players) {
-                pStates.Add(p.Id, p.State);
+                PlayerStruct ps = new PlayerStruct { State = p.State, Movements = p.Movements, VoteCount = p.VoteCount};
+
+                pStates.Add(p.Id, ps);
             }
             return (pStates, gameState);
         }
@@ -613,27 +679,51 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
         //e.g. DataSome/AllValuesFrom(:has2MoreAlivePlayers DatatypeRestriction( xsd:integer xsd:minInclusive "2"^^xsd:integer )))
 
-        public static CowlDataQuant CreateDataValuesRestriction(string propertyIri, string fillerLiteralIri, string dt, string lang, List<nint> instancesToRelease)
+        public static CowlDataQuant CreateDataValuesRestriction(string propertyIri, IEnumerable<string> fillerLiterals, string dt, string lang, List<nint> instancesToRelease)
         {
             var fillerVector = cowl_vector.UvecCowlObjectPtr();
 
-            // Add the filler literal to the vector
-            var fillerLiteral = cowl_literal.CowlLiteralFromString(UString.UstringCopyBuf(dt), UString.UstringCopyBuf(fillerLiteralIri), UString.UstringCopyBuf(lang));
-            instancesToRelease.Add(fillerLiteral.__Instance);
-            cowl_vector.UvecPushCowlObjectPtr(fillerVector, fillerLiteral.__Instance);
-   
-            var operandsRole = cowl_vector.CowlVector(fillerVector);
+            // Add the filler literals to the vector
+            foreach (var fillerLiteralIri in fillerLiterals)
+            {
+                var fillerLiteral = cowl_literal.CowlLiteralFromString(UString.UstringCopyBuf(dt), UString.UstringCopyBuf(fillerLiteralIri), UString.UstringCopyBuf(lang));
+                instancesToRelease.Add(fillerLiteral.__Instance);
+                cowl_vector.UvecPushCowlObjectPtr(fillerVector, fillerLiteral.__Instance);
+            }
             
-            // Create the task role
-            var taskRole = cowl_data_prop.CowlDataPropFromString(UString.UstringCopyBuf(propertyIri));
-            instancesToRelease.Add(taskRole.__Instance);
+            var operandsRole = cowl_vector.CowlVector(fillerVector);
 
-            // Create the object quantifier
-            var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, operandsRole.__Instance);
-            instancesToRelease.Add(data_quant.__Instance);
-            instancesToRelease.Add(operandsRole.__Instance);
+            // Check the number of operands
+            if (cowl_vector.CowlVectorCount(operandsRole) > 1)
+            {
+                // Create the closure
+                var closure = cowl_nary_bool.CowlNaryBool(CowlNAryType.COWL_NT_INTERSECT, operandsRole);
+                instancesToRelease.Add(closure.__Instance);
 
-            return data_quant;
+                // Create the task role
+                var taskRole = cowl_data_prop.CowlDataPropFromString(UString.UstringCopyBuf(propertyIri));
+                instancesToRelease.Add(taskRole.__Instance);
+
+                // Create the object quantifier
+                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, operandsRole.__Instance);
+                instancesToRelease.Add(data_quant.__Instance);
+                instancesToRelease.Add(operandsRole.__Instance);
+
+                return data_quant;
+            }
+            else
+            {
+                // Create the task role
+                var taskRole = cowl_data_prop.CowlDataPropFromString(UString.UstringCopyBuf(propertyIri));
+                instancesToRelease.Add(taskRole.__Instance);
+
+                // Create the object quantifier
+                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, operandsRole.__Instance);
+                instancesToRelease.Add(data_quant.__Instance);
+                instancesToRelease.Add(operandsRole.__Instance);
+
+                return data_quant;
+            }
         }
 
         
@@ -699,19 +789,23 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         public string State { get; set; }
         public CowlClass Cls { get; set; }
         public List<System.Numerics.Vector2> Movements { get; set; }
-        public int voteCount { get; set; }
+        public int VoteCount { get; set; }
         public List<CowlObjHasValue> objHasValueRestrictionsPlayer { get; set; }
         public List<CowlObjQuant> objQuantRestrictionsPlayer { get; set; }
         public List<CowlDataQuant> dataQuantRestrictionsPlayer { get; set; }
 
-        public Player(byte id, string name, CowlClass cls, System.Numerics.Vector2 initialPos, string state)
+        public Player(byte id, string name, CowlClass cls, List<System.Numerics.Vector2> movements, System.Numerics.Vector2 initialPos, string state, int voteCount)
         {
             Id = id; 
             Name = name.Replace(" ", "");
             State = state;
             Cls = cls; //class of the player
-            Movements = new List<System.Numerics.Vector2>{initialPos};
-            voteCount = 0; 
+            if (movements.Count() == 0) {
+                Movements = new List<System.Numerics.Vector2>{initialPos};
+            } else {
+                Movements = movements;
+            }
+            VoteCount = voteCount; 
             // lists to store characteristics inferred from events
             objHasValueRestrictionsPlayer = new List<CowlObjHasValue>();
             objQuantRestrictionsPlayer = new List<CowlObjQuant>();
@@ -719,11 +813,17 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         }
         public void IncrementScore()
         {
-            voteCount += 1; // Increment vote count
+            VoteCount ++; // Increment vote count
         }
         public void resetVoteCount()
         {
-            voteCount = 0; // reset after meeting ended
+            VoteCount = 0; // reset after meeting ended
+        }
+        public void resetMovements()
+        {
+            Movements.Clear(); // reset after meeting ended
+            System.Numerics.Vector2 meetingSpawnCenter = new System.Numerics.Vector2(-0.72f, 0.62f); //meetingSpawnCenter for Skeld Map
+            Movements.Add(meetingSpawnCenter);
         }
     }
 }

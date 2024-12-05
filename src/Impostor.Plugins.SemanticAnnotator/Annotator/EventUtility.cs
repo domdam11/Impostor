@@ -15,17 +15,48 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         private static IGame Game { get;  set; }
         private static List<IEvent> Events;
         private static CowlWrapper annotator = new CowlWrapper();
-        private static Dictionary<byte, string> PlayerStates;
+        private static Dictionary<byte, PlayerStruct> PlayerStates;
         private static string GameState;
-        private static int CallCount = 0;
+        private static int CallCount;
+        private static int NumRestarts;
+        private static Boolean GameStarted;
+        private static Boolean GameEnded;
+        
 
-        public static void CreateGame(IGame game)
+        public static void CreateGame(IGame game, int numRestarts=0)
         {
-            if (Game == null) {
-                Game = game;
-                Events = new List<IEvent>();
-                PlayerStates = new Dictionary<byte, string>();
-                GameState = "none";
+            Game = game;
+            Events = new List<IEvent>();
+            PlayerStates = new Dictionary<byte, PlayerStruct>();
+            GameState = "none";
+            NumRestarts = numRestarts;
+            CallCount = 0;
+            GameStarted = false;
+            GameEnded = false; 
+        }
+
+        public static void StartGame(IGame game)
+        {
+            if (Game is null || game.Code != Game.Code ) {
+                //creato un nuovo gioco
+                CreateGame(game);
+            } else if (game.Code == Game.Code) {
+                //gioco ripartito, incremento n_restarts in modo da non sovrascrivere
+                CreateGame(game, NumRestarts++);
+            }
+            GameStarted = true;
+        }
+
+        public static void EndGame(DateTimeOffset currentTime, Boolean destroyed = false)
+        {
+            if (Game is not null) {
+                GameEnded = true;
+                if (destroyed) {
+                    CallAnnotate(currentTime, true);
+                } else {
+                    CallAnnotate(currentTime);
+                }
+                
             }
         }
 
@@ -37,16 +68,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         // Method to store event
         public static void SaveEvent(IEvent newEvent)
         {
-            if (Game == null) {
+            if (Game is null) {
                 //creo dizionario dove sono tutti none visto che game appena iniziato
                 if (newEvent is IPlayerEvent playerEvent) { 
-                    PlayerStates = playerEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => "none");
+                    PlayerStates = playerEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => new PlayerStruct());
                 }
                 else if(newEvent is IMeetingEvent meetingEvent) { 
-                    PlayerStates = meetingEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => "none");
+                    PlayerStates = meetingEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => new PlayerStruct());
                 }
                 else if(newEvent is IShipEvent shipEvent) { 
-                    PlayerStates = shipEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => "none");
+                    PlayerStates = shipEvent.Game.Players.ToDictionary(player => player.Character.PlayerId, player => new PlayerStruct());
                 }
             }
             // Append the new event
@@ -54,29 +85,57 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         }
 
         // Method to clear the JSON file if the time difference is greater than 5 seconds or game ended and call annotate
-        public static void CallAnnotate(DateTimeOffset currentTime, Boolean gameEnd=false)
+        public static void CallAnnotate(DateTimeOffset currentTime, Boolean destroyed=false)
         {
-            if (gameEnd && Game != null) 
-            {
-                var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount); 
+            if (GameStarted && Game != null) {
+                //ha senso provare a scrivere perchè il gioco è iniziato
+                if (Events.Count() != 0) {
+                    //ho qualcosa da scrivere
+                    if ((currentTime - TimeStamp).TotalSeconds >= 3) {
+                        //scrivo perchè scaduto tempo finestra  
+                        var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
+                        PlayerStates = States.Item1;
+                        GameState = States.Item2; 
+                        Events.Clear();
+                        CallCount++;
+                    } else if (GameEnded) {
+                        //scrivo perchè è finito il gioco
+                        annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
+                        //reset
+                        CallCount=0;
+                        Events.Clear();
+                        if (destroyed) {
+                            Game = null;
+                            GameEnded = false;
+                        }
+                        PlayerStates = null;
+                        GameStarted = false;
+                    }
+                }
+            }
+            if (GameEnded) {
+                //se gioco terminato (distrutto se non iniziato) reset
                 CallCount=0;
-                Game = null;
+                Events.Clear();
+                if (destroyed) {
+                    Game = null;
+                    GameEnded = false;
+                }
                 PlayerStates = null;
-                GameState = null;
-                Events.Clear();
+                GameStarted = false;
             }
-            // Check if the time difference exceeds 3 seconds
-            else if (Events.Count() != 0 &&(currentTime - TimeStamp).TotalSeconds >= 10 && Game != null)
-            {
-                // If more than 5 seconds, empty the list 
-                var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount); 
-                PlayerStates = States.Item1;
-                GameState = States.Item2;
-                CallCount++;
-                TimeStamp = currentTime;
-                Events.Clear();
-            }
+            //in ogni caso
+            TimeStamp = currentTime;
         }
 
     }
+
+    public class PlayerStruct
+    {
+        public List<System.Numerics.Vector2> Movements { get; set; } = new List<System.Numerics.Vector2>(); // Lista dei movimenti
+        public int VoteCount { get; set; } = 0; // Contatore dei voti
+        public string State { get; set; } = "none"; // Stato del giocatore 
+    }
+
 }
+

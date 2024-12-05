@@ -27761,10 +27761,10 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_obj_has_value", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlObjHasValue(__IntPtr prop, __IntPtr individual);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_obj_has_value_get_prop@@YAPEAUCowlObjPropExp@@PEAUCowlObjHasValue@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_obj_has_value_get_prop", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlObjHasValueGetProp(__IntPtr exp);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_obj_has_value_get_ind@@YAPEAUCowlIndividual@@PEAUCowlObjHasValue@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_obj_has_value_get_ind", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlObjHasValueGetInd(__IntPtr exp);
         }
 
