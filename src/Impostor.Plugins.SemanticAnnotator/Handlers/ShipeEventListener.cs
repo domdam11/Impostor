@@ -20,15 +20,13 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnSabotage(IShipSabotageEvent e)
         {
-            EventUtility.SaveEvent(e);
             Console.WriteLine("Game: {0}, Ship > sabotage {1} by {2}", e.ClientPlayer.Game.Code, e.SystemType, e.ClientPlayer.Character.PlayerInfo.PlayerName);
-   
+            EventUtility.SaveEvent(e);
         }
 
         [EventListener]
         public void OnDoorsClosed(IShipDoorsCloseEvent e)
         {
-            EventUtility.SaveEvent(e);
             Console.WriteLine("Ship > doors closed - " + e.SystemType);
             //e.ShipStatus.Sabotage(SystemTypes.Electrical);
         }
@@ -36,7 +34,6 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnPolusDoorOpened(IShipPolusDoorOpenEvent e)
         {
-            EventUtility.SaveEvent(e);
             Console.WriteLine("Ship - door opened - " + e.Door);
        
         }
@@ -44,7 +41,6 @@ namespace Impostor.Plugins.Example.Handlers
         [EventListener]
         public void OnDecontamDoorOpened(IShipDecontamDoorOpenEvent e)
         {
-            EventUtility.SaveEvent(e);
             Console.WriteLine("Ship - decontam door opened - " + e.DecontamDoor);
         }
     }

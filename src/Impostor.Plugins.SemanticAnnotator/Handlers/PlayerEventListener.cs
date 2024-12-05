@@ -72,7 +72,7 @@ namespace Impostor.Plugins.Example.Handlers
             
             //_logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
             CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(), e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position.X.ToString(), e.PlayerControl.NetworkTransform.Position.Y.ToString());
-            //if (e is not null) EventUtility.SaveEvent(e);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
@@ -149,6 +149,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerVentEvent(IPlayerVentEvent e)
         {
             _logger.LogInformation("Player {player} vented to {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name, e.NewVent.Id);
+            if (e is not null) EventUtility.SaveEvent(e);
         }
 
         [EventListener]
@@ -164,6 +165,14 @@ namespace Impostor.Plugins.Example.Handlers
             _logger.LogDebug("Player {player} killed {killedCrewmate}", e.PlayerControl.PlayerInfo.PlayerName, e.Victim.PlayerInfo.PlayerName);
             if (e is not null) EventUtility.SaveEvent(e);
         }
+
+        [EventListener]
+        public void OnPlayerRepairSystem(IPlayerRepairSystemEvent e)
+        {
+            _logger.LogDebug("Player {player} repaired {system}", e.PlayerControl.PlayerInfo.PlayerName, e.SystemType);
+            if (e is not null) EventUtility.SaveEvent(e);
+        }
+
 
         [EventListener]
         public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
