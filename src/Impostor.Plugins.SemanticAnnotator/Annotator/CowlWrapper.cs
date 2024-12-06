@@ -358,25 +358,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
             // when all events have been analyzed, for each player create the individual with all collected properties
             foreach (var player in players)
-            {
-                /*
-                //counter of players in FOV
-                int count = 0;
-                
-                foreach (var obj in player.objHasValueRestrictionsPlayer)
-                {   
-                    var pippo = cowl_obj_has_value.CowlObjHasValueGetProp(obj);
-                    var temp = cowl_obj_prop_exp.CowlObjPropExpGetProp(pippo.__Instance);
-                    instancesToRelease.Add(pippo.__Instance);
-                    if (cowl_obj_prop.CowlObjPropGetIri(temp).ToString() == "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV")
-                    {
-                        count++;
-                    }
-                }
-                var dataQuantNPlayersFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/hasNPlayersInFOV", count.ToString(), "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
-                player.dataQuantRestrictionsPlayer.Add(dataQuantNPlayersFOV);
-                */
-
+            {  
                 var dim = player.Movements.Count();
                 
                 // if no movement, player is in a fixed position (maybe AFK?)
@@ -385,30 +367,51 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                     player.dataQuantRestrictionsPlayer.Add(dataQuantPos);
                 } else { 
                     // check movement trajectories to see if he's getting near someone. THIS METHOD DOESN'T CONSIDER WALLS
-                    foreach (var p in players) {
-                        var near = 0;
-                        if (p != player) {
-                            var initDistance = calcDistance(player.Movements[0], p.Movements[0]);
-                            for (var i=1; i < dim; i++) {
-                                var newDistance=0.0;
-                                if (i < p.Movements.Count()) {
-                                    // the other player is moving too
-                                    newDistance = calcDistance(player.Movements[i], p.Movements[i]);
-                                } else { 
-                                    // the other player is fixed
-                                    newDistance = calcDistance(player.Movements[i], p.Movements[p.Movements.Count()-1]);
-                                }
-                                //FIND A THRESHOLD
-                                if ((newDistance+5.0) < initDistance) {
-                                    //we should have coordinates of walls without doors(lines:start-end point) and if there is intersection between positions of players and a wall then they are not near
-                                    //OR think at rooms and define which room is near to the other
-                                    near++;
-                                }
+                    foreach (var p in players)
+                    {
+                        if (player.Cls == crewmateDeadClass || player.Cls == impostorDeadClass) continue; // Salta il confronto sen player morto
+                        if (p == player) continue; // Salta il confronto con se stesso
+                        if (p.Cls == crewmateDeadClass || p.Cls == impostorDeadClass) continue; // Salta il confronto con player morti
+
+                        int near = 0;
+                        var initDistance = calcDistance(player.Movements[0], p.Movements[0]);
+
+                        // Cicla sulle posizioni dei giocatori
+                        for (int i = 1; i < dim; i++)
+                        {
+                            double newDistance = 0.0;
+                            
+                            // Verifica se il giocatore "p" ha una posizione per questo passo
+                            if (i < p.Movements.Count)
+                            {
+                                // Il giocatore si sta muovendo
+                                newDistance = calcDistance(player.Movements[i], p.Movements[i]);
                             }
-                            if (near >= dim/2) {
-                                var objHasValueGetClose = CreateObjHasValue("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/getCloseTo", $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.Name}", instancesToRelease);                        
-                                player.objHasValueRestrictionsPlayer.Add(objHasValueGetClose);
+                            else
+                            {
+                                // Il giocatore "p" è fermo, quindi calcola la distanza con l'ultima posizione
+                                newDistance = calcDistance(player.Movements[i], p.Movements[p.Movements.Count - 1]);
                             }
+
+                            // Se la distanza è inferiore alla distanza iniziale incrementa il contatore "near"
+                            if (newDistance < initDistance )
+                            {
+                                // Aggiungi ulteriori verifiche sulle pareti o sulle stanze (commento non implementato)
+                                near++;
+                            }
+                        }
+
+                        // Se il numero di passi in cui i giocatori sono vicini è maggiore o uguale alla metà di "dim"
+                        if (near >= dim / 2)
+                        {
+                            // Crea l'oggetto solo se necessario
+                            var objHasValueGetClose = CreateObjHasValue(
+                                "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/getCloseTo",
+                                $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.Name}",
+                                instancesToRelease
+                            );
+
+                            player.objHasValueRestrictionsPlayer.Add(objHasValueGetClose);
                         }
                     }
                 }
@@ -453,7 +456,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             player.objQuantRestrictionsPlayer.Add(objQuantNextToTask);
 
                             var oldDist = calcDistance(player.Movements[0], coordsTask);
-                            if (dist == oldDist) {
+                            if (player.Movements[0] == player.Movements[dim-1]) {
                                 if (player.Cls == impostorClass) {
                                     var objQuantFake = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task },  instancesToRelease);
 
@@ -469,6 +472,23 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         } 
                     } if (nextTo == true) break;
                 }
+                 /*
+                //counter of players in FOV
+                int count = 0;
+                
+                foreach (var obj in player.objHasValueRestrictionsPlayer)
+                {   
+                    var pippo = cowl_obj_has_value.CowlObjHasValueGetProp(obj);
+                    var temp = cowl_obj_prop_exp.CowlObjPropExpGetProp(pippo.__Instance);
+                    instancesToRelease.Add(pippo.__Instance);
+                    if (cowl_obj_prop.CowlObjPropGetIri(temp).ToString() == "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV")
+                    {
+                        count++;
+                    }
+                }
+                var dataQuantNPlayersFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/hasNPlayersInFOV", count.ToString(), "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantNPlayersFOV);
+                */
 
                 var resultCreatePlayer  = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls }, player.objHasValueRestrictionsPlayer.Distinct().ToArray(), player.objQuantRestrictionsPlayer.Distinct().ToArray(), player.dataQuantRestrictionsPlayer.Distinct().ToArray(), instancesToRelease);
             

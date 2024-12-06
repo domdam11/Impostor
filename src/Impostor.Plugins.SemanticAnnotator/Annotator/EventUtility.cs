@@ -85,7 +85,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 //ha senso provare a scrivere perchè il gioco è iniziato
                 if (Events.Count() != 0) {
                     //ho qualcosa da annotare
-                    if ((currentTime - TimeStamp).TotalSeconds >= 3) {
+                    if ((currentTime - TimeStamp).TotalSeconds >= 4) {
                         //scrivo perchè scaduto tempo finestra  
                         var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
                         PlayerStates = States.Item1;
