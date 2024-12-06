@@ -454,9 +454,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                             var oldDist = calcDistance(player.Movements[0], coordsTask);
                             if (dist == oldDist) {
-                                var objQuantDoes = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task },  instancesToRelease);
+                                if (player.Cls == impostorClass) {
+                                    var objQuantFake = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task },  instancesToRelease);
 
-                                player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                    player.objQuantRestrictionsPlayer.Add(objQuantFake);
+                                } else {
+                                    var objQuantDoes = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task },  instancesToRelease);
+
+                                    player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                }
                             }
                             nextTo = true;
                             break;
