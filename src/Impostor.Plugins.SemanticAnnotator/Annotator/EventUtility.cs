@@ -25,7 +25,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         private static Boolean GameStarted;
         private static Boolean GameEnded;
         
-
+        // define the game
         public static void CreateGame(IGame game, int numRestarts=0)
         {
             Game = game;
@@ -38,6 +38,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             GameEnded = false; 
         }
 
+        // start game
         public static void StartGame(IGame game)
         {
             if (Game is null || game.Code.Code != Game.Code.Code ) {
@@ -51,6 +52,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             GameStarted = true;
         }
 
+        // end game
         public static void EndGame(DateTimeOffset currentTime, Boolean destroyed = false)
         {
             GameEnded = true;
@@ -61,6 +63,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
         }
 
+        // set time
         public static void SetTime(DateTimeOffset timeStamp)
         {
             TimeStamp = timeStamp;
@@ -71,7 +74,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             // Append the new event
             if (newEvent is IPlayerMovementEvent movEvent) {
-                //creo un nuovo evento
+                //handle movement event
                 var movementStruct = new CustomPlayerMovementEvent(movEvent.Game, movEvent.ClientPlayer, movEvent.PlayerControl);
                 Events.Add(movementStruct);
             } else {
@@ -82,11 +85,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public static void CallAnnotate(DateTimeOffset currentTime, Boolean destroyed=false)
         {
             if (GameStarted && Game != null) {
-                //ha senso provare a scrivere perchè il gioco è iniziato
+                //game started so annotaing makes sense
                 if (Events.Count() != 0) {
-                    //ho qualcosa da annotare
-                    if ((currentTime - TimeStamp).TotalSeconds >= 4) {
-                        //scrivo perchè scaduto tempo finestra  
+                    //something to annotate
+                    if ((currentTime - TimeStamp).TotalSeconds >= 3) {
+                        //4s passed after last annotation  
                         var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
                         PlayerStates = States.Item1;
                         GameState = States.Item2; 
@@ -94,7 +97,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         CallCount++;
                         TimeStamp = currentTime;
                     } else if (GameEnded) {
-                        //scrivo perchè è finito il gioco
+                        //annotate cause game is ended
                         annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
                         //reset
                         CallCount=0;
@@ -110,7 +113,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 }
             }
             if (GameEnded) {
-                //se gioco terminato (o distrutto) senza iniziare o con Game=null allora reset senza annotare
+                // if game ended (or destroyed) without starting or with invalid game (null), reset and don't annotate
                 CallCount=0;
                 Events.Clear();
                 if (destroyed) {
@@ -129,8 +132,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     public class PlayerStruct
     {
         public List<System.Numerics.Vector2> Movements { get; set; } = new List<System.Numerics.Vector2>(); // Lista dei movimenti
-        public int VoteCount { get; set; } = 0; // Contatore dei voti
-        public string State { get; set; } = "none"; // Stato del giocatore 
+        public int VoteCount { get; set; } = 0; // Vote counter
+        public string State { get; set; } = "none"; // player status 
     }
 
     public class CustomPlayerMovementEvent : IPlayerEvent

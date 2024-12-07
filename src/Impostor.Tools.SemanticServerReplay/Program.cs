@@ -209,6 +209,7 @@ namespace Impostor.Tools.SemanticServerReplay
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
+                        // call method to annotate
                         EventUtility.CallAnnotate(_fakeDateTimeProvider.UtcNow);
 
                     }

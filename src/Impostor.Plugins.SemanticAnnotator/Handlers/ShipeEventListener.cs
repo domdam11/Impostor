@@ -21,6 +21,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnSabotage(IShipSabotageEvent e)
         {
             Console.WriteLine("Game: {0}, Ship > sabotage {1} by {2}", e.ClientPlayer.Game.Code, e.SystemType, e.ClientPlayer.Character.PlayerInfo.PlayerName);
+            // add event in order to annotate
             EventUtility.SaveEvent(e);
         }
 

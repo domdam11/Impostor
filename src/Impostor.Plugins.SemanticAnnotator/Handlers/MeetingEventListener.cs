@@ -18,6 +18,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnMeetingStarted(IMeetingStartedEvent e)
         {
             _logger.LogInformation("Meeting > started");
+            // add event in order to annotate
             EventUtility.SaveEvent(e);
         }
 
@@ -25,6 +26,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnMeetingEnded(IMeetingEndedEvent e)
         {
             _logger.LogInformation("Meeting > ended, exiled: {exiled}, tie: {tie}", e.Exiled?.PlayerInfo.PlayerName, e.IsTie);
+            // add event in order to annotate
             EventUtility.SaveEvent(e);
 
             foreach (var playerState in e.MeetingHud.PlayerStates)

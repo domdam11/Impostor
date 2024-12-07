@@ -59,43 +59,42 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             var crewmateDeadClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CrewMateDead", instancesToRelease);
             var impostorClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorAlive", instancesToRelease);
             var impostorDeadClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorDead", instancesToRelease);
-            var shapeshifterClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Shapeshifter", instancesToRelease);
             var gameClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Game", instancesToRelease);
-            var genericRoomClass = CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Room", instancesToRelease);
 
             // create a list to hold the players
             List<Player> players = new List<Player>();
 
-           foreach (var p in game.Players)
+            // players in current game
+            foreach (var p in game.Players)
             {
-                if (p == null) break;  // Se un giocatore è null, saltiamo l'iterazione
+                if (p == null) break;  
                 if (p.Character == null) break;
-                // Se il giocatore non è già nel dizionario, lo aggiungiamo
+                // add player if not in dict
                 if (!playerStates.ContainsKey(p.Character.PlayerId))
                 {
                     PlayerStruct playerStruct = new PlayerStruct
                     {
-                        State = "none",  // Stato iniziale del giocatore
-                        Movements = new List<System.Numerics.Vector2> { p.Character.NetworkTransform.Position }, // Aggiungi la posizione iniziale
-                        VoteCount = 0 // Contatore dei voti iniziale
+                        State = "none",  // initial status
+                        Movements = new List<System.Numerics.Vector2> { p.Character.NetworkTransform.Position }, // actual position
+                        VoteCount = 0 // vote counter
                     };
 
                     playerStates.Add(p.Character.PlayerId, playerStruct);
                 }
             }
-            // Rimuovere giocatori che non sono più nel gioco
+            // remove players no more in game
             var playerIdsInGame = new HashSet<byte>(
                 game.Players
-                    .Where(p => p != null && p.Character != null)  // Verifica che il giocatore e il suo Character non siano null
+                    .Where(p => p != null && p.Character != null)  
                     .Select(p => p.Character.PlayerId)
             );
 
-            // Trova gli ID dei giocatori che sono nel dizionario ma non più nel gioco
+            // ids of player in dict but not in game
             var playerIdsToRemove = playerStates.Keys
                 .Where(playerId => !playerIdsInGame.Contains(playerId))
                 .ToList();
 
-            // Rimuovi i giocatori che non sono più nel gioco
+            // remove players no more in game
             foreach (var playerId in playerIdsToRemove)
             {
                 playerStates.Remove(playerId);
@@ -125,9 +124,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             break;
                         case RoleTypes.Impostor:
                             cls = impostorClass;
-                            break;
-                        case RoleTypes.Shapeshifter:
-                            cls = shapeshifterClass;
                             break;
                         default:
                             break;
@@ -195,9 +191,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             break;
                         } else if (murderEvent.Victim.PlayerInfo.PlayerName.ToString().Replace(" ", "") == "") {
                             break;
+                        } else if (player.Cls == impostorDeadClass) {
+                            break;
                         } else {
                             var victimIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{murderEvent.Victim.PlayerInfo.PlayerName.Replace(" ", "")}";  
-                            var objHasValueKill = CreateObjHasValue("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Kills", victimIri, instancesToRelease);
+                            var objHasValueKill = CreateObjHasValue("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Killed", victimIri, instancesToRelease);
                             
                             player.objHasValueRestrictionsPlayer.Add(objHasValueKill);
                             // update state of the victim
@@ -297,7 +295,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         player = players.Find(p => p.Id == shipSabotageEvent.ClientPlayer.Character.PlayerId);
                         var sabotageIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{shipSabotageEvent.SystemType}";
                         var objQuantSabotage = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Sabotages", new[] { sabotageIri }, instancesToRelease);
-                        //PER SAPERE STANZA BISOGNA INDAGARE SYSTEMTYPE?
                         player.objQuantRestrictionsPlayer.Add(objQuantSabotage);
                         gameState = "sabotage";
                         break;
@@ -369,47 +366,37 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                     // check movement trajectories to see if he's getting near someone. THIS METHOD DOESN'T CONSIDER WALLS
                     foreach (var p in players)
                     {
-                        if (player.Cls == crewmateDeadClass || player.Cls == impostorDeadClass) continue; // Salta il confronto sen player morto
-                        if (p == player) continue; // Salta il confronto con se stesso
-                        if (p.Cls == crewmateDeadClass || p.Cls == impostorDeadClass) continue; // Salta il confronto con player morti
+                        if (player.Cls == crewmateDeadClass || player.Cls == impostorDeadClass) continue; 
+                        if (p == player) continue; 
+                        if (p.Cls == crewmateDeadClass || p.Cls == impostorDeadClass) continue; 
 
                         int near = 0;
                         var initDistance = calcDistance(player.Movements[0], p.Movements[0]);
 
-                        // Cicla sulle posizioni dei giocatori
                         for (int i = 1; i < dim; i++)
                         {
                             double newDistance = 0.0;
                             
-                            // Verifica se il giocatore "p" ha una posizione per questo passo
                             if (i < p.Movements.Count)
                             {
-                                // Il giocatore si sta muovendo
+                                // player p is moving
                                 newDistance = calcDistance(player.Movements[i], p.Movements[i]);
                             }
                             else
                             {
-                                // Il giocatore "p" è fermo, quindi calcola la distanza con l'ultima posizione
+                                // player p is fixed
                                 newDistance = calcDistance(player.Movements[i], p.Movements[p.Movements.Count - 1]);
                             }
 
-                            // Se la distanza è inferiore alla distanza iniziale incrementa il contatore "near"
                             if (newDistance < initDistance )
                             {
-                                // Aggiungi ulteriori verifiche sulle pareti o sulle stanze (commento non implementato)
                                 near++;
                             }
                         }
 
-                        // Se il numero di passi in cui i giocatori sono vicini è maggiore o uguale alla metà di "dim"
                         if (near >= dim / 2)
                         {
-                            // Crea l'oggetto solo se necessario
-                            var objHasValueGetClose = CreateObjHasValue(
-                                "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/getCloseTo",
-                                $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.Name}",
-                                instancesToRelease
-                            );
+                            var objHasValueGetClose = CreateObjHasValue("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/getCloseTo",$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.Name}",instancesToRelease);
 
                             player.objHasValueRestrictionsPlayer.Add(objHasValueGetClose);
                         }
@@ -455,8 +442,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                             player.objQuantRestrictionsPlayer.Add(objQuantNextToTask);
 
-                            var oldDist = calcDistance(player.Movements[0], coordsTask);
-                            if (player.Movements[0] == player.Movements[dim-1]) {
+                            if (player.Movements.Count() == 1) {
                                 if (player.Cls == impostorClass) {
                                     var objQuantFake = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task },  instancesToRelease);
 
