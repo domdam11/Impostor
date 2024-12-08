@@ -464,12 +464,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 
                 foreach (var obj in player.objHasValueRestrictionsPlayer)
                 {   
-                    var pippo = cowl_obj_has_value.CowlObjHasValueGetProp(obj);
-                    var temp = cowl_obj_prop_exp.CowlObjPropExpGetProp(pippo.__Instance);
-                    instancesToRelease.Add(pippo.__Instance);
-                    if (cowl_obj_prop.CowlObjPropGetIri(temp).ToString() == "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV")
+                    var hasvalprop = cowl_obj_has_value.CowlObjHasValueGetProp(obj);
+                    var propexp = cowl_obj_prop_exp.CowlObjPropExpGetProp(hasvalprop.__Instance);
+                    instancesToRelease.Add(hasvalprop.__Instance);
+                    if (cowl_obj_prop.CowlObjPropGetIri(propexp).ToString() == "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV")
                     {
                         count++;
+                        instancesToRelease.Add(propexp.__Instance);
                     }
                 }
                 var dataQuantNPlayersFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/hasNPlayersInFOV", count.ToString(), "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
