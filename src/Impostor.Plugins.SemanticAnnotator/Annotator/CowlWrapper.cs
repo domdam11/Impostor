@@ -585,7 +585,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             return objRestr;
         }
         
-        //e.g. ObjectSome/AllValuesFrom(:Does ObjectIntersection/UnionOf(:Electrical_Sabotage)))
+        //e.g. ObjectAllValuesFrom(:Does ObjectIntersectionOf(:Electrical_Sabotage)))
         public static CowlObjQuant CreateObjValuesRestriction(string propertyIri, IEnumerable<string> fillerClassesIri, List<nint> instancesToRelease)
         {
             var fillerVector = cowl_vector.UvecCowlObjectPtr();
@@ -635,7 +635,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         }
 
 
-        //e.g. DataSome/AllValuesFrom(:has2MoreAlivePlayers DatatypeRestriction( xsd:integer xsd:minInclusive "2"^^xsd:integer )))
+        //e.g. DataAllValuesFrom(:has2MoreAlivePlayers DatatypeRestriction( xsd:integer xsd:minInclusive "2"^^xsd:integer )))
 
         public static CowlDataQuant CreateDataValuesRestriction(string propertyIri, IEnumerable<string> fillerLiterals, string dt, string lang, List<nint> instancesToRelease)
         {
@@ -662,10 +662,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 var taskRole = cowl_data_prop.CowlDataPropFromString(UString.UstringCopyBuf(propertyIri));
                 instancesToRelease.Add(taskRole.__Instance);
 
-                // Create the object quantifier
-                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, operandsRole.__Instance);
-                instancesToRelease.Add(data_quant.__Instance);
+                //e.g. DataOneOf("something1", "something2")
+                var range = cowl_data_one_of.CowlDataOneOf(operandsRole);
                 instancesToRelease.Add(operandsRole.__Instance);
+
+                // Create the object quantifier
+                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, range.__Instance);
+                instancesToRelease.Add(data_quant.__Instance);
+                instancesToRelease.Add(range.__Instance);
 
                 return data_quant;
             }
@@ -675,10 +679,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 var taskRole = cowl_data_prop.CowlDataPropFromString(UString.UstringCopyBuf(propertyIri));
                 instancesToRelease.Add(taskRole.__Instance);
 
-                // Create the object quantifier
-                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, operandsRole.__Instance);
-                instancesToRelease.Add(data_quant.__Instance);
+                //e.g. DataOneOf("something1", "something2")
+                var range = cowl_data_one_of.CowlDataOneOf(operandsRole);
                 instancesToRelease.Add(operandsRole.__Instance);
+
+                // Create the object quantifier
+                var data_quant = cowl_data_quant.CowlDataQuant(CowlQuantType.COWL_QT_ALL, taskRole.__Instance, range.__Instance);
+                instancesToRelease.Add(data_quant.__Instance);
+                instancesToRelease.Add(range.__Instance);
 
                 return data_quant;
             }
