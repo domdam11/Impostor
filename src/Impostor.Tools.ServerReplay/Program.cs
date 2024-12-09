@@ -217,6 +217,8 @@ namespace Impostor.Tools.ServerReplay
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
+                        EventUtility.CallAnnotate(_fakeDateTimeProvider.UtcNow);
+
                     }
 
                     break;
@@ -228,6 +230,8 @@ namespace Impostor.Tools.ServerReplay
                     await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
+                    EventUtility.SetTime(_fakeDateTimeProvider.UtcNow);
+
                     break;
 
                 default:

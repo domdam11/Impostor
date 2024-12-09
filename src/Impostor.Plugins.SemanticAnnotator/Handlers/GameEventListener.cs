@@ -34,6 +34,10 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnGameCreated(IGameCreatedEvent e)
         {
             _logger.LogInformation("Game {code} > created", e.Game.Code);
+<<<<<<< HEAD
+=======
+            if (e is not null) EventUtility.CreateGame(e.Game);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
@@ -47,6 +51,11 @@ namespace Impostor.Plugins.Example.Handlers
         {
             CsvUtility.CsvGeneratorStartGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > started", e.Game.Code);
+<<<<<<< HEAD
+=======
+            // start game -> start annotate
+            if (e is not null) EventUtility.StartGame(e.Game);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
 
             foreach (var player in e.Game.Players)
             {
@@ -61,12 +70,22 @@ namespace Impostor.Plugins.Example.Handlers
         {
             CsvUtility.CsvGeneratorEndGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > ended because {reason}", e.Game.Code, e.GameOverReason);
+<<<<<<< HEAD
+=======
+            // eng game -> stop annotate
+            if (e is not null) EventUtility.EndGame(DateTimeOffset.UtcNow);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
         public void OnGameDestroyed(IGameDestroyedEvent e)
         {
             _logger.LogInformation("Game {code} > destroyed", e.Game.Code);
+<<<<<<< HEAD
+=======
+            //end game -> stop game
+            if (e is not null) EventUtility.EndGame(DateTimeOffset.UtcNow, true);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]

@@ -72,6 +72,11 @@ namespace Impostor.Plugins.Example.Handlers
             
             //_logger.LogInformation("Player {player} > movement to {position}", e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position);
             CsvUtility.CsvGenerator(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString(), e.PlayerControl.PlayerInfo.PlayerName, e.PlayerControl.NetworkTransform.Position.X.ToString(), e.PlayerControl.NetworkTransform.Position.Y.ToString());
+<<<<<<< HEAD
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
@@ -127,36 +132,86 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerStartMeetingEvent(IPlayerStartMeetingEvent e)
         {
             _logger.LogInformation("Player {player} > started meeting, reason: {reason}", e.PlayerControl.PlayerInfo.PlayerName, e.Body == null ? "Emergency call button" : "Found the body of the player " + e.Body.PlayerInfo.PlayerName);
+<<<<<<< HEAD
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
         public void OnPlayerEnterVentEvent(IPlayerEnterVentEvent e)
         {
             _logger.LogInformation("Player {player} entered the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
+<<<<<<< HEAD
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
         public void OnPlayerExitVentEvent(IPlayerExitVentEvent e)
         {
             _logger.LogInformation("Player {player} exited the vent in {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.Vent.Name, e.Vent.Id);
+<<<<<<< HEAD
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
         public void OnPlayerVentEvent(IPlayerVentEvent e)
         {
             _logger.LogInformation("Player {player} vented to {vent} ({ventId})", e.PlayerControl.PlayerInfo.PlayerName, e.NewVent.Name, e.NewVent.Id);
+<<<<<<< HEAD
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
         public void OnPlayerVoted(IPlayerVotedEvent e)
         {
             _logger.LogDebug("Player {player} voted for {type} {votedFor}", e.PlayerControl.PlayerInfo.PlayerName, e.VoteType, e.VotedFor?.PlayerInfo.PlayerName);
+<<<<<<< HEAD
         }
 
         [EventListener]
         public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
         {
             _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+=======
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+        }
+
+        [EventListener]
+        public void OnPlayerMurder(IPlayerMurderEvent e)
+        {
+            _logger.LogDebug("Player {player} killed {killedCrewmate}", e.PlayerControl.PlayerInfo.PlayerName, e.Victim.PlayerInfo.PlayerName);
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+        }
+
+        [EventListener]
+        public void OnPlayerRepairSystem(IPlayerRepairSystemEvent e)
+        {
+            _logger.LogDebug("Player {player} repaired {system}", e.PlayerControl.PlayerInfo.PlayerName, e.SystemType);
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+        }
+
+
+        [EventListener]
+        public void OnPlayerCompletedTaskEvent(IPlayerCompletedTaskEvent e)
+        {
+            _logger.LogInformation("Player {player} completed {task}, {type}, {category}, visual {visual}", e.PlayerControl.PlayerInfo.PlayerName, e.Task.Task.Name, e.Task.Task.Type, e.Task.Task.Category, e.Task.Task.IsVisual);
+            // add event in order to annotate
+            if (e is not null) EventUtility.SaveEvent(e);
+>>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
     }
 }
