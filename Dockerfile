@@ -42,6 +42,7 @@ COPY --from=build /app ./
 
 # Override ASPNETCORE_URLS to stop warning.
 ENV ASPNETCORE_URLS=
+# Imposta LD_LIBRARY_PATH
 
 EXPOSE 22023/tcp 22023/udp
 ENTRYPOINT ["./Impostor.Server"]
