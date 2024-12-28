@@ -209,12 +209,7 @@ namespace Impostor.Tools.SemanticServerReplay
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
-<<<<<<< HEAD
-=======
                         // call method to annotate
-                        EventUtility.CallAnnotate(_fakeDateTimeProvider.UtcNow);
-
->>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
                     }
 
                     break;
@@ -226,11 +221,7 @@ namespace Impostor.Tools.SemanticServerReplay
                     await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
-<<<<<<< HEAD
-=======
-                    EventUtility.SetTime(_fakeDateTimeProvider.UtcNow);
 
->>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
                     break;
 
                 default:

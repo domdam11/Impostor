@@ -14,7 +14,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
     public static class EventUtility
     {
-        private static DateTimeOffset TimeStamp { get;  set; }
+        private static DateTimeOffset LastAnnotTimestamp { get;  set; }
+        private static DateTimeOffset CurrentTimestamp { get;  set; }
         private static IGame Game { get;  set; }
         private static List<IEvent> Events;
         private static CowlWrapper annotator = new CowlWrapper();
@@ -42,10 +43,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public static void StartGame(IGame game)
         {
             if (Game is null || game.Code.Code != Game.Code.Code ) {
-                //creato un nuovo gioco
+                //create a new game
                 CreateGame(game);
             } else if (game.Code.Code == Game.Code.Code) {
-                //gioco ripartito, incremento n_restarts in modo da non sovrascrivere
+                //game restarted
                 var rest = NumRestarts + 1;
                 CreateGame(game, rest);
             }
@@ -53,20 +54,24 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         }
 
         // end game
-        public static void EndGame(DateTimeOffset currentTime, Boolean destroyed = false)
+        public static void EndGame(Boolean destroyed = false)
         {
             GameEnded = true;
             if (destroyed) {
-                CallAnnotate(currentTime, true);
+                CallAnnotate(true);
             } else {
-               CallAnnotate(currentTime);   
+               CallAnnotate();   
             }
         }
 
         // set time
-        public static void SetTime(DateTimeOffset timeStamp)
+        public static void SetAnnotTime(DateTimeOffset timestamp)
         {
-            TimeStamp = timeStamp;
+            LastAnnotTimestamp = timestamp;
+        }
+        public static void SetCurrentTime(DateTimeOffset timestamp)
+        {
+            CurrentTimestamp = timestamp;
         }
 
         // Method to store event
@@ -75,30 +80,30 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             // Append the new event
             if (newEvent is IPlayerMovementEvent movEvent) {
                 //handle movement event
-                var movementStruct = new CustomPlayerMovementEvent(movEvent.Game, movEvent.ClientPlayer, movEvent.PlayerControl);
+                var movementStruct = new CustomPlayerMovementEvent(movEvent.Game, movEvent.ClientPlayer, movEvent.PlayerControl, CurrentTimestamp);
                 Events.Add(movementStruct);
             } else {
                 Events.Add(newEvent);
             }
         }
 
-        public static void CallAnnotate(DateTimeOffset currentTime, Boolean destroyed=false)
+        public static void CallAnnotate(Boolean destroyed=false)
         {
             if (GameStarted && Game != null) {
-                //game started so annotaing makes sense
+                //game started so annotating makes sense
                 if (Events.Count() != 0) {
                     //something to annotate
-                    if ((currentTime - TimeStamp).TotalSeconds >= 3) {
-                        //4s passed after last annotation  
-                        var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
+                    if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= 2.0) {
+                        //3s passed after last annotation  
+                        var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp); 
                         PlayerStates = States.Item1;
                         GameState = States.Item2; 
                         Events.Clear();
                         CallCount++;
-                        TimeStamp = currentTime;
+                        LastAnnotTimestamp = CurrentTimestamp;
                     } else if (GameEnded) {
                         //annotate cause game is ended
-                        annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts); 
+                        annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp); 
                         //reset
                         CallCount=0;
                         Events.Clear();
@@ -108,7 +113,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         }
                         PlayerStates = null;
                         GameStarted = false;
-                        TimeStamp = currentTime;
+                        LastAnnotTimestamp = CurrentTimestamp;
                     }
                 }
             }
@@ -123,7 +128,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 }
                 PlayerStates = null;
                 GameStarted = false;
-                TimeStamp = currentTime;
+                LastAnnotTimestamp = CurrentTimestamp;
             }
         }
 
@@ -131,25 +136,28 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
     public class PlayerStruct
     {
-        public List<System.Numerics.Vector2> Movements { get; set; } = new List<System.Numerics.Vector2>(); // Lista dei movimenti
+        public List<CustomMovement> Movements { get; set; } = new List<CustomMovement>(); // Lista dei movimenti
         public int VoteCount { get; set; } = 0; // Vote counter
         public string State { get; set; } = "none"; // player status 
     }
 
     public class CustomPlayerMovementEvent : IPlayerEvent
     {
-        public IGame? Game { get; private set; }
-        public IClientPlayer? ClientPlayer { get; private set; }
-        public IInnerPlayerControl? PlayerControl { get; private set; }
+        public IGame? Game { get; }
+        public IClientPlayer? ClientPlayer { get; }
+        public IInnerPlayerControl? PlayerControl { get; }
+        public  System.Numerics.Vector2 Position { get; }
+        public DateTimeOffset Timestamp { get;  set; }
 
         // Costruttore
-        public CustomPlayerMovementEvent(IGame? game, IClientPlayer? clientPlayer, IInnerPlayerControl? playerControl)
+        public CustomPlayerMovementEvent(IGame? game, IClientPlayer? clientPlayer, IInnerPlayerControl? playerControl, DateTimeOffset timestamp)
         {
             Game = game;
             ClientPlayer = clientPlayer;
             PlayerControl = playerControl;
+            Position = playerControl.NetworkTransform.Position;
+            Timestamp = timestamp;
         }
     }
 
 }
-

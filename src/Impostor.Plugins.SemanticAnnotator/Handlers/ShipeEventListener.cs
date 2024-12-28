@@ -5,10 +5,7 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Events.Ship;
 using Impostor.Api.Innersloth;
-<<<<<<< HEAD
-=======
 using Impostor.Plugins.SemanticAnnotator.Annotator;
->>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
 
 namespace Impostor.Plugins.Example.Handlers
 {
@@ -24,12 +21,8 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnSabotage(IShipSabotageEvent e)
         {
             Console.WriteLine("Game: {0}, Ship > sabotage {1} by {2}", e.ClientPlayer.Game.Code, e.SystemType, e.ClientPlayer.Character.PlayerInfo.PlayerName);
-<<<<<<< HEAD
-   
-=======
             // add event in order to annotate
             EventUtility.SaveEvent(e);
->>>>>>> 78f1e2eb8a16ecbc059c7d2e709b50a9de97723d
         }
 
         [EventListener]
