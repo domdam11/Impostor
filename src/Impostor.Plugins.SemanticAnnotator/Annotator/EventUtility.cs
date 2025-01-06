@@ -21,6 +21,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         private static CowlWrapper annotator = new CowlWrapper();
         private static Dictionary<byte, PlayerStruct> PlayerStates;
         private static string GameState;
+    
         private static int CallCount;
         private static int NumRestarts;
         private static Boolean GameStarted;
@@ -94,7 +95,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 if (Events.Count() != 0) {
                     //something to annotate
                     if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= 2.0) {
-                        //3s passed after last annotation  
+                        //2s passed after last annotation  
                         var States = annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp); 
                         PlayerStates = States.Item1;
                         GameState = States.Item2; 
