@@ -24,6 +24,7 @@ using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Impostor.Api.Innersloth.GameOptions;
+using System.Threading.Tasks;
 
 
 namespace Impostor.Plugins.SemanticAnnotator.Utils
@@ -73,44 +74,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
             // create a list to hold the players
             List<Player> players = new List<Player>();
-
-            // players in current game
-            foreach (var p in game.Players)
-            {
-                if (p == null) break;  
-                if (p.Character == null) break;
-                // add player if not in dict
-                if (!playerStates.ContainsKey(p.Character.PlayerId))
-                {
-                    var mov = new CustomMovement(p.Character.NetworkTransform.Position, timestamp);
-                    PlayerStruct playerStruct = new PlayerStruct
-                    {
-                        State = "none",  // initial status
-                        Movements = new List<CustomMovement> { mov }, // actual position
-                        VoteCount = 0 // vote counter
-                    };
-
-                    playerStates.Add(p.Character.PlayerId, playerStruct);
-                }
-            }
             
-            var playerIdsInGame = new HashSet<byte>(
-                game.Players
-                    .Where(p => p != null && p.Character != null)  
-                    .Select(p => p.Character.PlayerId)
-            );
-
-            // ids of player in dict but not in game
-            var playerIdsToRemove = playerStates.Keys
-                .Where(playerId => !playerIdsInGame.Contains(playerId))
-                .ToList();
-
-            // remove players no more in game
-            foreach (var playerId in playerIdsToRemove)
-            {
-                playerStates.Remove(playerId);
-            }
-
             foreach (var p in game.Players)
             {
                 if (p is null) {
@@ -125,7 +89,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                     break;
                 } else {
                     //assign class to players involved in the game
-                    CowlClass cls = crewmateClass;
+                    var cls = crewmateClass;
                     switch(p.Character.PlayerInfo.RoleType) {
                         case RoleTypes.CrewmateGhost:
                             cls = crewmateDeadClass;
@@ -141,7 +105,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                     }
                     // instantiate player: id, name, class, status, list of positions, lists of obj and data properties 
                     var spawnMov = new CustomMovement(p.Character.NetworkTransform.Position, timestamp);
-                    Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, playerStates[p.Character.PlayerId].Movements, spawnMov, playerStates[p.Character.PlayerId].State, playerStates[p.Character.PlayerId].VoteCount); 
+                    Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, playerStates[p.Character.PlayerId].SessionCls, playerStates[p.Character.PlayerId].Movements, spawnMov, playerStates[p.Character.PlayerId].State, playerStates[p.Character.PlayerId].VoteCount); 
                     players.Add(player);
                 }
             }
@@ -208,12 +172,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         } else if (player.Cls == impostorDeadClass) {
                             break;
                         } else {
-                            var victimIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{murderEvent.Victim.PlayerInfo.PlayerName.Replace(" ", "")}";  
-                            var objHasValueKill = CreateObjHasValueRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Kills", victimIri, instancesToRelease);
-                            
-                            player.objHasValueRestrictionsPlayer.Add(objHasValueKill);
+                            var playerKilled = players.Find(p => p.Id == murderEvent.Victim.PlayerId);
+                            var victimIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{playerKilled.SessionCls}";  
+                            var objQuantKill = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Kills", new[] { victimIri }, instancesToRelease);
+                            player.objQuantRestrictionsPlayer.Add(objQuantKill);
                             // update state of the victim
-                            Player playerKilled = players.Find(p => p.Id == murderEvent.Victim.PlayerId);
                             playerKilled.Cls = crewmateDeadClass;
                             break;
                         }
@@ -229,7 +192,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             var coords = completedTaskEvent.PlayerControl.NetworkTransform.Position;
                             foreach (var p in completedTaskEvent.Game.Players) {
                                 // an impostor wouldn't witness a crewmate 
-                                if (p != player && p.Character.PlayerInfo.RoleType.ToString() == "crewmate") {
+                                if (p != player && p.Character.PlayerInfo.RoleType.ToString() == "crewmate" && p.Character.PlayerInfo.IsDead == false) {
                                     var coordsP = p.Character.NetworkTransform.Position; 
                                     // euclidean distance
                                     var dist = calcDistance(coords, coordsP); 
@@ -253,12 +216,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                         } else if (votedEvent.VotedFor.PlayerInfo.PlayerName.ToString().Replace(" ", "") == "") {
                             break;
                         } else {
-                            var votedIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{votedEvent.VotedFor.PlayerInfo.PlayerName.Replace(" ", "")}";  
-                            var objHasValueVote = CreateObjHasValueRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Votes", votedIri, instancesToRelease);
+                            var votedPlayer = players.Find(ot => ot.Id == votedEvent.VotedFor.PlayerId);
+                            var votedIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{votedPlayer.SessionCls}";  
+                            var objQuantVote = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Votes", new[] {votedIri}, instancesToRelease);
                             
-                            player.objHasValueRestrictionsPlayer.Add(objHasValueVote);
+                            player.objQuantRestrictionsPlayer.Add(objQuantVote);
                             //update count of votes got by player in current round
-                            Player votedPlayer = players.Find(ot => ot.Id == votedEvent.VotedFor.PlayerId);
                             votedPlayer.IncrementScore();
                             break;
                         }
@@ -272,10 +235,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                             
                             player.objQuantRestrictionsPlayer.Add(objQuantEmergencyMeeting);
                         } else {
-                            var deadBodyIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{startMeetingEvent.Body.PlayerInfo.PlayerName.Replace(" ", "")}";  
-                            var objHasValueReport = CreateObjHasValueRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Reports", deadBodyIri, instancesToRelease);
+                            var deadPlayer = players.Find(ot => ot.Id == startMeetingEvent.Body.PlayerId);
+                            var deadBodyIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{deadPlayer.SessionCls}";  
+                            var objQuantReport = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Reports", new[] {deadBodyIri}, instancesToRelease);
                             
-                            player.objHasValueRestrictionsPlayer.Add(objHasValueReport);
+                            player.objQuantRestrictionsPlayer.Add(objQuantReport);
 
                             var emergencyCallIri = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/EmergencyCall";
                             var objQuantEmergencyMeeting = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Calls", new[] { emergencyCallIri }, instancesToRelease);
@@ -286,7 +250,17 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                     // RepairSystem
                      case IPlayerRepairSystemEvent repairSystemEvent:
-                        var repairediri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{repairSystemEvent.SystemType}";
+                        //mapping to adapt to the ontology
+                        string sabotageTask = repairSystemEvent.SystemType.ToString() switch
+                        {
+                            "Electrical" => "FixLight",
+                            "Comms" => "CommsSabotaged",
+                            "Reactor" => "ReactorMeltdown",
+                            "LifeSupp" => "O2OxygenDepleted",
+                            "Admin" => "AdminOxygenDepleted",
+                            _ => "Another type of sabotage task",
+                        };
+                        var repairediri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{sabotageTask}";
                         var objQuantRepairSystem = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Repairs", new[] { repairediri }, instancesToRelease);
                         
                         player.objQuantRestrictionsPlayer.Add(objQuantRepairSystem);
@@ -308,7 +282,21 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                     // shipSabotage 
                     case IShipSabotageEvent shipSabotageEvent:
                         player = players.Find(p => p.Id == shipSabotageEvent.ClientPlayer.Character.PlayerId);
-                        var sabotageIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{shipSabotageEvent.SystemType}";
+                        //mapping to adapt to the ontology
+                        string sabotage = shipSabotageEvent.SystemType.ToString() switch
+                        {
+                            "Electrical" => "SabotageFixLights",
+                            "MedBay" => "SabotageMedScan",
+                            "Doors" => "SabotageDoorSabotage",
+                            "Comms" => "CommsSabotaged",
+                            "Security" => "SabotageSecurity",
+                            "Reactor" => "SabotageReactorMeltdown",
+                            "LifeSupp" => "SabotageOxygenDepleted",
+                            "Ventilation" => "SabotageVentilation",
+                            _ => "Another type of sabotage",
+                        };
+
+                        var sabotageIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{sabotage}";
                         var objQuantSabotage = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Sabotages", new[] { sabotageIri }, instancesToRelease);
                         player.objQuantRestrictionsPlayer.Add(objQuantSabotage);
                         gameState = "sabotage";
@@ -373,7 +361,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             {
                 
                 var dim = player.Movements.Count();
-                var nPlayersFOV = 0;
+                var nCrewmatesFOV = 0;
+                var nImpostorsFOV = 0;
 
                 // check if player fixed or moving towards someone
                 
@@ -415,31 +404,40 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                         if (near >= dim / 2)
                         {
-                            var objHasValueGetClose = CreateObjHasValueRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/GetCloseTo",$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.Name}",instancesToRelease);
+                            var getClosePlayer = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.SessionCls}";
+                            var objQuantGetClose = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/GetCloseTo",new[] {getClosePlayer},instancesToRelease);
 
-                            player.objHasValueRestrictionsPlayer.Add(objHasValueGetClose);
+                            player.objQuantRestrictionsPlayer.Add(objQuantGetClose);
                         }
                     }
                 }
 
                 // check if player is InFOV other players
                 foreach (var op in players) {
-                    if (op != player) {
+                    //if dead player, skip
+                    if (op != player && op.Cls != crewmateDeadClass && op.Cls != impostorDeadClass) {
                         var dimOp = op.Movements.Count();
                         // euclidean distance
                         var dist = calcDistance(player.Movements[dim-1].Position, op.Movements[dimOp-1].Position); 
                         // if distance < threshold then IsInFOV for both players 
                         if (dist <= thresholds.FOV) {
-                            var objHasValueIsInFOV = CreateObjHasValueRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{op.Name}", instancesToRelease);                        
-                            player.objHasValueRestrictionsPlayer.Add(objHasValueIsInFOV);
-                            nPlayersFOV++;
+                            var InFovIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{op.SessionCls}";                      
+                            var objQuantIsInFOV = CreateObjValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", new[] {InFovIri}, instancesToRelease);
+                            player.objQuantRestrictionsPlayer.Add(objQuantIsInFOV);
+                            if (op.Cls == crewmateClass) {
+                                nCrewmatesFOV++;
+                            } else {
+                                nImpostorsFOV++;
+                            }
                         }
                     }
                 }
 
                 //counter of players in FOV
-                var dataQuantNPlayersFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNPlayersInFOV", new [] { nPlayersFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
-                player.dataQuantRestrictionsPlayer.Add(dataQuantNPlayersFOV);
+                var dataQuantNCrewmatesFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNCrewmatesInFOV", new [] { nCrewmatesFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantNCrewmatesFOV);
+                var dataQuantNImpostorsFOV =  CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNImpostorsInFOV", new [] { nImpostorsFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantNImpostorsFOV);
 
                 // check if player is nextTo a vent
                 foreach (var v in MapData.Maps[game.Options.Map].Vents) {
@@ -557,8 +555,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                 var dataQuantHasCoordinates = CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim-1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
                 player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
+                var sessionClass = CreateClassFromIri($"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.SessionCls}", instancesToRelease);
 
-                var resultCreatePlayer  = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls }, player.objHasValueRestrictionsPlayer.ToArray(), player.objQuantRestrictionsPlayer.ToArray(), player.dataQuantRestrictionsPlayer.ToArray(), instancesToRelease);
+                var resultCreatePlayer  = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls, sessionClass }, player.objQuantRestrictionsPlayer.ToArray(), player.dataQuantRestrictionsPlayer.ToArray(), instancesToRelease);
             
             }
             
@@ -594,7 +593,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             var dataQuantRestrictionNPlayers = CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { alive.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
             
 
-            var resultCreateGame = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
+            var resultCreateGame = CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
             
             //write to file
             string folderPath = $"gameSession{game.Code}";
@@ -617,6 +616,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
 
+            var result2 = Task.Run(async () => await CallArgumentationAsync(result));
+            result2.Wait(); 
+            //Console.WriteLine(result2.Result);
+
             foreach (var instance in instancesToRelease)
             {
                 cowl_object.CowlRelease(instance);
@@ -630,12 +633,33 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             Dictionary<byte, PlayerStruct> pStates = new Dictionary<byte, PlayerStruct>();
             foreach (var p in players) {
                 var dim = p.Movements.Count();
-                PlayerStruct ps = new PlayerStruct { State = p.State, Movements = new List<CustomMovement> { p.Movements[dim - 1] }, VoteCount = p.VoteCount};
+                var ps = new PlayerStruct { State = p.State, SessionCls = p.SessionCls, Movements = new List<CustomMovement> { p.Movements[dim - 1] }, VoteCount = p.VoteCount};
 
                 pStates.Add(p.Id, ps);
             }
             return (pStates, gameState);
         }
+
+        public static async Task<string> CallArgumentationAsync(string annotations)
+        {
+            string url_owl = "http://127.0.0.1:18080/update";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    var StringContent = new StringContent(annotations, System.Text.Encoding.UTF8);
+                    HttpResponseMessage response_1 = await client.PostAsync(url_owl, StringContent);
+                    string result = await response_1.Content.ReadAsStringAsync();
+                    return result;
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"Errore nella richiesta: {e.Message}");
+                    return "Errore nella richiesta";
+                }
+            }
+        }
+
 
         public static void Main(string[] args)
         {
@@ -797,7 +821,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
         
         //e.g. ClassAssertion(ObjectIntersectionOf(:CrewMateAlive ObjectAllValuesFrom(...) :Player1)
-        public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri,  IEnumerable<CowlObjHasValue>? objHasValues, IEnumerable<CowlObjQuant> objQuantsIri, IEnumerable<CowlDataQuant>? dataQuantsIri, List<nint> instancesToRelease, Boolean isPlayer=true)
+        public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri, IEnumerable<CowlObjQuant> objQuantsIri, IEnumerable<CowlDataQuant>? dataQuantsIri, List<nint> instancesToRelease, Boolean isPlayer=true)
         {
             var operands = cowl_vector.UvecCowlObjectPtr();
 
@@ -812,11 +836,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
                 foreach (var objQuant in objQuantsIri)
                 {
                     cowl_vector.UvecPushCowlObjectPtr(operands, objQuant.__Instance);
-                }
-
-                foreach (var objVal in objHasValues)
-                {
-                    cowl_vector.UvecPushCowlObjectPtr(operands, objVal.__Instance);
                 }
             }
 
@@ -872,18 +891,20 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         public string Name { get; set; }
         public string State { get; set; }
         public CowlClass Cls { get; set; }
+        public string SessionCls { get; set; }
         public List<CustomMovement> Movements { get; set; }
         public int VoteCount { get; set; }
         public List<CowlObjHasValue> objHasValueRestrictionsPlayer { get; set; }
         public List<CowlObjQuant> objQuantRestrictionsPlayer { get; set; }
         public List<CowlDataQuant> dataQuantRestrictionsPlayer { get; set; }
 
-        public Player(byte id, string name, CowlClass cls, List<CustomMovement> movements, CustomMovement initialMov, string state, int voteCount)
+        public Player(byte id, string name, CowlClass cls, string sesCls, List<CustomMovement> movements, CustomMovement initialMov, string state, int voteCount)
         {
             Id = id; 
             Name = name.Replace(" ", "");
             State = state;
             Cls = cls; //class of the player
+            SessionCls = sesCls; //class of the player for the session
             if (movements.Count() == 0) {
                 Movements = new List<CustomMovement>{initialMov};
             } else {

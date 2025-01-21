@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
+using System.Diagnostics.Metrics;
 
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
@@ -40,16 +41,43 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             GameEnded = false; 
         }
 
+        public static void CreatePlayers()
+        {
+            // players in current game
+            var counter = 1;
+            foreach (var p in Game.Players)
+            {
+                if (p == null) break;  
+                if (p.Character == null) break;
+                // start tracking player state
+                var mov = new CustomMovement(p.Character.NetworkTransform.Position, CurrentTimestamp);
+                PlayerStruct playerStruct = new PlayerStruct
+                {
+                    State = "none",  // initial status
+                    Movements = new List<CustomMovement> { mov }, // actual position                        
+                    VoteCount = 0, // vote counter
+                    SessionCls = $"Player{counter}" // session class
+                };
+
+                PlayerStates.Add(p.Character.PlayerId, playerStruct);
+                counter++;
+            }
+        }
+
         // start game
         public static void StartGame(IGame game)
         {
             if (Game is null || game.Code.Code != Game.Code.Code ) {
                 //create a new game
                 CreateGame(game);
+                //assign session class and more
+                CreatePlayers();
             } else if (game.Code.Code == Game.Code.Code) {
                 //game restarted
                 var rest = NumRestarts + 1;
                 CreateGame(game, rest);
+                //assign session class and more
+                CreatePlayers();
             }
             GameStarted = true;
         }
@@ -105,16 +133,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     } else if (GameEnded) {
                         //annotate cause game is ended
                         annotator.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp); 
-                        //reset
-                        CallCount=0;
-                        Events.Clear();
-                        if (destroyed) {
-                            Game = null;
-                            GameEnded = false;
-                        }
-                        PlayerStates = null;
-                        GameStarted = false;
-                        LastAnnotTimestamp = CurrentTimestamp;
                     }
                 }
             }
@@ -139,7 +157,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     {
         public List<CustomMovement> Movements { get; set; } = new List<CustomMovement>(); // Lista dei movimenti
         public int VoteCount { get; set; } = 0; // Vote counter
-        public string State { get; set; } = "none"; // player status 
+        public string State { get; set; } = "none"; // player status
+        public string SessionCls { get; set; } = "Player0"; // player status
     }
 
     public class CustomPlayerMovementEvent : IPlayerEvent
