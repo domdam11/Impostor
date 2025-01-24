@@ -10,13 +10,21 @@ using Impostor.Plugins.SemanticAnnotator.Annotator;
 using System.Text.Json;
 using Impostor.Api.Innersloth.GameOptions;
 using CowlSharp.Wrapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.IO;
 
 
 namespace Impostor.Plugins.SemanticAnnotator.Utils
 {
+   
     public class AnnotatorEngine
     {
-        
+    
+
         /// <summary>
         /// Retrieves the annotation.
         /// </summary>

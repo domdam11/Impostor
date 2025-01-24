@@ -9,6 +9,9 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using System.Diagnostics.Metrics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
@@ -19,7 +22,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         private static DateTimeOffset CurrentTimestamp { get;  set; }
         private static IGame Game { get;  set; }
         private static List<IEvent> Events;
-        private static CowlWrapper annotator = new CowlWrapper();
+        private static AnnotatorEngine annotator = new AnnotatorEngine();
         private static Dictionary<byte, PlayerStruct> PlayerStates;
         private static string GameState;
     
