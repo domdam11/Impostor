@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CowlSharp\CowlSharp.csproj" />
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
   </ItemGroup>
 
