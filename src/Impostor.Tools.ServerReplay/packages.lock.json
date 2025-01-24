@@ -30,6 +30,11 @@
           "Microsoft.Win32.Registry": "5.0.0"
         }
       },
+      "CppSharp.Runtime": {
+        "type": "Transitive",
+        "resolved": "1.1.5.3168",
+        "contentHash": "57twYtZo0D0uWByv6fW128A7WwbLgdNCSe8BAzcUMr+MUNMfisjLmas4JOwCfd2mWyZyGvtOCYHwoCSuvWTdzw=="
+      },
       "Impostor.Hazel": {
         "type": "Transitive",
         "resolved": "1.0.0",
@@ -465,6 +470,12 @@
           "System.Text.Encodings.Web": "8.0.0"
         }
       },
+      "cowlsharp": {
+        "type": "Project",
+        "dependencies": {
+          "CppSharp.Runtime": "[1.1.5.3168, )"
+        }
+      },
       "impostor.api": {
         "type": "Project",
         "dependencies": {
@@ -484,6 +495,7 @@
         "type": "Project",
         "dependencies": {
           "Coravel": "[5.0.4, )",
+          "CowlSharp": "[1.9.3-dev, )",
           "CppSharp": "[1.1.5.3168, )",
           "Impostor.Api": "[1.9.3-dev, )"
         }
