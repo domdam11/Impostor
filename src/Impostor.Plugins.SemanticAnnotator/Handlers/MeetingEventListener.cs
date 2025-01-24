@@ -1,6 +1,7 @@
 ﻿using Impostor.Api.Events;
 using Impostor.Api.Events.Meeting;
 using Microsoft.Extensions.Logging;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Plugins.Example.Handlers
 {
@@ -17,12 +18,16 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnMeetingStarted(IMeetingStartedEvent e)
         {
             _logger.LogInformation("Meeting > started");
+            // add event in order to annotate
+            EventUtility.SaveEvent(e);
         }
 
         [EventListener]
         public void OnMeetingEnded(IMeetingEndedEvent e)
         {
             _logger.LogInformation("Meeting > ended, exiled: {exiled}, tie: {tie}", e.Exiled?.PlayerInfo.PlayerName, e.IsTie);
+            // add event in order to annotate
+            EventUtility.SaveEvent(e);
 
             foreach (var playerState in e.MeetingHud.PlayerStates)
             {

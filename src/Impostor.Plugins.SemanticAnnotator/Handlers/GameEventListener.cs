@@ -34,6 +34,7 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnGameCreated(IGameCreatedEvent e)
         {
             _logger.LogInformation("Game {code} > created", e.Game.Code);
+            if (e is not null) EventUtility.CreateGame(e.Game);
         }
 
         [EventListener]
@@ -47,6 +48,8 @@ namespace Impostor.Plugins.Example.Handlers
         {
             CsvUtility.CsvGeneratorStartGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > started", e.Game.Code);
+            // start game -> start annotate
+            if (e is not null) EventUtility.StartGame(e.Game);
 
             foreach (var player in e.Game.Players)
             {
@@ -61,12 +64,16 @@ namespace Impostor.Plugins.Example.Handlers
         {
             CsvUtility.CsvGeneratorEndGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > ended because {reason}", e.Game.Code, e.GameOverReason);
+            // eng game -> stop annotate
+            if (e is not null) EventUtility.EndGame();
         }
 
         [EventListener]
         public void OnGameDestroyed(IGameDestroyedEvent e)
         {
             _logger.LogInformation("Game {code} > destroyed", e.Game.Code);
+            //end game -> stop game
+            if (e is not null) EventUtility.EndGame(true);
         }
 
         [EventListener]

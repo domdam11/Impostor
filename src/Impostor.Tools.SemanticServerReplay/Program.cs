@@ -220,6 +220,7 @@ namespace Impostor.Tools.SemanticServerReplay
                     await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
+
                     break;
 
                 default:

@@ -36,6 +36,7 @@ using Impostor.Api.Events;
 using Impostor.Plugins.Example.Handlers;
 using Impostor.Plugins.Example;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using CppSharp.AST;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -154,6 +155,8 @@ namespace Impostor.Tools.ServerReplay
                 {
                     _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
                     CsvUtility.TimeStamp = _fakeDateTimeProvider.UtcNow;
+                    EventUtility.SetCurrentTime(_fakeDateTimeProvider.UtcNow);
+                    
                     //Console.WriteLine(_fakeDateTimeProvider.UtcNow);
                     await ParsePacket(readerInner);
                 }
@@ -217,6 +220,7 @@ namespace Impostor.Tools.ServerReplay
                     else if (Connections.TryGetValue(clientId, out var client))
                     {
                         await client.Client!.HandleMessageAsync(message, messageType);
+                        EventUtility.CallAnnotate();
                     }
 
                     break;
@@ -228,6 +232,8 @@ namespace Impostor.Tools.ServerReplay
                     await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
 
                     GameOptions.Remove(clientId);
+                    EventUtility.SetAnnotTime(_fakeDateTimeProvider.UtcNow);
+
                     break;
 
                 default:
