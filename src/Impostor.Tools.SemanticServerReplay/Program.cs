@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -14,20 +18,29 @@ using Impostor.Api.Utils;
 using Impostor.Hazel;
 using Impostor.Hazel.Extensions;
 using Impostor.Server;
+using Impostor.Server.Events;
+using Impostor.Server.Net;
 using Impostor.Server.Net.Custom;
+using Impostor.Server.Net.Factories;
+using Impostor.Server.Net.Manager;
 using Impostor.Server.Recorder;
 using Impostor.Server.Utils;
+using Impostor.Tools.ServerReplay;
+using Impostor.Tools.SemanticServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using ILogger = Serilog.ILogger;
 using Impostor.Api.Net.Manager;
+using Impostor.Api.Events;
+using Impostor.Plugins.SemanticAnnotator;
+using Impostor.Plugins.SemanticAnnotator.Handlers;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Tools.SemanticServerReplay;
 
-using Impostor.Plugins.Example;
-using Impostor.Tools.SemanticServerReplay.Mocks;
 
-namespace Impostor.Tools.SemanticServerReplay
+namespace Impostor.Tools.ServerReplay
 {
     internal static class Program
     {
@@ -42,7 +55,6 @@ namespace Impostor.Tools.SemanticServerReplay
         private static ClientManager _clientManager;
         private static GameManager _gameManager;
         public static FakeDateTimeProvider _fakeDateTimeProvider;
-        public static SemanticAnnotatorPlugin _semanticAnnotatorPlugin;
 
         private static async Task Main(string[] args)
         {
@@ -53,7 +65,7 @@ namespace Impostor.Tools.SemanticServerReplay
                 .CreateLogger();
 
             var stopwatch = Stopwatch.StartNew();
-         
+
             foreach (var file in Directory.GetFiles("..\\..\\..\\sessions\\", "*.dat"))
             {
                 // Clear.
@@ -69,8 +81,6 @@ namespace Impostor.Tools.SemanticServerReplay
                 _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
                 _gameManager = _serviceProvider.GetRequiredService<GameManager>();
                 _fakeDateTimeProvider = _serviceProvider.GetRequiredService<FakeDateTimeProvider>();
-
-
 
                 await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new BinaryReader(stream))
@@ -109,7 +119,7 @@ namespace Impostor.Tools.SemanticServerReplay
             services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
             services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
             services.AddSingleton<ClientManager>();
-            
+
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
             services.AddSingleton<IEventManager, EventManager>();
 
@@ -146,7 +156,8 @@ namespace Impostor.Tools.SemanticServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
-                    Console.WriteLine(_fakeDateTimeProvider.UtcNow);
+                    CsvUtility.TimeStamp = _fakeDateTimeProvider.UtcNow;
+                    //Console.WriteLine(_fakeDateTimeProvider.UtcNow);
                     await ParsePacket(readerInner);
                 }
             }

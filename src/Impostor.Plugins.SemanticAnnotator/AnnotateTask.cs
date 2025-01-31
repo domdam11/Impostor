@@ -3,52 +3,97 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Coravel.Invocable;
-using Impostor.Plugins.SemanticAnnotator.Utils;
+using Impostor.Plugins.SemanticAnnotator;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
-    // Implementa l'interfaccia IInvocable per la gestione delle annotazioni periodiche
+    /// <summary>
+    /// Implements the IInvocable interface to manage periodic annotations.
+    /// </summary>
     public class AnnotateTask : IInvocable
     {
         private readonly GameEventCacheManager _eventCacheManager;
-        private readonly CowlWrapper _cowlWrapper;
+        private readonly AnnotatorEngine _annotatorEngine;
         private readonly ILogger<AnnotateTask> _logger;
 
-        // Costruttore con iniezione delle dipendenze
-        public AnnotateTask(GameEventCacheManager eventCacheManager, CowlWrapper cowlWrapper, ILogger<AnnotateTask> logger)
+        /// <summary>
+        /// Constructor with dependency injection.
+        /// </summary>
+        /// <param name="eventCacheManager">Manages the cached game events.</param>
+        /// <param name="annotatorEngine">Processes game events and generates annotations.</param>
+        /// <param name="logger">Handles logging for debugging and monitoring.</param>
+        public AnnotateTask(GameEventCacheManager eventCacheManager, AnnotatorEngine annotatorEngine, ILogger<AnnotateTask> logger)
         {
             _eventCacheManager = eventCacheManager;
-            _cowlWrapper = cowlWrapper;
+            _annotatorEngine = annotatorEngine;
             _logger = logger;
         }
 
-        // Metodo per l'annotazione asincrona degli eventi di una sessione
+        /// <summary>
+        /// Asynchronous method for annotating game events of a session.
+        /// </summary>
+        /// <param name="gameCode">The game session code to annotate.</param>
+        /// <returns>Asynchronous task.</returns>
         public async Task AnnotateAsync(string gameCode)
         {
-            // Recupera gli eventi dalla cache usando il GameEventCacheManager
-            var cachedEvents = await _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
-
-            // Controlla la presenza di eventi
-            if (cachedEvents == null || cachedEvents.Count == 0)
+            if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
             {
-                _logger.LogInformation($"Nessun evento trovato nella cache per il GameCode: {gameCode}.");
+                _logger.LogInformation($"Salta l'annotazione per GameCode: {gameCode}.");
+                return;
+            }
+            _logger.LogInformation($"Inizio annotazione per GameCode: {gameCode}.");
+
+            // Retrieve the game state from the cache using the GameEventCacheManager
+            var gameState = await _eventCacheManager.GetGameStateAsync(gameCode);
+            if (gameState == null)
+            {
+                _logger.LogWarning($"Stato del gioco non trovato per GameCode: {gameCode}.");
                 return;
             }
 
-            // Passa gli eventi al CowlWrapper per l'annotazione
-            await _cowlWrapper.Annotate(gameCode);
+            // Check if the game has ended to perform a final annotation
+            bool isFinalAnnotation = gameState.GameEnded;
 
-            // Cancella gli eventi dalla cache una volta completata l'annotazione
+            // Pass the game state to the AnnotatorEngine for processing
+            var (playerAnnotations, updatedGameStateName) = _annotatorEngine.Annotate(
+                gameCode,
+                _eventCacheManager,
+                numAnnot: gameState.CallCount + 1,
+                numRestarts: gameState.NumRestarts,
+                timestamp: DateTimeOffset.UtcNow
+            );
+
+            // Update the count of performed annotations
+            gameState.CallCount += 1;
+
+            // Update the game state with the new state name
+            gameState.GameStateName = updatedGameStateName;
+
+            // If the game has ended, keep its state finalized
+            if (isFinalAnnotation)
+            {
+                gameState.GameEnded = true;
+            }
+
+            // Update the game state in the cache
+            await _eventCacheManager.UpdateGameStateAsync(gameCode, gameState);
+
+            /// Clear the cached events after annotation is completed
             await _eventCacheManager.ClearGameEventsAsync(gameCode);
 
-            // Log di completamento annotazione
+            // Log annotation completion
             _logger.LogInformation($"Annotazione completata per GameCode: {gameCode}.");
         }
 
-        // Metodo invocabile da Coravel per annotare tutte le sessioni attive
+        /// <summary>
+        /// Invocable method used by Coravel to annotate all active sessions.
+        /// </summary>
+        /// <returns>Asynchronous task.</returns>
         public async Task Invoke()
         {
-            var activeSessions = await _eventCacheManager.GetAllEventsAsync();
+            // Retrieve all active game sessions
+            var activeSessions = _eventCacheManager.GetActiveSessions();
 
             if (activeSessions.Count == 0)
             {
@@ -58,10 +103,28 @@ namespace Impostor.Plugins.SemanticAnnotator
 
             _logger.LogInformation($"Annotazione avviata per {activeSessions.Count} sessioni attive.");
 
-            foreach (var session in activeSessions)
+            foreach (var gameCode in activeSessions)
             {
-                var gameCode = session.Key;
-                await AnnotateAsync(gameCode);
+                // Retrieve the game state for each active session
+                var gameState = await _eventCacheManager.GetGameStateAsync(gameCode);
+                if (gameState == null)
+                {
+                    _logger.LogWarning($"Stato del gioco non trovato per GameCode: {gameCode} durante l'annotazione.");
+                    continue;
+                }
+
+                // If the game has ended, perform a final annotation and remove it from active cache
+                if (gameState.GameEnded)
+                {
+                    await AnnotateAsync(gameCode);
+                    _logger.LogInformation($"GameCode: {gameCode} è terminato. Annotazione finale eseguita.");
+                   
+                }
+                else
+                {
+                    // Perform periodic annotation for active games.
+                    await AnnotateAsync(gameCode);
+                }
             }
 
             _logger.LogInformation("Annotazione completata per tutte le sessioni attive.");

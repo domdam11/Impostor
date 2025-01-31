@@ -2,17 +2,21 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Client;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using Impostor.Plugins.SemanticAnnotator;
 
 namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class ClientEventListener : IEventListener
     {
-        //Campo privato per registrare i log relativi all'attività del listener
+        // Private field to log information related to listener activity
         private readonly ILogger<ClientEventListener> _logger;
-        //Campo privato per gestire la cache degli eventi raccolti
+
+        // Private field to manage the cache of collected events
         private readonly GameEventCacheManager _eventCacheManager;
 
-        // Iniezione della dipendenza per il logging e la cache degli eventi
+        // Dependency injection for logging and event cache management
         public ClientEventListener(ILogger<ClientEventListener> logger, GameEventCacheManager eventCacheManager)
         {
             _logger = logger;
@@ -20,31 +24,30 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
         }
 
         [EventListener]
-        public async Task OnClientConnected(IClientConnectedEvent e)
+        public async ValueTask OnClientConnected(IClientConnectedEvent e)
         {
-            // Determina il GameCode in base al contesto disponibile
-            string gameCode = e.Client?.Game?.Code ?? "unassigned";
+            // Determine the GameCode based on the available context (currently set as "unassigned")
+            string gameCode = "unassigned";
 
-            // Crea un dizionario per rappresentare le informazioni sull'evento
+            // Create a dictionary to store event details
             var eventData = new Dictionary<string, object>
             {
-                { "EventId", Guid.NewGuid().ToString() },  // Usa un GUID come EventId
-                { "GameCode", gameCode },                  // Salva il gameCode
-                { "EventType", "ClientConnected" },        // Tipo di evento
-                { "Timestamp", DateTime.UtcNow },          // Timestamp dell'evento
-                { "ClientName", e.Client.Name },
-                { "ClientLanguage", e.Client.Language },
-                { "ChatMode", e.Client.ChatMode}
+                { "EventId", Guid.NewGuid().ToString() },  // Use a GUID as a unique EventId
+                { "GameCode", gameCode },                  // Store the gameCode (currently defaulted)
+                { "EventType", "ClientConnected" },        // Specify the type of event
+                { "Timestamp", DateTime.UtcNow },          // Capture the event timestamp in UTC
+                { "ClientName", e.Client.Name },           // Store the client's username
+                { "ClientLanguage", e.Client.Language },   // Store the client's language setting
+                { "ChatMode", e.Client.ChatMode}           // Store the chat mode preference of the client
             };
 
-            // Salva l'evento nella cache
+            // Store the event data in the cache
             await _eventCacheManager.AddEventAsync(gameCode, eventData);
 
-            // Log dell'evento
+            // Log the event, including client name, language, and chat mode
             _logger.LogInformation(
                 "Client {name} > connected (language: {language}, chat mode: {chatMode})",
                 e.Client.Name, e.Client.Language, e.Client.ChatMode);
         }
-
     }
 }

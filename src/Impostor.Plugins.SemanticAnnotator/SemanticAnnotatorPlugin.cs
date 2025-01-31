@@ -5,6 +5,7 @@ using Coravel;
 using Coravel.Scheduling.Schedule.Interfaces;
 using System.Threading.Tasks;
 using System;
+using Impostor.Plugins.SemanticAnnotator.Handlers;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Plugins.SemanticAnnotator
@@ -16,7 +17,12 @@ namespace Impostor.Plugins.SemanticAnnotator
         private readonly GameEventCacheManager _eventCacheManager;
         private readonly IServiceProvider _serviceProvider;
 
-        // Costruttore con iniezione delle dipendenze
+        /// <summary>
+        /// Constructor with dependency injection.
+        /// </summary>
+        /// <param name="logger">Handles logging for debugging and monitoring.</param>
+        /// <param name="eventCacheManager">Manages cached game events.</param>
+        /// <param name="serviceProvider">Provides services and dependency resolution.</param>
         public SemanticAnnotatorPlugin(ILogger<SemanticAnnotatorPlugin> logger, GameEventCacheManager eventCacheManager, IServiceProvider serviceProvider)
         {
             _logger = logger;
@@ -24,42 +30,51 @@ namespace Impostor.Plugins.SemanticAnnotator
             _serviceProvider = serviceProvider;
         }
 
-        // Metodo asincrono che si attiva quando il plugin viene abilitato
+        /// <summary>
+        /// Asynchronous method triggered when the plugin is enabled.
+        /// </summary>
+        /// <returns>Asynchronous ValueTask.</returns>
         public override ValueTask EnableAsync()
         {
             _logger.LogInformation("SemanticAnnotator is being enabled.");
 
-            // Recupera il periodo di annotazione dai parametri di ambiente o usa un valore predefinito
+            // Retrieve the annotation period from environment variables or use a default value
             int annotationPeriodInSeconds = int.Parse(Environment.GetEnvironmentVariable("ANNOTATION_PERIOD") ?? "30");
 
-            // Risoluzione del servizio IScheduler
+            // Resolve the IScheduler service
             var scheduler = _serviceProvider.GetRequiredService<IScheduler>();
 
-            // Programma l'esecuzione periodica del task di annotazione
+            // Schedule the periodic execution of the annotation task
             scheduler.Schedule(() => AnnotateSessions()).EverySeconds(annotationPeriodInSeconds);
 
             return default;
         }
 
-        // Metodo asincrono che si attiva quando il plugin viene disabilitato
+        /// <summary>
+        /// Asynchronous method triggered when the plugin is disabled.
+        /// </summary>
+        /// <returns>Asynchronous ValueTask.</returns>
         public override ValueTask DisableAsync()
         {
             _logger.LogInformation("SemanticAnnotator is being disabled.");
             return default;
         }
 
-        // Metodo che esegue l'annotazione per tutte le sessioni attive
+        /// <summary>
+        /// Executes the annotation for all active sessions.
+        /// </summary>
+        /// <returns>Asynchronous Task.</returns>
         private async Task AnnotateSessions()
         {
-            // Recupera tutte le sessioni attive
+            // Retrieve all active game sessions
             var activeSessions = _eventCacheManager.GetActiveSessions();
 
             foreach (var gameCode in activeSessions)
             {
-                // Recupera gli eventi per la sessione specifica
+                // Retrieve events for the specific session
                 var events = await _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
 
-                // Crea e avvia l'annotatore per ogni sessione
+                // Resolve and execute the annotation task for each session
                 var annotator = _serviceProvider.GetRequiredService<AnnotateTask>();
                 await annotator.AnnotateAsync(gameCode);  // Passa gli eventi per l'annotazione
             }

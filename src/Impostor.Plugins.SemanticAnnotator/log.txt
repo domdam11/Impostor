@@ -1,0 +1,22 @@
+13/01/2025 12:36:41: Avvio programma.
+13/01/2025 12:36:41: Creazione delle classi.
+13/01/2025 12:36:41: Creazione degli individui.
+13/01/2025 12:36:41: Creazione delle restrizioni.
+13/01/2025 12:36:41: Errore durante l'esecuzione: Unable to find an entry point named '?' in DLL 'cowl'.
+13/01/2025 12:36:41: Stack Trace:    at cowl.cowl_obj_has_value.__Internal.CowlObjHasValue(IntPtr prop, IntPtr individual)
+   at cowl.cowl_obj_has_value.CowlObjHasValue(IntPtr prop, IntPtr individual) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\CowlWrapper\cowl.cs:line 27777
+   at Impostor.Plugins.SemanticAnnotator.Utils.CowlWrapper.CreateObjHasValue(String propertyIri, String individualIri, List`1 instancesToRelease) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\Annotator\CowlWrapper.cs:line 229
+   at Impostor.Plugins.SemanticAnnotator.Utils.CowlWrapper.Main(String[] args) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\Annotator\CowlWrapper.cs:line 54
+13/01/2025 12:36:41: Pulizia delle risorse...
+13/01/2025 12:36:41: Pulizia completata.
+13/01/2025 12:56:36: Avvio programma.
+13/01/2025 12:56:37: Creazione delle classi.
+13/01/2025 12:56:37: Creazione degli individui.
+13/01/2025 12:56:37: Creazione delle restrizioni.
+13/01/2025 12:56:37: Errore durante l'esecuzione: Unable to find an entry point named '?' in DLL 'cowl'.
+13/01/2025 12:56:37: Stack Trace:    at cowl.cowl_obj_has_value.__Internal.CowlObjHasValue(IntPtr prop, IntPtr individual)
+   at cowl.cowl_obj_has_value.CowlObjHasValue(IntPtr prop, IntPtr individual) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\CowlWrapper\cowl.cs:line 27777
+   at Impostor.Plugins.SemanticAnnotator.Utils.CowlWrapper.CreateObjHasValue(String propertyIri, String individualIri, List`1 instancesToRelease) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\Annotator\CowlWrapper.cs:line 229
+   at Impostor.Plugins.SemanticAnnotator.Utils.CowlWrapper.Main(String[] args) in C:\Users\utente\Desktop\Progetto_CrewMinds\Impostor\src\Impostor.Plugins.SemanticAnnotator\Annotator\CowlWrapper.cs:line 54
+13/01/2025 12:56:37: Pulizia delle risorse...
+13/01/2025 12:56:37: Pulizia completata.

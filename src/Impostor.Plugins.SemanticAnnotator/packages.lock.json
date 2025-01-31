@@ -23,6 +23,11 @@
           "Microsoft.Win32.Registry": "5.0.0"
         }
       },
+      "CppSharp.Runtime": {
+        "type": "Transitive",
+        "resolved": "1.1.5.3168",
+        "contentHash": "57twYtZo0D0uWByv6fW128A7WwbLgdNCSe8BAzcUMr+MUNMfisjLmas4JOwCfd2mWyZyGvtOCYHwoCSuvWTdzw=="
+      },
       "Impostor.Hazel.Abstractions": {
         "type": "Transitive",
         "resolved": "1.0.0",
@@ -180,6 +185,12 @@
         "type": "Transitive",
         "resolved": "4.5.0",
         "contentHash": "Xg4G4Indi4dqP1iuAiMSwpiWS54ZghzR644OtsRCm/m/lBMG8dUBhLVN7hLm8NNrNTR+iGbshCPTwrvxZPlm4g=="
+      },
+      "cowlsharp": {
+        "type": "Project",
+        "dependencies": {
+          "CppSharp.Runtime": "[1.1.5.3168, )"
+        }
       },
       "impostor.api": {
         "type": "Project",

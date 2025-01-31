@@ -1,7 +1,6 @@
 using Impostor.Api.Events;
 using Impostor.Api.Plugins;
 using Impostor.Plugins.SemanticAnnotator.Handlers;
-using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,23 +15,30 @@ namespace Impostor.Plugins.SemanticAnnotator
 
         }
 
-        // Metodo utilizzato per configurare i servizi del plugin e per registrare le dipendenze utilizzando la Dependency Injection
+        /// <summary>
+        /// Configures the services required for the plugin.
+        /// Registers dependencies using Dependency Injection.
+        /// </summary>
+        /// <param name="services">Service collection for dependency registration.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Aggiunge tutti i listener di eventi necessari
+            // Adds all necessary event listeners as singletons
             services.AddSingleton<IEventListener, GameEventListener>();
             services.AddSingleton<IEventListener, ClientEventListener>();
             services.AddSingleton<IEventListener, PlayerEventListener>();
             services.AddSingleton<IEventListener, MeetingEventListener>();
             services.AddSingleton<IEventListener, ShipEventListener>();
 
-            // Aggiunge il GameEventCacheManager come singleton per la gestione degli eventi
+            // Adds the GameEventCacheManager as a singleton for managing event storage
             services.AddSingleton<GameEventCacheManager>();
 
-            // Aggiunge AnnotateTask per il salvataggio periodico
+            // Adds AnnotateTask for periodic annotation
             services.AddTransient<AnnotateTask>();
 
-            // Configura Coravel per la pianificazione dei task periodici
+            // Adds AnnotatorEngine as a singleton for processing game event annotations
+            services.AddSingleton<AnnotatorEngine>();
+
+            // Configures Coravel for scheduling periodic tasks
             services.AddScheduler();
         }
     }
