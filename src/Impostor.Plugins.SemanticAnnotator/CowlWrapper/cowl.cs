@@ -23091,13 +23091,13 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop@@YAPEAUCowlDataProp@@PEAUCowlIRI@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataProp(__IntPtr iri);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_from_string@@YAPEAUCowlDataProp@@UUString@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_from_string", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropFromString(global::cowl.UString.__Internal @string);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_get_iri@@YAPEAUCowlIRI@@PEAUCowlDataProp@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_get_iri", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropGetIri(__IntPtr prop);
         }
 
@@ -23211,23 +23211,23 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom@@YAPEAUCowlDataPropAssertAxiom@@PEAX0PEAUCowlLiteral@@PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiom(__IntPtr prop, __IntPtr subj, __IntPtr obj, __IntPtr annot);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_neg_data_prop_assert_axiom@@YAPEAUCowlDataPropAssertAxiom@@PEAX0PEAUCowlLiteral@@PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_neg_data_prop_assert_axiom", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNegDataPropAssertAxiom(__IntPtr prop, __IntPtr subj, __IntPtr obj, __IntPtr annot);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_is_negative@@YA_NPEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_is_negative", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlDataPropAssertAxiomIsNegative(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_prop@@YAPEAUCowlDataPropExp@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_prop", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetProp(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_subject@@YAPEAUCowlIndividual@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_subject", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetSubject(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_object@@YAPEAUCowlLiteral@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_object", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetObject(__IntPtr axiom);
         }
 

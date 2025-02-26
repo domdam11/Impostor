@@ -114,15 +114,19 @@ namespace Impostor.Plugins.SemanticAnnotator
                 }
 
                 // If the game has ended, perform a final annotation and remove it from active cache
-                if (gameState.GameEnded)
+                if (gameState.GameEnded && !gameState.FinalAnnotationDone)
                 {
-                    await AnnotateAsync(gameCode);
                     _logger.LogInformation($"GameCode: {gameCode} è terminato. Annotazione finale eseguita.");
-                   
+                    await AnnotateAsync(gameCode);
+                    // Segnamo che abbiamo fatto la final annotation
+                    gameState.FinalAnnotationDone = true;
+                    await _eventCacheManager.UpdateGameStateAsync(gameCode, gameState);
+
+                    continue;
                 }
-                else
+                if (gameState.IsInMatch)
                 {
-                    // Perform periodic annotation for active games.
+                    _logger.LogInformation($"[AnnotateTask] Eseguo annotazione periodica per match in corso: {gameCode}");
                     await AnnotateAsync(gameCode);
                 }
             }

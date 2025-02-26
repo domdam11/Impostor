@@ -154,6 +154,17 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 gameState.GameStarted = true;
                 await _eventCacheManager.UpdateGameStateAsync(e.Game.Code.ToString(), gameState);
             }
+
+            if (!gameState.IsInMatch)
+            {
+                gameState.MatchCounter++;      
+                gameState.IsInMatch = true;
+                gameState.GameEnded = false;
+                gameState.GameStarted = true;
+                gameState.FinalAnnotationDone = false;
+            }
+
+            await _eventCacheManager.UpdateGameStateAsync(e.Game.Code.ToString(), gameState);
         }
 
         /// <summary>
@@ -184,6 +195,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 gameState.GameStateName = "ended";
                 gameState.GameOverReason = e.GameOverReason.ToString();
                 gameState.GameEnded = true;
+                gameState.IsInMatch = false;
                 await _eventCacheManager.UpdateGameStateAsync(e.Game.Code.ToString(), gameState);
             }
         }

@@ -238,6 +238,10 @@ namespace Impostor.Plugins.SemanticAnnotator
             public bool GameStarted { get; set; } = false;
             public bool GameEnded { get; set; } = false;
 
+            public int MatchCounter { get; set; } = 0;
+            public bool IsInMatch { get; set; } = false;
+            public bool FinalAnnotationDone { get; set; } = false;
+
             /// <summary>
             /// Constructor to initialize a new game state.
             /// </summary>
@@ -250,6 +254,10 @@ namespace Impostor.Plugins.SemanticAnnotator
                 EventHistory = new List<Dictionary<string, object>>();
                 Map = "UnknownMap";
                 AlivePlayers = 0;
+
+                MatchCounter = 0;
+                IsInMatch = false;
+                FinalAnnotationDone = false;
             }
         }
 

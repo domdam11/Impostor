@@ -20,7 +20,7 @@ using System.IO;
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
-   
+
     public class AnnotatorEngine
     {
 
@@ -31,7 +31,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
         public (Dictionary<string, Player>, string) Annotate(string gameCode, GameEventCacheManager cacheManager, int numAnnot, int numRestarts, DateTimeOffset timestamp)
         {
-            string filePath = "../../../../Impostor.Plugins.SemanticAnnotator/Annotator/properties.json";  // JSON file with thresholds
+            string filePath = "C:/Users/utente/Desktop/Progetto_CrewMinds/Impostor/src/Impostor.Plugins.SemanticAnnotator/Annotator/properties.json";  // JSON file with thresholds
+            
             string nameSpace = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/";
             // load existing thresholds
             var thresholds = LoadThresholds(filePath);
@@ -66,6 +67,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
             // Retrive game status
             var gameState = cacheManager.GetGameStateAsync(gameCode).Result;
+            int matchCounter = gameState.MatchCounter;
             if (gameState == null)
             {
                 throw new Exception($"Game state for game code {gameCode} not found in cache.");
@@ -94,7 +96,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 var spawnMov = pState.Movements.FirstOrDefault();
                 var player = new Player(
-                    id: pState.id, 
+                    id: pState.id,
                     name: pState.Name,
                     cls: cls,
                     sesCls: pState.Role,
@@ -104,11 +106,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     voteCount: pState.VoteCount
                 );
                 players.Add(player);
-                               
+                Console.WriteLine($"[AnnotatorEngine] Creato oggetto Player: {player.Name}, Ruolo: {player.SessionCls}");
+
             }
 
             // scan player events
-            foreach (var dictEvent in gameState.EventHistory) 
+            foreach (var dictEvent in gameState.EventHistory)
             {
                 if (!dictEvent.ContainsKey("EventType"))
                     continue;
@@ -165,7 +168,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 }
                 //Console.WriteLine(ev);
-            } 
+            }
 
             // Creazione delle restrizioni di dati per le opzioni del gioco
             var dataQuantRestrictionMap = CowlWrapper.CreateDataValuesRestriction(
@@ -235,15 +238,51 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 false
             );
 
-            //write to file
-            string folderPath = $"gameSession{gameCode}";
-            if (!Directory.Exists(folderPath)) {
-                Directory.CreateDirectory(folderPath); 
-            } else if (numRestarts != 0) {
-                folderPath = $"gameSession{gameCode}_{numRestarts}";
-                Directory.CreateDirectory(folderPath); 
+            foreach (var player in players)
+            {
+                // IRI dell’individuo
+                string playerIndIri = CowlWrapper.GetFullIri(nameSpace, player.Name);
+                Console.WriteLine($"[AnnotatorEngine] Creazione individuo per Player: {player.Name}, classe: {player.Cls}, #objQuant: {player.objQuantRestrictionsPlayer.Count}, #hasValue: {player.objHasValueRestrictionsPlayer.Count}, #dataQuant: {player.dataQuantRestrictionsPlayer.Count}");
+
+                // Creo l’individuo del Player (con la classe e le objQuant + dataQuant)
+                var creationRet = CowlWrapper.CreateIndividual(
+                    onto,
+                    playerIndIri,
+                    new[] { player.Cls },
+                    player.objQuantRestrictionsPlayer,        
+                    player.dataQuantRestrictionsPlayer,       
+                    instancesToRelease,
+                    true
+                );
+                Console.WriteLine($"[AnnotatorEngine] -> CreateIndividual per {player.Name} restituisce: {creationRet}");
+                foreach (var hv in player.objHasValueRestrictionsPlayer)
+                {
+                    // Creiamo la class-assertion axiom
+                    var hvAxiom = cowl_cls_assert_axiom.CowlClsAssertAxiom(hv.__Instance,
+                        cowl_named_ind.CowlNamedIndFromString(UString.UstringCopyBuf(playerIndIri)).__Instance,
+                        null
+                    );
+
+                    instancesToRelease.Add(hvAxiom.__Instance);
+                    var retAxiom = cowl_ontology.CowlOntologyAddAxiom(onto, hvAxiom.__Instance);
+                    Console.WriteLine($"[AnnotatorEngine] ----> Aggiunta ObjHasValue Restriction per {player.Name} con esito: {retAxiom}");
+                }
             }
-            string absoluteHeaderDirectory = Path.Combine(folderPath, $"amongus{numAnnot}.owl");
+
+
+
+            //write to file
+            string folderPath = $"gameSession{gameCode}_match{matchCounter}";
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            else if (numRestarts != 0)
+            {
+                folderPath = $"gameSession{gameCode}_match{matchCounter}_{numRestarts}";
+                Directory.CreateDirectory(folderPath);
+            }
+            string absoluteHeaderDirectory = Path.Combine(folderPath, $"amongus_m{matchCounter}_{numAnnot}.owl");
             var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory);
             cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
             cowl_manager.CowlManagerWritePath(manager, onto, string3);
@@ -258,21 +297,22 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
 
             var result2 = Task.Run(async () => await CallArgumentationAsync(result));
-            result2.Wait(); 
+            result2.Wait();
             //Console.WriteLine(result2.Result);
 
             foreach (var instance in instancesToRelease)
             {
                 cowl_object.CowlRelease(instance);
             }
-  
+
             //ConsoleDriver.Run(new CowlWrapper());
             cowl_object.CowlRelease(onto.__Instance);
             cowl_object.CowlRelease(manager.__Instance);
-            
+
             // create a dictionary of player states updates and return that
             Dictionary<string, Player> pStates = new Dictionary<string, Player>();
-            foreach (var p in players) {
+            foreach (var p in players)
+            {
                 var dim = p.Movements.Count();
                 var ps = new Player(
                     id: p.Id,
@@ -319,7 +359,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             {
                 var ventIri = $"{nameSpace}{ventName}";
                 var objQuantVent = CowlWrapper.CreateAllValuesRestriction($"{nameSpace}VentTo", new[] { ventIri }, instancesToRelease);
-                var ventMov = new GameEventCacheManager.CustomMovement(new System.Numerics.Vector2(0, 0), DateTimeOffset.UtcNow); 
+                var ventMov = new GameEventCacheManager.CustomMovement(new System.Numerics.Vector2(0, 0), DateTimeOffset.UtcNow);
                 player.Movements.Add(ventMov);
                 player.objQuantRestrictionsPlayer.Add(objQuantVent);
             }
@@ -558,7 +598,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 }
             }
         }
-        
+
 
         private static double CalcDistance(System.Numerics.Vector2 posPlayer1, System.Numerics.Vector2 posPlayer2)
         {
@@ -597,17 +637,20 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
         public Player(string id, string name, CowlClass cls, string sesCls, List<GameEventCacheManager.CustomMovement> movements, GameEventCacheManager.CustomMovement initialMov, string state, int voteCount)
         {
-            Id = id; 
+            Id = id;
             Name = name.Replace(" ", "");
             State = state;
             Cls = cls; //class of the player
             SessionCls = sesCls; //class of the player for the session
-            if (movements.Count() == 0) {
-                Movements = new List<GameEventCacheManager.CustomMovement>{initialMov};
-            } else {
+            if (movements.Count() == 0)
+            {
+                Movements = new List<GameEventCacheManager.CustomMovement> { initialMov };
+            }
+            else
+            {
                 Movements = movements;
             }
-            VoteCount = voteCount; 
+            VoteCount = voteCount;
             // lists to store characteristics inferred from events
             objHasValueRestrictionsPlayer = new List<CowlObjHasValue>();
             objQuantRestrictionsPlayer = new List<CowlObjQuant>();
@@ -615,7 +658,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         }
         public void IncrementScore()
         {
-            VoteCount ++; // Increment vote count
+            VoteCount++; // Increment vote count
         }
         public void resetVoteCount()
         {
