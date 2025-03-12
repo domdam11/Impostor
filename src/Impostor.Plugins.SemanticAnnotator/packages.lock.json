@@ -4,11 +4,12 @@
     "net8.0": {
       "Coravel": {
         "type": "Direct",
-        "requested": "[5.0.4, )",
-        "resolved": "5.0.4",
-        "contentHash": "Bp3G5tmJgTpTYAYB86OljIbNZb2qt5iByWLUMYUZGA/hccoavKg2SWl5gs29WcrlHn96DVA+O+9NUEjVq3nUng==",
+        "requested": "[6.0.2, )",
+        "resolved": "6.0.2",
+        "contentHash": "/XZiRId4Ilar/OqjGKdxkZWfW97ekeT0wgiWNjGdqf8pPxiK508//Zkc0xrKMDOqchFT7B/oqAoQ+Vrx1txpPQ==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "3.1.0",
+          "Microsoft.Extensions.Configuration.Binder": "6.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "3.1.0",
           "Microsoft.Extensions.Logging.Abstractions": "3.1.0"
@@ -75,6 +76,14 @@
         "contentHash": "3lE/iLSutpgX1CC0NOW70FJoGARRHbyKmG7dc0klnUZ9Dd9hS6N/POPWhKhMLCEuNN5nXEY5agmlFtH562vqhQ==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "8.0.0"
+        }
+      },
+      "Microsoft.Extensions.Configuration.Binder": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "b3ErKzND8LIC7o08QAVlKfaEIYEvLJbtmVbFZVBRXeu9YkKfSSzLZfR1SUfQPBIy9mKLhEtJgGYImkcMNaKE0A==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "6.0.0"
         }
       },
       "Microsoft.Extensions.DependencyInjection": {
