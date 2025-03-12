@@ -108,7 +108,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 var timeSpent = (DateTime.UtcNow - lastTimestamp).TotalSeconds;
 
                 // Log player movement or stationary time
-                if (lastPosition == currentPosition)
+                /*if (lastPosition == currentPosition)
                 {
                     _logger.LogDebug("Player {playerId} ({playerName}) stationary at {position} for {timeSpent:F1} seconds.",
                         e.PlayerControl.PlayerId, e.PlayerControl.PlayerInfo.PlayerName.Replace(" ", ""), currentPosition, timeSpent);
@@ -117,7 +117,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 {
                     _logger.LogDebug("Player {playerId} ({playerName}) moved from {lastPosition} to {currentPosition}.",
                         e.PlayerControl.PlayerId, e.PlayerControl.PlayerInfo.PlayerName.Replace(" ", ""), lastPosition, currentPosition);
-                }
+                }*/
 
                 // Create movement event data
                 var movementEventData = new Dictionary<string, object>

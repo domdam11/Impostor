@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Coravel.Invocable;
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
@@ -23,7 +25,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         /// <param name="eventCacheManager">Manages the cached game events.</param>
         /// <param name="annotatorEngine">Processes game events and generates annotations.</param>
         /// <param name="logger">Handles logging for debugging and monitoring.</param>
-        public AnnotateTask(GameEventCacheManager eventCacheManager, AnnotatorEngine annotatorEngine, ILogger<AnnotateTask> logger)
+        public AnnotateTask(GameEventCacheManager eventCacheManager, AnnotatorEngine annotatorEngine, ILogger<AnnotateTask> logger, IConfiguration configuration)
         {
             _eventCacheManager = eventCacheManager;
             _annotatorEngine = annotatorEngine;

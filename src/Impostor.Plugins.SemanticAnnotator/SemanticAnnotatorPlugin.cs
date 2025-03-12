@@ -64,7 +64,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         /// Executes the annotation for all active sessions.
         /// </summary>
         /// <returns>Asynchronous Task.</returns>
-        private async Task AnnotateSessions()
+        public async Task AnnotateSessions()
         {
             // Retrieve all active game sessions
             var activeSessions = _eventCacheManager.GetActiveSessions();
@@ -72,12 +72,13 @@ namespace Impostor.Plugins.SemanticAnnotator
             foreach (var gameCode in activeSessions)
             {
                 // Retrieve events for the specific session
-                var events = await _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
+                //var events = await _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
 
                 // Resolve and execute the annotation task for each session
                 var annotator = _serviceProvider.GetRequiredService<AnnotateTask>();
                 await annotator.AnnotateAsync(gameCode);  // Passa gli eventi per l'annotazione
             }
+
         }
     }
 }

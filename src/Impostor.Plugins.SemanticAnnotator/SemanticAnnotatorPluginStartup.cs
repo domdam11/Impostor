@@ -5,6 +5,7 @@ using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Coravel;
+using System;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
@@ -40,6 +41,7 @@ namespace Impostor.Plugins.SemanticAnnotator
 
             // Configures Coravel for scheduling periodic tasks
             services.AddScheduler();
+           
         }
     }
 }

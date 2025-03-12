@@ -37,6 +37,7 @@ using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Coravel;
 using Coravel.Scheduling.Schedule.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -79,10 +80,11 @@ namespace Impostor.Tools.ServerReplay
             _serviceProvider = BuildServices();
 
             var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
-            await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
+            //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
 
             // Read all .dat files from the "sessions" directory
-            foreach (var file in Directory.GetFiles("sessions\\", "*.dat"))
+            foreach (var file in Directory.GetFiles("..\\" +
+                "..\\..\\sessions\\", "*.dat"))
             {
                 // Clear dictionaries at the start of each session
                 Connections.Clear();
@@ -106,16 +108,6 @@ namespace Impostor.Tools.ServerReplay
                     await ParseSession(reader);
                 }
 
-                // Retrieve the GameEventCacheManager and AnnotateTask for final annotation
-                var eventCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
-                var annotateTask = _serviceProvider.GetRequiredService<AnnotateTask>();
-
-                // Perform final annotation on all active sessions
-                var activeSessions = eventCacheManager.GetActiveSessions();
-                foreach (var gameCode in activeSessions)
-                {
-                    await annotateTask.AnnotateAsync(gameCode);
-                }
             }
 
             // Log total processing time
@@ -131,7 +123,16 @@ namespace Impostor.Tools.ServerReplay
         /// </summary>
         private static ServiceProvider BuildServices()
         {
+            var configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
+            configurationBuilder.AddJsonFile("properties.json", true);
+            var configuration = configurationBuilder.Build();
+
             var services = new ServiceCollection();
+
+            services.AddSingleton<IConfiguration>(configuration);
+            services.Configure<Thresholds>(configuration); // Registra la configurazione
 
             // Set up a mock ServerEnvironment
             services.AddSingleton(new ServerEnvironment
@@ -197,7 +198,7 @@ namespace Impostor.Tools.ServerReplay
             // Read the server version
             var serverVersion = reader.ReadString();
             Logger.Information("Loaded session (server: {ServerVersion}, recorded at {StartTime})", serverVersion, startTime);
-
+            var totalTimeframe = 0;
             // Read all packets in the session
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
@@ -207,11 +208,17 @@ namespace Impostor.Tools.ServerReplay
                 await using (var stream = new MemoryStream(data))
                 using (var readerInner = new BinaryReader(stream))
                 {
+                    var nextTimeFrame = TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
                     // Update the simulated time for each block
-                    _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
-
+                    _fakeDateTimeProvider.UtcNow += nextTimeFrame;
+                    totalTimeframe += nextTimeFrame.Milliseconds;
                     // Interpret the individual packet
                     await ParsePacket(readerInner);
+                    if (totalTimeframe > 3000) {
+                        var annotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
+                        await annotatorPlugin.AnnotateSessions();
+                        totalTimeframe = 0;
+                    }
                 }
             }
         }

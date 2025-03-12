@@ -39,9 +39,13 @@ namespace Impostor.Plugins.SemanticAnnotator
         /// <returns>Asynchronous Task.</returns>
         public async Task AddGameAsync(string gameCode, GameState gameState)
         {
-            if (!_gameCache.ContainsKey(gameCode))
-                _gameCache[gameCode] = gameState;
-
+            if(gameCode != "unassigned")
+            {
+                // Adds the game to the cache (if it doesn't already exist)
+                if (!_gameCache.ContainsKey(gameCode))
+                    _gameCache[gameCode] = gameState;
+            }
+          
             await Task.CompletedTask;
         }
 

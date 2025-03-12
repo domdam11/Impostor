@@ -16,26 +16,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.IO;
-
-
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
 
     public class AnnotatorEngine
     {
 
+        public AnnotatorEngine(IOptions<Thresholds> options)
+        {
+            _thresholds = options.Value;
+        }
+        private Thresholds _thresholds;
+
         /// <summary>
         /// Retrieves the annotation.
         /// </summary>
         /// <returns>The annotation.</returns>
-
         public (Dictionary<string, Player>, string) Annotate(string gameCode, GameEventCacheManager cacheManager, int numAnnot, int numRestarts, DateTimeOffset timestamp)
         {
-            string filePath = "C:/Users/utente/Desktop/Progetto_CrewMinds/Impostor/src/Impostor.Plugins.SemanticAnnotator/Annotator/properties.json";  // JSON file with thresholds
             
             string nameSpace = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/";
-            // load existing thresholds
-            var thresholds = LoadThresholds(filePath);
 
             // You must always initialize the library before use.
             try
@@ -137,7 +139,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         break;
 
                     case "PlayerCompletedTask":
-                        HandlePlayerCompletedTask(dictEvent, players, thresholds, nameSpace, instancesToRelease);
+                        HandlePlayerCompletedTask(dictEvent, players, nameSpace, instancesToRelease);
                         break;
 
                     case "PlayerVotedEvent":
@@ -149,7 +151,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         break;
 
                     case "PlayerRepairSystem":
-                        HandlePlayerRepairSystem(dictEvent, players, thresholds, nameSpace, instancesToRelease);
+                        HandlePlayerRepairSystem(dictEvent, players, nameSpace, instancesToRelease);
                         break;
 
                     case "PlayerMovement":
@@ -296,8 +298,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
 
-            var result2 = Task.Run(async () => await CallArgumentationAsync(result));
-            result2.Wait();
+            //var result2 = Task.Run(async () => await CallArgumentationAsync(result));
+            //result2.Wait();
             //Console.WriteLine(result2.Result);
 
             foreach (var instance in instancesToRelease)
@@ -376,10 +378,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 var exitVentIri = $"{nameSpace}{ventName}";
                 var objQuantExitVent = CowlWrapper.CreateAllValuesRestriction($"{nameSpace}ExitVent", new[] { exitVentIri }, instancesToRelease);
                 player.objQuantRestrictionsPlayer.Add(objQuantExitVent);
-
-                // Aggiungi un movimento di uscita
-                var exitMov = new GameEventCacheManager.CustomMovement(player.Movements.Last().Position, DateTimeOffset.UtcNow);
-                player.Movements.Add(exitMov);
+                if (player.Movements.Last() != null)
+                {
+                    // Aggiungi un movimento di uscita
+                    var exitMov = new GameEventCacheManager.CustomMovement(player.Movements.Last().Position, DateTimeOffset.UtcNow);
+                    player.Movements.Add(exitMov);
+                }
             }
         }
 
@@ -406,7 +410,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
         }
 
-        private void HandlePlayerCompletedTask(Dictionary<string, object> dictEvent, List<Player> players, Thresholds thresholds, string nameSpace, List<nint> instancesToRelease)
+        private void HandlePlayerCompletedTask(Dictionary<string, object> dictEvent, List<Player> players, string nameSpace, List<nint> instancesToRelease)
         {
             var playerName = dictEvent.ContainsKey("PlayerName") ? dictEvent["PlayerName"].ToString() : "UnknownPlayer";
             var taskType = dictEvent.ContainsKey("TaskType") ? dictEvent["TaskType"].ToString() : "UnknownTask";
@@ -426,20 +430,22 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     {
                         if (otherPlayer.Name.Equals(player.Name, StringComparison.OrdinalIgnoreCase) || otherPlayer.State.Equals("dead", StringComparison.OrdinalIgnoreCase))
                             continue;
-
-                        double distance = CalcDistance(player.Movements.Last().Position, otherPlayer.Movements.Last().Position);
-                        if (distance <= thresholds.FOV)
+                        if (player.Movements.Last() != null)
                         {
-                            player.State = "trusted";
-                            var dataQuantPlayerState = CowlWrapper.CreateDataValuesRestriction(
-                                $"{nameSpace}HasStatus",
-                                new[] { "trusted" },
-                                "http://www.w3.org/2001/XMLSchema#string",
-                                "",
-                                instancesToRelease
-                            );
-                            player.dataQuantRestrictionsPlayer.Add(dataQuantPlayerState);
-                            break; // Almeno un Crewmate ha visto la task
+                            double distance = CalcDistance(player.Movements.Last().Position, otherPlayer.Movements.Last().Position);
+                            if (distance <= _thresholds.FOV)
+                            {
+                                player.State = "trusted";
+                                var dataQuantPlayerState = CowlWrapper.CreateDataValuesRestriction(
+                                    $"{nameSpace}HasStatus",
+                                    new[] { "trusted" },
+                                    "http://www.w3.org/2001/XMLSchema#string",
+                                    "",
+                                    instancesToRelease
+                                );
+                                player.dataQuantRestrictionsPlayer.Add(dataQuantPlayerState);
+                                break; // Almeno un Crewmate ha visto la task
+                            }
                         }
                     }
                 }
@@ -501,7 +507,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
         }
 
-        private void HandlePlayerRepairSystem(Dictionary<string, object> dictEvent, List<Player> players, Thresholds thresholds, string nameSpace, List<nint> instancesToRelease)
+        private void HandlePlayerRepairSystem(Dictionary<string, object> dictEvent, List<Player> players, string nameSpace, List<nint> instancesToRelease)
         {
             string playerName = dictEvent.ContainsKey("PlayerName") ? dictEvent["PlayerName"].ToString() : "UnknownPlayer";
             string systemType = dictEvent.ContainsKey("SystemType") ? dictEvent["SystemType"].ToString() : "UnknownSystem";
@@ -605,7 +611,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return Math.Sqrt(Math.Pow(posPlayer1.X - posPlayer2.X, 2) + Math.Pow(posPlayer1.Y - posPlayer2.Y, 2));
         }
 
-        public static Thresholds LoadThresholds(string filePath)
+        /*public static Thresholds LoadThresholds(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -617,7 +623,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 Console.WriteLine("JSON file not found");
                 return new Thresholds() { FOV = 3.0, NextToTask = 1.0, NextToVent = 1.0, TimeShort = 2.0, TimeInspectSample = 3.0, TimeUnlockManifolds = 5.0, TimeCalibratedDistributor = 9.0, TimeClearAsteroids = 11.0, TimeStartReactor = 28.0 };  // default threhsolds
             }
-        }
+        }*/
 
 
     }
