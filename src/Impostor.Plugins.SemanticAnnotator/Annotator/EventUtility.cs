@@ -2,10 +2,7 @@ using Impostor.Api.Games;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Meeting;
 using Impostor.Api.Events.Player;
-using Impostor.Api.Events.Ship;
-using Impostor.Plugins.SemanticAnnotator.Utils;
-using System.Runtime.CompilerServices;
-using Impostor.Api.Innersloth;
+
 using Impostor.Api.Net;
 using Impostor.Api.Net.Inner.Objects;
 using System.Diagnostics.Metrics;

@@ -485,12 +485,6 @@
           "Microsoft.Extensions.Logging.Abstractions": "[8.0.0, )"
         }
       },
-      "impostor.plugins.example": {
-        "type": "Project",
-        "dependencies": {
-          "Impostor.Api": "[1.9.3-dev, )"
-        }
-      },
       "impostor.plugins.semanticannotator": {
         "type": "Project",
         "dependencies": {
