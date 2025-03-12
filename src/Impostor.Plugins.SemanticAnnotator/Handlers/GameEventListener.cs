@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
@@ -44,7 +45,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
             if (gameState == null)
             {
                 // Initialize a new game state if none exists
-                gameState = new GameEventCacheManager.GameState("unassigned");
+                gameState = new GameState("unassigned");
                 gameState.GameStateName = "created";
                 await _eventCacheManager.AddGameAsync("unassigned", gameState);
             }
@@ -75,7 +76,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
             var gameState = await _eventCacheManager.GetGameStateAsync(e.Game.Code.ToString());
             if (gameState == null)
             {
-                gameState = new GameEventCacheManager.GameState(e.Game.Code.ToString());
+                gameState = new GameState(e.Game.Code.ToString());
                 gameState.GameStateName = "created";
                 await _eventCacheManager.AddGameAsync(e.Game.Code.ToString(), gameState);
             }
@@ -340,9 +341,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 if (player == null)
                 {
                     // Add a new player to the game state
-                    var newPlayerState = new GameEventCacheManager.PlayerState(e.Player.Client.Name, e.Player.Character?.PlayerInfo?.RoleType?.ToString() ?? "Unknown")
+                    var newPlayerState = new PlayerState(e.Player.Client.Name, e.Player.Character?.PlayerInfo?.RoleType?.ToString() ?? "Unknown")
                     {
-                        Movements = new List<GameEventCacheManager.CustomMovement>(),
+                        Movements = new List<CustomMovement>(),
                         State = "alive",
                         VoteCount = 0
                     };

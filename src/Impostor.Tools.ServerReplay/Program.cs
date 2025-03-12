@@ -38,6 +38,7 @@ using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Coravel;
 using Coravel.Scheduling.Schedule.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Tools.ServerReplay
 {

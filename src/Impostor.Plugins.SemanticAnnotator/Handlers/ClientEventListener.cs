@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using Impostor.Plugins.SemanticAnnotator;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {

@@ -9,9 +9,9 @@ using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth.Customization;
 using Microsoft.Extensions.Logging;
 using Impostor.Api.Innersloth.GameOptions;
-using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Api.Net.Inner.Objects;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
@@ -60,12 +60,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 if (player == null)
                 {
                     // Add a new player to the game state
-                    var newPlayerState = new GameEventCacheManager.PlayerState(e.PlayerControl.PlayerInfo.PlayerName.Replace(" ", ""), e.PlayerControl.PlayerInfo.IsImpostor ? "Impostor" : "Crewmate")
+                    var newPlayerState = new PlayerState(e.PlayerControl.PlayerInfo.PlayerName.Replace(" ", ""), e.PlayerControl.PlayerInfo.IsImpostor ? "Impostor" : "Crewmate")
                     {
-                        Movements = new List<GameEventCacheManager.CustomMovement>
+                        Movements = new List<CustomMovement>
                         {
 
-                            new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow)
+                            new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow)
                         },
                         State = "alive",
                         VoteCount = 0
@@ -77,7 +77,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                     // Update existing player information
                     player.State = "alive";
                     player.Role = e.PlayerControl.PlayerInfo.IsImpostor ? "Impostor" : "Crewmate";
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
                 }
 
                 // Set the game started flag if not already set
@@ -149,7 +149,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 if (player != null)
                 {
                     // Add the current movement to player history
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(currentPosition, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(currentPosition, DateTimeOffset.UtcNow));
 
                     await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);
                 }
@@ -330,7 +330,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 {
                     // Update player state to "venting"
                     player.State = "venting";
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
                     await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);
                 }
             }
@@ -368,7 +368,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 {
                     // Set player state back to "alive" after exiting the vent
                     player.State = "alive";
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
                     await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);
                 }
             }
@@ -406,7 +406,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 {
                     // Update player state to "venting"
                     player.State = "venting";
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
                     await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);
                 }
             }
@@ -544,7 +544,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 var player = gameState.Players.FirstOrDefault(p => p.Name.Equals(e.PlayerControl.PlayerInfo.PlayerName.Replace(" ", ""), StringComparison.OrdinalIgnoreCase));
                 if (player != null)
                 {
-                    player.Movements.Add(new GameEventCacheManager.CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
+                    player.Movements.Add(new CustomMovement(e.PlayerControl.NetworkTransform.Position, DateTimeOffset.UtcNow));
 
                     await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);
                 }
