@@ -6,7 +6,6 @@ using Impostor.Api.Events.Ship;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Maps;
-using Impostor.Plugins.SemanticAnnotator;
 using System.Text.Json;
 using Impostor.Api.Innersloth.GameOptions;
 using CowlSharp.Wrapper;
@@ -18,6 +17,7 @@ using System.Net.Http;
 using System.IO;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
+using Impostor.Plugins.SemanticAnnotator.Models;
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
 
@@ -321,7 +321,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     name: p.Name,
                     cls: p.Cls,
                     sesCls: p.SessionCls,
-                    movements: new List<GameEventCacheManager.CustomMovement> { p.Movements[dim - 1] },
+                    movements: new List<CustomMovement> { p.Movements[dim - 1] },
                     initialMov: p.Movements.LastOrDefault(),
                     state: p.State,
                     voteCount: p.VoteCount
@@ -361,7 +361,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             {
                 var ventIri = $"{nameSpace}{ventName}";
                 var objQuantVent = CowlWrapper.CreateAllValuesRestriction($"{nameSpace}VentTo", new[] { ventIri }, instancesToRelease);
-                var ventMov = new GameEventCacheManager.CustomMovement(new System.Numerics.Vector2(0, 0), DateTimeOffset.UtcNow);
+                var ventMov = new CustomMovement(new System.Numerics.Vector2(0, 0), DateTimeOffset.UtcNow);
                 player.Movements.Add(ventMov);
                 player.objQuantRestrictionsPlayer.Add(objQuantVent);
             }
@@ -381,7 +381,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 if (player.Movements.Last() != null)
                 {
                     // Aggiungi un movimento di uscita
-                    var exitMov = new GameEventCacheManager.CustomMovement(player.Movements.Last().Position, DateTimeOffset.UtcNow);
+                    var exitMov = new CustomMovement(player.Movements.Last().Position, DateTimeOffset.UtcNow);
                     player.Movements.Add(exitMov);
                 }
             }
@@ -546,7 +546,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             var player = players.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
             if (player != null)
             {
-                var mov = new GameEventCacheManager.CustomMovement(new System.Numerics.Vector2(posX, posY), timestamp);
+                var mov = new CustomMovement(new System.Numerics.Vector2(posX, posY), timestamp);
                 player.Movements.Add(mov);
                 // Puoi aggiungere ulteriori restrizioni o logica se necessario
             }
@@ -628,69 +628,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
     }
 
-    public class Player
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string State { get; set; }
-        public CowlClass Cls { get; set; }
-        public string SessionCls { get; set; }
-        public List<GameEventCacheManager.CustomMovement> Movements { get; set; }
-        public int VoteCount { get; set; }
-        public List<CowlObjHasValue> objHasValueRestrictionsPlayer { get; set; }
-        public List<CowlObjQuant> objQuantRestrictionsPlayer { get; set; }
-        public List<CowlDataQuant> dataQuantRestrictionsPlayer { get; set; }
-
-        public Player(string id, string name, CowlClass cls, string sesCls, List<GameEventCacheManager.CustomMovement> movements, GameEventCacheManager.CustomMovement initialMov, string state, int voteCount)
-        {
-            Id = id;
-            Name = name.Replace(" ", "");
-            State = state;
-            Cls = cls; //class of the player
-            SessionCls = sesCls; //class of the player for the session
-            if (movements.Count() == 0)
-            {
-                Movements = new List<GameEventCacheManager.CustomMovement> { initialMov };
-            }
-            else
-            {
-                Movements = movements;
-            }
-            VoteCount = voteCount;
-            // lists to store characteristics inferred from events
-            objHasValueRestrictionsPlayer = new List<CowlObjHasValue>();
-            objQuantRestrictionsPlayer = new List<CowlObjQuant>();
-            dataQuantRestrictionsPlayer = new List<CowlDataQuant>();
-        }
-        public void IncrementScore()
-        {
-            VoteCount++; // Increment vote count
-        }
-        public void resetVoteCount()
-        {
-            VoteCount = 0; // reset after meeting ended
-        }
-        public void resetMovements()
-        {
-            var timestamp = Movements[Movements.Count - 1].Timestamp;
-            Movements.Clear(); // reset after meeting ended
-            System.Numerics.Vector2 meetingSpawnCenter = new System.Numerics.Vector2(-0.72f, 0.62f); //meetingSpawnCenter for Skeld Map
-            GameEventCacheManager.CustomMovement spawnMov = new GameEventCacheManager.CustomMovement(meetingSpawnCenter, timestamp);
-            Movements.Add(spawnMov);
-        }
-    }
 
 
-    public class Thresholds
-    {
-        public double FOV { get; set; }
-        public double NextToTask { get; set; }
-        public double NextToVent { get; set; }
-        public double TimeShort { get; set; }
-        public double TimeInspectSample { get; set; }
-        public double TimeUnlockManifolds { get; set; }
-        public double TimeCalibratedDistributor { get; set; }
-        public double TimeClearAsteroids { get; set; }
-        public double TimeStartReactor { get; set; }
-    }
+
+    
 }
