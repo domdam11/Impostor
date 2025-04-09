@@ -1,7 +1,13 @@
 using Impostor.Api.Events;
 using Impostor.Api.Plugins;
-using Impostor.Plugins.SemanticAnnotator.Handlers;
+using Impostor.Plugins.SemanticAnnotator.Adapters;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Application;
+using Impostor.Plugins.SemanticAnnotator.Handlers;
+using Impostor.Plugins.SemanticAnnotator.Jobs;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Coravel;
@@ -11,37 +17,60 @@ namespace Impostor.Plugins.SemanticAnnotator
 {
     public class SemanticAnnotatorPluginStartup : IPluginStartup
     {
-        public void ConfigureHost(IHostBuilder host)
-        {
+        private readonly IConfiguration _configuration;
 
+        public SemanticAnnotatorPluginStartup()
+        {
         }
 
-        /// <summary>
-        /// Configures the services required for the plugin.
-        /// Registers dependencies using Dependency Injection.
-        /// </summary>
-        /// <param name="services">Service collection for dependency registration.</param>
+        public SemanticAnnotatorPluginStartup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public void ConfigureHost(IHostBuilder host)
+        {
+            // Nothing extra
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            // Adds all necessary event listeners as singletons
+            // Coravel
+            services.AddScheduler();
+
+            // Binding manuale dei Thresholds
+            var thresholds = new Thresholds();
+            _configuration.GetSection("Thresholds").Bind(thresholds);
+            services.AddSingleton(thresholds);
+
+            // Event listeners
             services.AddSingleton<IEventListener, GameEventListener>();
-            services.AddSingleton<IEventListener, ClientEventListener>();
             services.AddSingleton<IEventListener, PlayerEventListener>();
             services.AddSingleton<IEventListener, MeetingEventListener>();
             services.AddSingleton<IEventListener, ShipEventListener>();
+            services.AddSingleton<IEventListener, ClientEventListener>();
 
-            // Adds the GameEventCacheManager as a singleton for managing event storage
+            // Core
             services.AddSingleton<GameEventCacheManager>();
-
-            // Adds AnnotateTask for periodic annotation
-            services.AddTransient<AnnotateTask>();
-
-            // Adds AnnotatorEngine as a singleton for processing game event annotations
             services.AddSingleton<AnnotatorEngine>();
 
-            // Configures Coravel for scheduling periodic tasks
+            // Porta buffer o diretta
+            bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", true);
+
+            if (useBuffer)
+            {
+                services.AddSingleton<IAnnotationBuffer, InMemoryAnnotationBuffer>();
+                services.AddSingleton<IArgumentationResultBuffer, InMemoryArgumentationResultBuffer>();
+            }
+
+            // Porte e orchestratori
+            services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
+            //services.AddSingleton<INotarizationService, BlockchainAdapter>();
+            services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
+
+            // Coravel
             services.AddScheduler();
-           
+            services.AddTransient<DecisionSupportJob>();
         }
     }
 }

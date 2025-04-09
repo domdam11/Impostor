@@ -217,7 +217,7 @@ namespace Impostor.Tools.ServerReplay
                     await ParsePacket(readerInner);
                     if (totalTimeframe > 3000) {
                         var annotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
-                        await annotatorPlugin.AnnotateSessions();
+                        //await annotatorPlugin.AnnotateSessions();
                         totalTimeframe = 0;
                     }
                 }

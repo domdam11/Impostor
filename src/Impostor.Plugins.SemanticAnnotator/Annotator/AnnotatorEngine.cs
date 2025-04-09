@@ -24,11 +24,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     public class AnnotatorEngine
     {
 
-        public AnnotatorEngine(IOptions<Thresholds> options)
+        private readonly Thresholds _thresholds;
+
+        public AnnotatorEngine(Thresholds thresholds)
         {
-            _thresholds = options.Value;
+            _thresholds = thresholds;
         }
-        private Thresholds _thresholds;
 
         /// <summary>
         /// Retrieves the annotation.
@@ -297,6 +298,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             uvec_builtin.UvecCopyToArrayChar(chars, sbyteArray);
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
+
+            SaveLastOwl(result);
 
             //var result2 = Task.Run(async () => await CallArgumentationAsync(result));
             //result2.Wait();
@@ -585,7 +588,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
 
 
-        public static async Task<string> CallArgumentationAsync(string annotations)
+        /*public static async Task<string> CallArgumentationAsync(string annotations)
         {
             string url_owl = "http://127.0.0.1:18080/update";
             using (HttpClient client = new HttpClient())
@@ -603,7 +606,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     return "Errore nella richiesta";
                 }
             }
-        }
+        }*/
 
 
         private static double CalcDistance(System.Numerics.Vector2 posPlayer1, System.Numerics.Vector2 posPlayer2)
@@ -624,6 +627,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 return new Thresholds() { FOV = 3.0, NextToTask = 1.0, NextToVent = 1.0, TimeShort = 2.0, TimeInspectSample = 3.0, TimeUnlockManifolds = 5.0, TimeCalibratedDistributor = 9.0, TimeClearAsteroids = 11.0, TimeStartReactor = 28.0 };  // default threhsolds
             }
         }*/
+
+        private string _lastOwl;
+
+        public string GetLastOwl() => _lastOwl;
+
+        private void SaveLastOwl(string owlContent)
+        {
+            _lastOwl = owlContent;
+        }
 
 
     }

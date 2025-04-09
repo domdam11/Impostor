@@ -9,8 +9,10 @@ using Impostor.Api.Net.Inner;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Server.Events.Player;
 using Impostor.Server.Net.State;
+using Impostor.Server.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Serilog;
 
 namespace Impostor.Server.Net.Inner.Objects.Components
 {
@@ -128,7 +130,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
         {
             Position = position;
-
+            Log.Information("Position {0} {1}", position.X, position.Y);
             var playerMovementEvent = _pool.Get();
             playerMovementEvent.Reset(Game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);
