@@ -36,9 +36,9 @@ namespace Impostor.Plugins.SemanticAnnotator
                 .EverySeconds(annotationPeriod)
                 .PreventOverlapping(nameof(ArgumentationJob));
 
-            scheduler.Schedule<BlockchainNotarizationJob>()
+            scheduler.Schedule<GameNotarizationJob>()
                 .EverySeconds(annotationPeriod)
-                .PreventOverlapping(nameof(BlockchainNotarizationJob));
+                .PreventOverlapping(nameof(GameNotarizationJob));
 
             return default;
         }

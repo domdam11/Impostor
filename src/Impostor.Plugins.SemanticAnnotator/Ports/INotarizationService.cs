@@ -1,9 +1,14 @@
 using System.Threading.Tasks;
 
-namespace Impostor.Plugins.SemanticAnnotator.Ports
+public interface INotarizationService
 {
-    public interface INotarizationService
-    {
-        Task NotifyAsync(string annotatedReasoning);
-    }
+    /// <summary>
+    /// Notarizes a reasoning result obtained from argumentation.
+    /// </summary>
+    Task NotifyAsync(string gameId, string annotatedReasoning);
+
+    /// <summary>
+    /// Dispatches notarization tasks based on cached game events.
+    /// </summary>
+    Task DispatchNotarizationTasksAsync();
 }

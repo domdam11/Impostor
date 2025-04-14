@@ -1,71 +1,47 @@
-using System;
-using System.Threading.Tasks;
-using System.Linq;
-using Impostor.Plugins.SemanticAnnotator.Ports;
-using Impostor.Plugins.SemanticAnnotator.Handlers;
-using Microsoft.Extensions.Logging;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using System.Threading.Tasks;
+using System;
 
 namespace Impostor.Plugins.SemanticAnnotator.Application
 {
-    public class AnnotationService
+    public class AnnotatorService : IAnnotator
     {
-        private readonly IGameSessionProvider _sessionProvider;
-        private readonly IAnnotator _annotator;
-        private readonly GameEventCacheManager _eventCacheManager;
-        private readonly ILogger<AnnotationService> _logger;
+        private readonly AnnotatorEngine _engine;
+        private readonly GameEventCacheManager _cacheManager;
+        private readonly IAnnotationBuffer _buffer;
 
-        public AnnotationService(
-            IGameSessionProvider sessionProvider,
-            IAnnotator annotator,
-            GameEventCacheManager eventCacheManager,
-            ILogger<AnnotationService> logger)
+        public AnnotatorService(AnnotatorEngine engine, GameEventCacheManager cacheManager, IAnnotationBuffer buffer)
         {
-            _sessionProvider = sessionProvider;
-            _annotator = annotator;
-            _eventCacheManager = eventCacheManager;
-            _logger = logger;
+            _engine = engine;
+            _cacheManager = cacheManager;
+            _buffer = buffer;
         }
 
-        public async Task AnnotateAllSessionsAsync()
+        public async Task AnnotateAsync(string gameCode)
         {
-            var activeSessions = _sessionProvider.GetActiveSessions()?.ToList();
-
-            if (activeSessions == null || activeSessions.Count == 0)
-            {
-                _logger.LogInformation("Nessuna sessione attiva trovata per l'annotazione.");
+            if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
                 return;
-            }
 
-            _logger.LogInformation($"Annotazione avviata per {activeSessions.Count} sessioni attive.");
+            var gameState = await _cacheManager.GetGameStateAsync(gameCode);
+            if (gameState == null)
+                return;
 
-            foreach (var gameCode in activeSessions)
-            {
-                var gameState = await _eventCacheManager.GetGameStateAsync(gameCode);
+            var (results, newGameStateName) = _engine.Annotate(
+                gameCode,
+                _cacheManager,
+                gameState.CallCount + 1,
+                gameState.NumRestarts,
+                DateTimeOffset.UtcNow
+            );
 
-                if (gameState == null)
-                {
-                    _logger.LogWarning($"Stato del gioco non trovato per GameCode: {gameCode}.");
-                    continue;
-                }
+            string owl = _engine.GetLastOwl();
+            _buffer.Save(gameCode, owl);
 
-                if (gameState.GameEnded && !gameState.FinalAnnotationDone)
-                {
-                    _logger.LogInformation($"GameCode: {gameCode} è terminato. Annotazione finale eseguita.");
-                    await _annotator.AnnotateAsync(gameCode);
-                    gameState.FinalAnnotationDone = true;
-                    await _eventCacheManager.UpdateGameStateAsync(gameCode, gameState);
-                    continue;
-                }
-
-                if (gameState.IsInMatch)
-                {
-                    _logger.LogInformation($"Eseguo annotazione periodica per match in corso: {gameCode}");
-                    await _annotator.AnnotateAsync(gameCode);
-                }
-            }
-
-            _logger.LogInformation("Annotazione completata per tutte le sessioni attive.");
+            gameState.CallCount += 1;
+            gameState.GameStateName = newGameStateName;
+            await _cacheManager.UpdateGameStateAsync(gameCode, gameState);
+            await _cacheManager.ClearGameEventsAsync(gameCode);
         }
     }
 }

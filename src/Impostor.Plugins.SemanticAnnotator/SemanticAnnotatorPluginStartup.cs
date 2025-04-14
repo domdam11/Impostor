@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Coravel;
 using System;
+using TransactionHandler.Tasks;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
@@ -38,7 +39,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             // Coravel
             services.AddScheduler();
 
-            // Binding manuale dei Thresholds
+            // Binding dei Thresholds
             var thresholds = new Thresholds();
             _configuration.GetSection("Thresholds").Bind(thresholds);
             services.AddSingleton(thresholds);
@@ -54,23 +55,35 @@ namespace Impostor.Plugins.SemanticAnnotator
             services.AddSingleton<GameEventCacheManager>();
             services.AddSingleton<AnnotatorEngine>();
 
-            // Porta buffer o diretta
+            // Modalità buffer: true -> uso di buffer + job Coravel
             bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", true);
 
             if (useBuffer)
             {
+                // Buffer e orchestrazione asincrona
                 services.AddSingleton<IAnnotationBuffer, InMemoryAnnotationBuffer>();
                 services.AddSingleton<IArgumentationResultBuffer, InMemoryArgumentationResultBuffer>();
+
+                services.AddSingleton<IAnnotator, AnnotatorService>();
+                services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
+                services.AddSingleton<INotarizationService, NotarizationAdapter>();
+                services.AddSingleton<ITransactionManager, TransactionManager>();
+
+                // Job asincroni Coravel
+                services.AddTransient<AnnotationJob>();
+                services.AddTransient<GameNotarizationJob>();
+
             }
+            else
+            {
+                // Modalità diretta con orchestrazione coordinata
+                services.AddSingleton<IAnnotator, AnnotatorService>();
+                services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
+                services.AddSingleton<INotarizationService, NotarizationAdapter>();
+                services.AddSingleton<ITransactionManager, TransactionManager>();
+                services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
 
-            // Porte e orchestratori
-            services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
-            //services.AddSingleton<INotarizationService, BlockchainAdapter>();
-            services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
-
-            // Coravel
-            services.AddScheduler();
-            services.AddTransient<DecisionSupportJob>();
+            }
         }
     }
 }

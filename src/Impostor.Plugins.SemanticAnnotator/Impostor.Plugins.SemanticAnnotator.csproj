@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CowlSharp\CowlSharp.csproj" />
     <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+    <ProjectReference Include="..\TransactionHandler\src\IO.Swagger\TransactionHandler.csproj" />
   </ItemGroup>
 
   <ItemGroup>
