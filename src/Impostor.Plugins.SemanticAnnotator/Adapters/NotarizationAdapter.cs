@@ -41,9 +41,6 @@ public class NotarizationAdapter : INotarizationService
                     case "RemovePlayer":
                         await _transactionManager.RemovePlayerAsync(gameCode, player.ToString());
                         break;
-                    case "CreateEvent":
-                        await _transactionManager.CreateEventAsync(gameCode, description);
-                        break;
                     //come gestire la creazione di un Asset?
                     case "ChangeState":
                         await_transactionManager.ChangeStateAsync(gameCode, state);
