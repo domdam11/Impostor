@@ -35,12 +35,32 @@ public class NotarizationAdapter : INotarizationService
                 string eventType = typeObj.ToString();
                 switch (eventType)
                 {
-                    case "GameCreated":
-                        await _transactionManager.CreateGameSessionAsync(gameCode, "Game created");
+                    case "UpdateDescription":
+                        await _transactionManager.UpdateDescriptionAsync(gameCode, description);
                         break;
-                    case "PlayerJoined":
-                        if (ev.TryGetValue("Player", out var player))
-                            await _transactionManager.AddPlayerAsync(gameCode, player.ToString(), "Joined");
+                    case "RemovePlayer":
+                        await _transactionManager.RemovePlayerAsync(gameCode, player.ToString());
+                        break;
+                    case "CreateEvent":
+                        await _transactionManager.CreateEventAsync(gameCode, description);
+                        break;
+                    //come gestire la creazione di un Asset?
+                    case "ChangeState":
+                        await_transactionManager.ChangeStateAsync(gameCode, state);
+                        break;
+                    case "AddPlayer":
+                        await _transactionManager.AddPlayerAsync(gameCode, player.ToString(), "Joined");
+                        break;
+                    case "ReadEvent":
+                        await _transactionManager.GetEventDetailAsync(gameCode);
+                        break;
+                    case "ReadAsset":
+                        await _transactionManager.GetGameDetailsAsync(gameCode);
+                    case "CreateAsset":
+                        await _transactionManager.CreateGameSessionAsync(gameCode, description);
+                        break;
+                    case "GetClientID":
+                        await _transactionManager.GetClientIdAsync();
                         break;
                     case "GameStarted":
                         await _transactionManager.ChangeStateAsync(gameCode, "started");
@@ -48,7 +68,10 @@ public class NotarizationAdapter : INotarizationService
                     case "GameEnded":
                         await _transactionManager.EndGameSessionAsync(gameCode);
                         break;
-                        // altri eventi da gestire se necessario
+                    // altri casi da gestire
+                    default:
+                        _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", eventType, gameCode);
+                        break;
                 }
             }
         }
