@@ -9,19 +9,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
     public class DecisionSupportService : IDecisionSupportService
     {
         private readonly IAnnotator _annotator;
-        private readonly IAnnotationBuffer _annotationBuffer;
         private readonly IArgumentationService _argumentation;
         private readonly INotarizationService _notarization;
         private readonly ILogger<DecisionSupportService> _logger;
 
         public DecisionSupportService(IAnnotator annotator,
-                                      IAnnotationBuffer annotationBuffer,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
                                       ILogger<DecisionSupportService> logger)
         {
             _annotator = annotator;
-            _annotationBuffer = annotationBuffer;
             _argumentation = argumentation;
             _notarization = notarization;
             _logger = logger;
@@ -31,18 +28,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         {
             _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
 
-            await _annotator.AnnotateAsync(gameCode);
+            string owl = await _annotator.AnnotateAsync(gameCode);
 
-            if (_annotationBuffer.TryGetNext(out var retrievedGameCode, out var owl) &&
-                retrievedGameCode == gameCode)
+            if (!string.IsNullOrWhiteSpace(owl))
             {
                 var reasoning = await _argumentation.SendAnnotationsAsync(owl);
                 await _notarization.NotifyAsync(gameCode, reasoning);
-                _annotationBuffer.MarkAsProcessed(gameCode);
             }
             else
             {
-                _logger.LogWarning($"[DSS] Annotazione non trovata per {gameCode}");
+                _logger.LogWarning($"[DSS] Annotazione non generata per {gameCode}");
             }
 
             _logger.LogInformation($"[DSS] Processo decisionale completato per {gameCode}");

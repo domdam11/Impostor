@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using IO.Swagger.Api;
 using IO.Swagger.Model;
@@ -7,9 +7,9 @@ namespace TransactionHandler.Tasks
 {
     public class TransactionManager : ITransactionManager
     {
-        private readonly BlockchainReSTAPIApi _client;
+        private readonly IBlockchainReSTAPIApi _client;
 
-        public TransactionManager(BlockchainReSTAPIApi client)
+        public TransactionManager(IBlockchainReSTAPIApi client)
         {
             _client = client;
         }

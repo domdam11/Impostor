@@ -13,6 +13,10 @@ using Microsoft.Extensions.Hosting;
 using Coravel;
 using System;
 using TransactionHandler.Tasks;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using IO.Swagger.Api;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
@@ -20,13 +24,16 @@ namespace Impostor.Plugins.SemanticAnnotator
     {
         private readonly IConfiguration _configuration;
 
+
         public SemanticAnnotatorPluginStartup()
         {
-        }
+    
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory()) // or use Path.Combine for plugin folder
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-        public SemanticAnnotatorPluginStartup(IConfiguration configuration)
-        {
-            _configuration = configuration;
+            _configuration = builder.Build();
+    
         }
 
         public void ConfigureHost(IHostBuilder host)
@@ -38,7 +45,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         {
             // Coravel
             services.AddScheduler();
-
+            services.AddSingleton(_configuration);
             // Binding dei Thresholds
             var thresholds = new Thresholds();
             _configuration.GetSection("Thresholds").Bind(thresholds);
@@ -56,18 +63,33 @@ namespace Impostor.Plugins.SemanticAnnotator
             services.AddSingleton<AnnotatorEngine>();
 
             // Modalità buffer: true -> uso di buffer + job Coravel
-            bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", true);
+            bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", false);
+            services.AddSingleton<IAnnotator, AnnotatorService>();
+            services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
+            services.AddSingleton<INotarizationService, NotarizationAdapter>();
+            services.AddSingleton<ITransactionManager, TransactionManager>();
+   
+            services.Configure<ArgumentationServiceOptions>(_configuration.GetSection("ArgumentationService"));
+
+            services.AddHttpClient<IArgumentationService, ArgumentationApiAdapter>((provider, client) =>
+            {
+                var options = provider.GetRequiredService<IOptions<ArgumentationServiceOptions>>().Value;
+                client.BaseAddress = new Uri(options.BaseUrl);
+            });
+
+            services.Configure<BlockchainApiOptions>(_configuration.GetSection("BlockchainApi"));
+
+            services.AddSingleton<IBlockchainReSTAPIApi>(provider =>
+            {
+                var options = provider.GetRequiredService<IOptions<BlockchainApiOptions>>().Value;
+                return new BlockchainReSTAPIApi(options.BaseUrl);
+            });
 
             if (useBuffer)
             {
                 // Buffer e orchestrazione asincrona
                 services.AddSingleton<IAnnotationBuffer, InMemoryAnnotationBuffer>();
                 services.AddSingleton<IArgumentationResultBuffer, InMemoryArgumentationResultBuffer>();
-
-                services.AddSingleton<IAnnotator, AnnotatorService>();
-                services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
-                services.AddSingleton<INotarizationService, NotarizationAdapter>();
-                services.AddSingleton<ITransactionManager, TransactionManager>();
 
                 // Job asincroni Coravel
                 services.AddTransient<AnnotationJob>();
@@ -76,11 +98,6 @@ namespace Impostor.Plugins.SemanticAnnotator
             }
             else
             {
-                // Modalità diretta con orchestrazione coordinata
-                services.AddSingleton<IAnnotator, AnnotatorService>();
-                services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
-                services.AddSingleton<INotarizationService, NotarizationAdapter>();
-                services.AddSingleton<ITransactionManager, TransactionManager>();
                 services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
 
             }

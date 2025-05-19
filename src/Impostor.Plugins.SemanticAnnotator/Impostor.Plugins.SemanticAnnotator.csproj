@@ -19,6 +19,9 @@
   <ItemGroup>
     <PackageReference Include="Coravel" Version="6.0.2" />
     <PackageReference Include="CppSharp" Version="1.1.5.3168" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +32,9 @@
 
   <ItemGroup>
     <None Update="amongus.owl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="cowl.dll">

@@ -36,9 +36,9 @@ using ILogger = Serilog.ILogger;
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Coravel;
-using Coravel.Scheduling.Schedule.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -78,9 +78,9 @@ namespace Impostor.Tools.ServerReplay
             var stopwatch = Stopwatch.StartNew();
 
             // Build our DI service provider
-            _serviceProvider = BuildServices();
+           // _serviceProvider = BuildServices();
 
-            var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
+           // var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
             //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
 
             // Read all .dat files from the "sessions" directory
@@ -170,11 +170,14 @@ namespace Impostor.Tools.ServerReplay
 
             // Add Coravel's scheduler services
             services.AddScheduler();
+            var serviceProvider = services.BuildServiceProvider();
+            // Crea un'istanza di SemanticAnnotatorPluginStartup iniettando IConfiguration
+            var semanticAnnotatorPluginStartup = ActivatorUtilities.CreateInstance<SemanticAnnotatorPluginStartup>(serviceProvider);
 
-            // Initialize the Semantic Annotator plugin and configure its services
-            var semanticAnnotatorPluginStartup = new SemanticAnnotatorPluginStartup();
+            // Configura i servizi
             semanticAnnotatorPluginStartup.ConfigureServices(services);
 
+            // Registrazioni aggiuntive (se serve)
             services.AddSingleton<SemanticAnnotatorPlugin>();
 
             // Build and return the service provider
@@ -210,14 +213,19 @@ namespace Impostor.Tools.ServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     var nextTimeFrame = TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
+                    // Sleep for the entire duration
+                    await Task.Delay(Math.Min((int)nextTimeFrame.TotalMilliseconds, 500));
                     // Update the simulated time for each block
                     _fakeDateTimeProvider.UtcNow += nextTimeFrame;
                     totalTimeframe += nextTimeFrame.Milliseconds;
                     // Interpret the individual packet
                     await ParsePacket(readerInner);
                     if (totalTimeframe > 3000) {
-                        var annotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
-                        //await annotatorPlugin.AnnotateSessions();
+                       
+                        var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
+                        var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
+                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
+                    
                         totalTimeframe = 0;
                     }
                 }
