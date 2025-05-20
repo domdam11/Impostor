@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Impostor.Plugins.SemanticAnnotator.Ports;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator.Application
 {
@@ -12,16 +14,20 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         private readonly IArgumentationService _argumentation;
         private readonly INotarizationService _notarization;
         private readonly ILogger<DecisionSupportService> _logger;
+        private readonly bool _notarizationEnabled;
+        private readonly bool _argumentationEnabled;
 
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
-                                      ILogger<DecisionSupportService> logger)
+                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions)
         {
             _annotator = annotator;
             _argumentation = argumentation;
             _notarization = notarization;
             _logger = logger;
+            _notarizationEnabled = notarizationOptions.Value.Enabled;
+            _argumentationEnabled = argumentationOptions.Value.Enabled;
         }
 
         public async Task ProcessAsync(string gameCode)
@@ -32,8 +38,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
             if (!string.IsNullOrWhiteSpace(owl))
             {
-                var reasoning = await _argumentation.SendAnnotationsAsync(owl);
-                await _notarization.NotifyAsync(gameCode, reasoning);
+                if (_argumentationEnabled)
+                {
+                    var reasoning = await _argumentation.SendAnnotationsAsync(owl);
+                    if (_notarizationEnabled)
+                    {
+                        await _notarization.NotifyAsync(gameCode, reasoning);
+                    }
+                }
             }
             else
             {

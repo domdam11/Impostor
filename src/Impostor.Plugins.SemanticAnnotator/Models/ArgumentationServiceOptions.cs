@@ -8,6 +8,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
 {
     public class ArgumentationServiceOptions
     {
-        public string BaseUrl { get; set; }
+        public string ArgumentationEndpointUrl { get; set; }
+        public bool Enabled { get; set; }
     }
 }

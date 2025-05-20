@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Impostor.Plugins.SemanticAnnotator.Models
 {
-    public class BlockchainApiOptions
+    public class NotarizationServiceOptions
     {
-        public string BaseUrl { get; set; }
+        public string BlockchainEndpointUrl { get; set; }
+        public bool Enabled { get; set; }
     }
 }

@@ -74,15 +74,15 @@ namespace Impostor.Plugins.SemanticAnnotator
             services.AddHttpClient<IArgumentationService, ArgumentationApiAdapter>((provider, client) =>
             {
                 var options = provider.GetRequiredService<IOptions<ArgumentationServiceOptions>>().Value;
-                client.BaseAddress = new Uri(options.BaseUrl);
+                client.BaseAddress = new Uri(options.ArgumentationEndpointUrl);
             });
 
-            services.Configure<BlockchainApiOptions>(_configuration.GetSection("BlockchainApi"));
+            services.Configure<NotarizationServiceOptions>(_configuration.GetSection("NotarizationService"));
 
             services.AddSingleton<IBlockchainReSTAPIApi>(provider =>
             {
-                var options = provider.GetRequiredService<IOptions<BlockchainApiOptions>>().Value;
-                return new BlockchainReSTAPIApi(options.BaseUrl);
+                var options = provider.GetRequiredService<IOptions<NotarizationServiceOptions>>().Value;
+                return new BlockchainReSTAPIApi(options.BlockchainEndpointUrl);
             });
 
             if (useBuffer)

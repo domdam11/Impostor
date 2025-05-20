@@ -39,6 +39,7 @@ using Coravel;
 using Microsoft.Extensions.Configuration;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
+using Impostor.Api.Config;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -151,6 +152,10 @@ namespace Impostor.Tools.ServerReplay
             services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
             services.AddSingleton<MockGameCodeFactory>();
             services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
+            services.Configure<CompatibilityConfig>(config =>
+            {
+                config.AllowFutureGameVersions = true;
+            });
             services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
             services.AddSingleton<ClientManager>();
             services.AddSingleton<IClientFactory, ClientFactory<Client>>();
