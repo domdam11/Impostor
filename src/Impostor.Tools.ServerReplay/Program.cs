@@ -124,17 +124,11 @@ namespace Impostor.Tools.ServerReplay
         /// </summary>
         private static ServiceProvider BuildServices()
         {
-            var configurationBuilder = new ConfigurationBuilder();
-
-            configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-            configurationBuilder.AddJsonFile("properties.json", true);
-            var configuration = configurationBuilder.Build();
+           
 
             var services = new ServiceCollection();
 
-            services.AddSingleton<IConfiguration>(configuration);
-            services.Configure<Thresholds>(configuration); // Registra la configurazione
-
+            
             // Set up a mock ServerEnvironment
             services.AddSingleton(new ServerEnvironment
             {

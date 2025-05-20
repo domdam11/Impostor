@@ -26,9 +26,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
         private readonly Thresholds _thresholds;
 
-        public AnnotatorEngine(Thresholds thresholds)
+        public AnnotatorEngine(IOptions<AnnotatorServiceOptions> options)
         {
-            _thresholds = thresholds;
+            _thresholds = options.Value.Thresholds;
         }
 
         /// <summary>

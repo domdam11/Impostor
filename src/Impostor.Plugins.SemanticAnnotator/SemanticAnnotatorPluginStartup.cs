@@ -47,9 +47,9 @@ namespace Impostor.Plugins.SemanticAnnotator
             services.AddScheduler();
             services.AddSingleton(_configuration);
             // Binding dei Thresholds
-            var thresholds = new Thresholds();
-            _configuration.GetSection("Thresholds").Bind(thresholds);
-            services.AddSingleton(thresholds);
+   
+            services.Configure<AnnotatorServiceOptions>(_configuration.GetSection("AnnotatorService"));
+      
 
             // Event listeners
             services.AddSingleton<IEventListener, GameEventListener>();
