@@ -98,6 +98,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 }
 
                 var spawnMov = pState.Movements.FirstOrDefault();
+               
                 var player = new Player(
                     id: pState.id,
                     name: pState.Name,
@@ -241,7 +242,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 false
             );
 
-            foreach (var player in players)
+            /*foreach (var player in players)
             {
                 // IRI dell’individuo
                 string playerIndIri = CowlWrapper.GetFullIri(nameSpace, player.Name);
@@ -270,6 +271,251 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     var retAxiom = cowl_ontology.CowlOntologyAddAxiom(onto, hvAxiom.__Instance);
                     Console.WriteLine($"[AnnotatorEngine] ----> Aggiunta ObjHasValue Restriction per {player.Name} con esito: {retAxiom}");
                 }
+            }*/
+            // when all events have been analyzed, for each player create the individual with all collected properties
+            foreach (var player in players)
+            {
+
+                var dim = player.Movements.Count();
+                var nCrewmatesFOV = 0;
+                var nImpostorsFOV = 0;
+
+                // check if player fixed or moving towards someone
+
+                // if no movement, player is in a fixed position (maybe AFK?)
+                if(dim == 0)
+                {
+                    continue;
+                }
+                if (dim == 1)
+                {
+                    var dataQuantPos = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsFixed", new[] { "true" }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+                    player.dataQuantRestrictionsPlayer.Add(dataQuantPos);
+                }
+                else
+                {
+                    // check movement trajectories to see if he's getting near someone. This method doesn't consider walls
+                    foreach (var p in players)
+                    {
+                        if(p.Movements.Count() == 0)
+                        {
+                            continue;
+                        }
+                        if (player.Cls == crewmateDeadClass || player.Cls == impostorDeadClass) continue;
+                        if (p == player) continue;
+                        if (p.Cls == crewmateDeadClass || p.Cls == impostorDeadClass) continue;
+
+                        var near = 0;
+                        var initDistance = CalcDistance(player.Movements[0].Position, p.Movements[0].Position);
+
+                        for (var i = 1; i < dim; i++)
+                        {
+                            var newDistance = 0.0;
+
+                            if (i < p.Movements.Count)
+                            {
+                                // player p is moving
+                                newDistance = CalcDistance(player.Movements[i].Position, p.Movements[i].Position);
+                            }
+                            else
+                            {
+                                // player p is fixed
+                                newDistance = CalcDistance(player.Movements[i].Position, p.Movements[p.Movements.Count - 1].Position);
+                            }
+
+                            if (newDistance < initDistance)
+                            {
+                                near++;
+                            }
+                        }
+
+                        if (near >= dim / 2)
+                        {
+                            var getClosePlayer = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.SessionCls}";
+                            var objQuantGetClose = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/GetCloseTo", new[] { getClosePlayer }, instancesToRelease);
+
+                            player.objQuantRestrictionsPlayer.Add(objQuantGetClose);
+                        }
+                    }
+                }
+
+                // check if player is InFOV other players
+                foreach (var op in players)
+                {
+                    //if dead player, skip
+                    if (op != player && op.Cls != crewmateDeadClass && op.Cls != impostorDeadClass)
+                    {
+                        var dimOp = op.Movements.Count();
+                        if(dimOp == 0)
+                        {
+                            continue;
+                        }
+                        // euclidean distance
+                        var dist = CalcDistance(player.Movements[dim - 1].Position, op.Movements[dimOp - 1].Position);
+                        // if distance < threshold then IsInFOV for both players 
+                        if (dist <= _thresholds.FOV)
+                        {
+                            var InFovIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{op.SessionCls}";
+                            var objQuantIsInFOV = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", new[] { InFovIri }, instancesToRelease);
+                            player.objQuantRestrictionsPlayer.Add(objQuantIsInFOV);
+                            if (op.Cls == crewmateClass)
+                            {
+                                nCrewmatesFOV++;
+                            }
+                            else
+                            {
+                                nImpostorsFOV++;
+                            }
+                        }
+                    }
+                }
+
+                //counter of players in FOV
+                var dataQuantNCrewmatesFOV = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNCrewmatesInFOV", new[] { nCrewmatesFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantNCrewmatesFOV);
+                var dataQuantNImpostorsFOV = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNImpostorsInFOV", new[] { nImpostorsFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantNImpostorsFOV);
+                Enum.TryParse(gameState.Map, out MapTypes mapType);
+                // check if player is nextTo a vent
+                foreach (var v in MapData.Maps[mapType].Vents)
+                {
+                    var coordsVent = v.Value.Position;
+                    var dist = CalcDistance(player.Movements[dim - 1].Position, coordsVent);
+                    if (dist <= _thresholds.NextToVent)
+                    {
+                        var vent = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{v.Value.Name}";
+                        var objQuantNextToVent = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/NextTo", new[] { vent }, instancesToRelease);
+
+                        player.objQuantRestrictionsPlayer.Add(objQuantNextToVent);
+                        break; //a player can't be next to more than 1 vent
+                    }
+                }
+
+                // check if player is nextTo a task
+                foreach (var t in MapData.Maps[mapType].Tasks)
+                {
+                    var nextTo = false;
+                    for (var i = 0; i < t.Value.Position.Count(); i++)
+                    {
+                        var coordsTask = t.Value.Position[i];
+                        var dist = CalcDistance(player.Movements[dim - 1].Position, coordsTask);
+                        if (dist <= _thresholds.NextToVent)
+                        {
+                            var task = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{t.Value.Type}";
+                            var objQuantNextToTask = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/NextTo", new[] { task }, instancesToRelease);
+
+                            player.objQuantRestrictionsPlayer.Add(objQuantNextToTask);
+                            nextTo = true; //a player can't be next to more than 1 task
+                            break;
+                        }
+                    }
+                    if (nextTo) break;
+                }
+
+                // loop through player positions
+                for (var j = 0; j < dim; j++)
+                {
+                    var does = false;
+                    var playerMovement = player.Movements[j];
+                    // check if player is nextTo a task and does a task
+                    foreach (var t in MapData.Maps[mapType].Tasks)
+                    {
+                        var timeThreshold = _thresholds.TimeShort;
+                        switch (t.Value.Type)
+                        {
+                            case TaskTypes.InspectSample:
+                                timeThreshold = _thresholds.TimeInspectSample;
+                                break;
+                            case TaskTypes.UnlockManifolds:
+                                timeThreshold = _thresholds.TimeUnlockManifolds;
+                                break;
+                            case TaskTypes.CalibrateDistributor:
+                                timeThreshold = _thresholds.TimeCalibratedDistributor;
+                                break;
+                            case TaskTypes.ClearAsteroids:
+                                timeThreshold = _thresholds.TimeClearAsteroids;
+                                break;
+                            case TaskTypes.StartReactor:
+                                timeThreshold = _thresholds.TimeStartReactor;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        var task = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{t.Value.Type}";
+
+                        // there are tasks with more positions
+                        for (var i = 0; i < t.Value.Position.Count(); i++)
+                        {
+                            var coordsTask = t.Value.Position[i];
+
+                            // distance between player pos and task pos
+                            var dist = CalcDistance(playerMovement.Position, coordsTask);
+
+                            // if dist < threshold, check time of staying fixed
+                            if (dist <= _thresholds.NextToTask)
+                            {
+
+                                // check timespan between movements
+                                if (j < dim - 1)
+                                {
+                                    var nextMovement = player.Movements[j + 1];
+                                    var timeDiff = (nextMovement.Timestamp - playerMovement.Timestamp).TotalSeconds;
+
+                                    // if timespan compatible with time to perform task
+                                    if (timeDiff >= timeThreshold)
+                                    {
+                                        if (player.Cls == impostorClass)
+                                        {
+                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task }, instancesToRelease);
+
+                                            player.objQuantRestrictionsPlayer.Add(objQuantFake);
+                                        }
+                                        else
+                                        {
+                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task }, instancesToRelease);
+
+                                            player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                        }
+                                        does = true;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    // if last position, check time from last movement and now
+                                    var timeDiff = (timestamp - playerMovement.Timestamp).TotalSeconds;
+                                    if (timeDiff >= timeThreshold)
+                                    {
+                                        if (player.Cls == impostorClass)
+                                        {
+                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task }, instancesToRelease);
+
+                                            player.objQuantRestrictionsPlayer.Add(objQuantFake);
+                                        }
+                                        else
+                                        {
+                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task }, instancesToRelease);
+
+                                            player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                        }
+                                        does = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (does) break;
+                        }
+                        if (does) break;
+                    }
+                }
+
+                var dataQuantHasCoordinates = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim - 1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+                player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
+                var sessionClass = CowlWrapper.CreateClassFromIri($"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.SessionCls}", instancesToRelease);
+
+                var resultCreatePlayer = CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls, sessionClass }, player.objQuantRestrictionsPlayer.ToArray(), player.dataQuantRestrictionsPlayer.ToArray(), instancesToRelease);
+
             }
 
 
@@ -300,7 +546,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
 
             SaveLastOwl(result);
-
+            //Console.WriteLine(result);
             //var result2 = Task.Run(async () => await CallArgumentationAsync(result));
             //result2.Wait();
             //Console.WriteLine(result2.Result);
@@ -314,28 +560,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             cowl_object.CowlRelease(onto.__Instance);
             cowl_object.CowlRelease(manager.__Instance);
 
-            // create a dictionary of player states updates and return that
-            Dictionary<string, Player> pStates = new Dictionary<string, Player>();
-            foreach (var p in players)
-            {
-                var dim = p.Movements.Count();
-                var ps = new Player(
-                    id: p.Id,
-                    name: p.Name,
-                    cls: p.Cls,
-                    sesCls: p.SessionCls,
-                    movements: new List<CustomMovement> { p.Movements[dim - 1] },
-                    initialMov: p.Movements.LastOrDefault(),
-                    state: p.State,
-                    voteCount: p.VoteCount
-                );
-
-                pStates.Add(p.Id, ps);
-            }
-
+            
             string newStateName = gameState.GameStateName;
 
-            return (pStates, newStateName);
+            return (players.ToDictionary(a => { return a.Id; }, a => { return a; }), newStateName);
         }
 
         private void HandlePlayerEnterVent(Dictionary<string, object> dictEvent, List<Player> players, string nameSpace, List<nint> instancesToRelease)

@@ -28,7 +28,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
             State = state;
             Cls = cls; //class of the player
             SessionCls = sesCls; //class of the player for the session
-            if (movements.Count() == 0)
+            if (movements.Count() == 0 && initialMov != null)
             {
                 Movements = new List<CustomMovement> { initialMov };
             }

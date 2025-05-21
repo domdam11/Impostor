@@ -36,10 +36,9 @@ using ILogger = Serilog.ILogger;
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Coravel;
-using Microsoft.Extensions.Configuration;
-using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Api.Config;
+using System.Linq;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -201,7 +200,7 @@ namespace Impostor.Tools.ServerReplay
             // Read the server version
             var serverVersion = reader.ReadString();
             Logger.Information("Loaded session (server: {ServerVersion}, recorded at {StartTime})", serverVersion, startTime);
-            var totalTimeframe = 0;
+            double totalTimeframe = 0;
             // Read all packets in the session
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
@@ -212,18 +211,24 @@ namespace Impostor.Tools.ServerReplay
                 using (var readerInner = new BinaryReader(stream))
                 {
                     var nextTimeFrame = TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
-                    // Sleep for the entire duration
-                    await Task.Delay(Math.Min((int)nextTimeFrame.TotalMilliseconds, 500));
+                    
                     // Update the simulated time for each block
-                    _fakeDateTimeProvider.UtcNow += nextTimeFrame;
-                    totalTimeframe += nextTimeFrame.Milliseconds;
+                    var previous = _fakeDateTimeProvider.UtcNow;
+                    _fakeDateTimeProvider.UtcNow = startTime + nextTimeFrame;
+                    totalTimeframe += _fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
+                    var milliseconds = (int)_fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
+                    // Sleep for the entire duration
+                    await Task.Delay(Math.Min(milliseconds, 300));
                     // Interpret the individual packet
                     await ParsePacket(readerInner);
                     if (totalTimeframe > 3000) {
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
                         var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
-                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
+                        if (gameCacheManager.GetActiveSessions().Count > 0)
+                        {
+                            await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
+                        }
                     
                         totalTimeframe = 0;
                     }
