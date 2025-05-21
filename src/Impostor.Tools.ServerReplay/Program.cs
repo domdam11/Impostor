@@ -39,6 +39,8 @@ using Coravel;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Api.Config;
 using System.Linq;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -221,7 +223,8 @@ namespace Impostor.Tools.ServerReplay
                     await Task.Delay(Math.Min(milliseconds, 300));
                     // Interpret the individual packet
                     await ParsePacket(readerInner);
-                    if (totalTimeframe > 3000) {
+                    var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
+                    if (totalTimeframe > options.AnnotationIntervalMilliseconds) {
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
                         var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
