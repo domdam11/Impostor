@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Impostor.Plugins.SemanticAnnotator.Ports;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator.Application
@@ -16,11 +17,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         private readonly ILogger<DecisionSupportService> _logger;
         private readonly bool _notarizationEnabled;
         private readonly bool _argumentationEnabled;
+        private readonly GameEventCacheManager _cacheManager;
 
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
-                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions)
+                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager)
         {
             _annotator = annotator;
             _argumentation = argumentation;
@@ -28,31 +30,44 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             _logger = logger;
             _notarizationEnabled = notarizationOptions.Value.Enabled;
             _argumentationEnabled = argumentationOptions.Value.Enabled;
+            _cacheManager = cacheManager;
         }
 
         public async Task ProcessAsync(string gameCode)
         {
             _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
-
-            string owl = await _annotator.AnnotateAsync(gameCode);
-
-            if (!string.IsNullOrWhiteSpace(owl))
+            var gameState = await _cacheManager.GetGameStateAsync(gameCode);
+            if (gameState.IsInMatch)
             {
-                if (_argumentationEnabled)
+                string owl = await _annotator.AnnotateAsync(gameCode);
+
+
+                if (!string.IsNullOrWhiteSpace(owl))
                 {
-                    var reasoning = await _argumentation.SendAnnotationsAsync(owl);
-                    if (_notarizationEnabled)
+                    if (_argumentationEnabled)
                     {
-                        await _notarization.NotifyAsync(gameCode, reasoning);
+                        var reasoning = await _argumentation.SendAnnotationsAsync(owl);
+                        if (_notarizationEnabled)
+                        {
+                            await _notarization.NotifyAsync(gameCode, owl);
+                        }
                     }
                 }
+                else
+                {
+                    _logger.LogWarning($"[DSS] Annotazione non generata per {gameCode}");
+                }
+
+
+                _logger.LogInformation($"[DSS] Processo decisionale completato per {gameCode}");
             }
             else
             {
-                _logger.LogWarning($"[DSS] Annotazione non generata per {gameCode}");
+                if(_notarizationEnabled )
+                {
+                    await _notarization.DispatchNotarizationTasksAsync();
+                }
             }
-
-            _logger.LogInformation($"[DSS] Processo decisionale completato per {gameCode}");
         }
 
         public async Task ProcessMultipleAsync(IEnumerable<string> gameCodes)

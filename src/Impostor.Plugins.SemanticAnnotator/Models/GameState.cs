@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Impostor.Plugins.SemanticAnnotator.Models
@@ -49,5 +50,45 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
             IsInMatch = false;
             FinalAnnotationDone = false;
         }
+
+        public string ToJson(bool includeEventHistory = true)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            if (includeEventHistory)
+            {
+                return JsonSerializer.Serialize(this, options);
+            }
+            else
+            {
+                // Create a shallow copy with EventHistory null
+                var copy = new GameState(this.GameCode)
+                {
+                    GameStateName = this.GameStateName,
+                    Players = this.Players,
+                    EventHistory = null, // exclude
+                    Map = this.Map,
+                    AlivePlayers = this.AlivePlayers,
+                    Host = this.Host,
+                    GameOverReason = this.GameOverReason,
+                    AnonymousVotesEnabled = this.AnonymousVotesEnabled,
+                    VisualTasksEnabled = this.VisualTasksEnabled,
+                    ConfirmEjects = this.ConfirmEjects,
+                    NumRestarts = this.NumRestarts,
+                    CallCount = this.CallCount,
+                    GameStarted = this.GameStarted,
+                    GameEnded = this.GameEnded,
+                    MatchCounter = this.MatchCounter,
+                    IsInMatch = this.IsInMatch,
+                    FinalAnnotationDone = this.FinalAnnotationDone
+                };
+                return JsonSerializer.Serialize(copy, options);
+            }
+        }
     }
+
+
 }

@@ -130,7 +130,7 @@ namespace Impostor.Server.Net.Inner.Objects.Components
         internal async ValueTask SetPositionAsync(IClientPlayer sender, Vector2 position)
         {
             Position = position;
-            Log.Information("Position {0} {1}", position.X, position.Y);
+            //Log.Information("Position {0} {1}", position.X, position.Y);
             var playerMovementEvent = _pool.Get();
             playerMovementEvent.Reset(Game, sender, _playerControl);
             await _eventManager.CallAsync(playerMovementEvent);

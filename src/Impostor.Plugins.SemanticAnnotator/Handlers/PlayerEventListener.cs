@@ -81,11 +81,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 }
 
                 // Set the game started flag if not already set
-                if (!gameState.GameStarted)
+                /*if (!gameState.GameStarted)
                 {
                     gameState.GameStarted = true;
                     _logger.LogInformation($"GameCode: {e.Game.Code} ha iniziato.");
-                }
+                }*/
 
                 // Update the game state in the cache
                 await _eventCacheManager.UpdateGameStateAsync(e.Game.Code, gameState);

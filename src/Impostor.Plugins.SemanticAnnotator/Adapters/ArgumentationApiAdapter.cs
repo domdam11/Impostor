@@ -20,12 +20,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Adapters
 
         public async Task<string> SendAnnotationsAsync(string annotations)
         {
-            string url = "http://127.0.0.1:18080/update";
+            //string url = "http://127.0.0.1:18080/update";
 
             try
             {
                 var content = new StringContent(annotations, Encoding.UTF8);
-                var response = await _httpClient.PostAsync(url, content);
+                var response = await _httpClient.PostAsync("update", content);
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadAsStringAsync();

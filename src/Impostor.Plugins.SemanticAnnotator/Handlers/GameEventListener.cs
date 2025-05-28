@@ -50,7 +50,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 await _eventCacheManager.AddGameAsync("unassigned", gameState);
             }
             // Store the event data in the cache
-            await _eventCacheManager.AddEventAsync("unassigned", eventData);
+            await _eventCacheManager.AddEventAsync(e.Client.Name, eventData);
         }
 
         /// <summary>
@@ -70,8 +70,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                 { "Timestamp", DateTime.UtcNow },
             };
 
-            await _eventCacheManager.AddEventAsync(e.Game.Code.ToString(), eventData);
-
+            
             // Update the game state in the cache
             var gameState = await _eventCacheManager.GetGameStateAsync(e.Game.Code.ToString());
             if (gameState == null)
@@ -88,6 +87,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
 
             // Create or reset the game state
             await _eventCacheManager.CreateOrResetGameAsync(e.Game.Code.ToString(), isRestart: false);
+
+            await _eventCacheManager.AddEventAsync(e.Game.Code.ToString(), eventData);
+
         }
 
         /// <summary>

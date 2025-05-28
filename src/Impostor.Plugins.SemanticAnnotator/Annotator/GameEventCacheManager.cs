@@ -29,7 +29,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public List<string> GetActiveSessions()
         {
             // Returns only the keys (gameCodes) of active sessions
-            return new List<string>(_gameCache.Where(a=>a.Value.IsInMatch).Select(a=>a.Key).ToList());
+            return new List<string>(_gameCache.Where(a=>a.Value.GameCode != null).Select(a=>a.Key).ToList());
         }
 
         /// <summary>

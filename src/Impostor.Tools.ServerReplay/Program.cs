@@ -80,11 +80,11 @@ namespace Impostor.Tools.ServerReplay
             var stopwatch = Stopwatch.StartNew();
 
             // Build our DI service provider
-           // _serviceProvider = BuildServices();
+            // _serviceProvider = BuildServices();
 
-           // var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
+            // var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
             //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
-
+            bool Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             // Read all .dat files from the "sessions" directory
             foreach (var file in Directory.GetFiles("..\\" +
                 "..\\..\\sessions\\", "*.dat"))
@@ -228,11 +228,8 @@ namespace Impostor.Tools.ServerReplay
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
                         var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
-                        if (gameCacheManager.GetActiveSessions().Count > 0)
-                        {
-                            await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
-                        }
-                    
+                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
+
                         totalTimeframe = 0;
                     }
                 }

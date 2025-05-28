@@ -48,9 +48,9 @@ public class NotarizationAdapter : INotarizationService
                 string eventType = typeObj.ToString();
 
                 // Cattura delle variabili nel contesto giusto
-                tasks.Add(Task.Run(async () =>
-                {
-                    await semaphore.WaitAsync();
+                //tasks.Add(Task.Run(async () =>
+                //{
+                    //await semaphore.WaitAsync();
                     try
                     {
                         switch (eventType)
@@ -60,9 +60,9 @@ public class NotarizationAdapter : INotarizationService
                                     await _transactionManager.UpdateDescriptionAsync(gameCode, description.ToString());
                                 break;
 
-                            case "RemovePlayer":
+                            case "PlayerLeftGame":
                                 if (ev.TryGetValue("Player", out var player))
-                                    await _transactionManager.RemovePlayerAsync(gameCode, player.ToString(), "Left");
+                                    await _transactionManager.RemovePlayerAsync(gameCode, player.ToString(), "");
                                 break;
 
                             case "ChangeState":
@@ -70,9 +70,9 @@ public class NotarizationAdapter : INotarizationService
                                     await _transactionManager.ChangeStateAsync(gameCode, state.ToString());
                                 break;
 
-                            case "AddPlayer":
+                            case "PlayerJoined":
                                 if (ev.TryGetValue("Player", out var newPlayer))
-                                    await _transactionManager.AddPlayerAsync(gameCode, newPlayer.ToString(), "Joined");
+                                    await _transactionManager.AddPlayerAsync(gameCode, newPlayer.ToString(), "");
                                 break;
 
                             case "ReadEvent":
@@ -83,20 +83,28 @@ public class NotarizationAdapter : INotarizationService
                                 await _transactionManager.GetGameDetailsAsync(gameCode);
                                 break;
 
-                            case "CreateAsset":
-                                if (ev.TryGetValue("Description", out var assetDescription))
-                                    await _transactionManager.CreateGameSessionAsync(gameCode, assetDescription.ToString());
+                            case "GameCreated":
+                            {
+                                var data1 = await _eventCacheManager.GetGameStateAsync(gameCode);
+                                await _transactionManager.CreateGameSessionAsync(gameCode, data1.ToJson(false));
                                 break;
+                            }
 
                             case "GetClientID":
                                 await _transactionManager.GetClientIdAsync();
                                 break;
 
                             case "GameStarted":
+                            {
+                                var data2 = await _eventCacheManager.GetGameStateAsync(gameCode);
+                                await _transactionManager.UpdateDescriptionAsync(gameCode, data2.ToJson(false));
                                 await _transactionManager.ChangeStateAsync(gameCode, "started");
                                 break;
+                            }
 
                             case "GameEnded":
+                                var data = await _eventCacheManager.GetGameStateAsync(gameCode);
+                                await _transactionManager.UpdateDescriptionAsync(gameCode, data.ToJson(false));
                                 await _transactionManager.EndGameSessionAsync(gameCode);
                                 break;
 
@@ -109,11 +117,11 @@ public class NotarizationAdapter : INotarizationService
                     {
                         _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", eventType, gameCode);
                     }
-                    finally
+                    /*finally
                     {
                         semaphore.Release();
-                    }
-                }));
+                    }*/
+                //}));
             }
         }
 
