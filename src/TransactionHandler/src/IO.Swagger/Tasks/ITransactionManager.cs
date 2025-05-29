@@ -27,11 +27,7 @@ namespace TransactionHandler.Tasks
         /// <summary>
         /// Creates an event inside a game session.
         /// </summary>
-<<<<<<< Updated upstream
-        Task CreateEventAsync(string gameId, string description);
-=======
         Task CreateEventAsync(string gameId, string eventId, string description, string metadata);
->>>>>>> Stashed changes
 
         /// <summary>
         /// Updates the description of a game session.

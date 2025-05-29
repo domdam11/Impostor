@@ -11,21 +11,19 @@ public class AnnotatorService : IAnnotator
     private readonly AnnotatorEngine _engine;
     private readonly GameEventCacheManager _cacheManager;
     private readonly IAnnotationBuffer? _buffer;
-    private readonly long _windowSize;
 
-    public AnnotatorService(AnnotatorEngine engine, GameEventCacheManager cacheManager, IAnnotationBuffer? buffer = null, IOptions<AnnotatorServiceOptions> options = null)
+    public AnnotatorService(AnnotatorEngine engine, GameEventCacheManager cacheManager, IAnnotationBuffer? buffer = null)
     {
         _engine = engine;
         _cacheManager = cacheManager;
         _buffer = buffer;
-        _windowSize = options.Value.AnnotationIntervalMilliseconds;
     }
 
     public async Task<string> AnnotateAsync(string gameCode)
     {
         if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
             return string.Empty;
-        var owl = _cacheManager.CallAnnotate(gameCode, _engine, _windowSize);
+        var owl = _cacheManager.CallAnnotate(gameCode, _engine, DateTime.UtcNow);
         
      
         _buffer?.Save(gameCode, owl); // save to buffer only if it's configured

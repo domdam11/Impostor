@@ -3,7 +3,7 @@ using Impostor.Api.Events.Meeting;
 using Microsoft.Extensions.Logging;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class MeetingEventListener : IEventListener
     {

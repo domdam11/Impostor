@@ -100,11 +100,7 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>string</returns>
-<<<<<<< Updated upstream
-        string CreateEvent(EventDTO body, string ID);
-=======
         string CreateEvent(EventDTO body, string gameId, string eventId);
->>>>>>> Stashed changes
 
         /// <summary>
         /// Crea un evento
@@ -116,11 +112,7 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>ApiResponse of string</returns>
-<<<<<<< Updated upstream
-        ApiResponse<string> CreateEventWithHttpInfo(EventDTO body, string ID);
-=======
         ApiResponse<string> CreateEventWithHttpInfo(EventDTO body, string gameId, string eventId);
->>>>>>> Stashed changes
         /// <summary>
         /// Dettagli utente
         /// </summary>
@@ -326,11 +318,7 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>Task of string</returns>
-<<<<<<< Updated upstream
-        System.Threading.Tasks.Task<string> CreateEventAsync(EventDTO body, string ID);
-=======
         System.Threading.Tasks.Task<string> CreateEventAsync(EventDTO body, string gameId, string eventId);
->>>>>>> Stashed changes
 
         /// <summary>
         /// Crea un evento
@@ -342,11 +330,7 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>Task of ApiResponse (string)</returns>
-<<<<<<< Updated upstream
-        System.Threading.Tasks.Task<ApiResponse<string>> CreateEventAsyncWithHttpInfo(EventDTO body, string ID);
-=======
         System.Threading.Tasks.Task<ApiResponse<string>> CreateEventAsyncWithHttpInfo(EventDTO body, string gameId, string eventId);
->>>>>>> Stashed changes
         /// <summary>
         /// Dettagli utente
         /// </summary>
@@ -1056,15 +1040,9 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>string</returns>
-<<<<<<< Updated upstream
-        public string CreateEvent(EventDTO body, string ID)
-        {
-            ApiResponse<string> localVarResponse = CreateEventWithHttpInfo(body, ID);
-=======
         public string CreateEvent(EventDTO body, string gameId, string eventId)
         {
             ApiResponse<string> localVarResponse = CreateEventWithHttpInfo(body, gameId, eventId);
->>>>>>> Stashed changes
             return localVarResponse.Data;
         }
 
@@ -1075,22 +1053,12 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>ApiResponse of string</returns>
-<<<<<<< Updated upstream
-        public ApiResponse<string> CreateEventWithHttpInfo(EventDTO body, string ID)
-=======
         public ApiResponse<string> CreateEventWithHttpInfo(EventDTO body, string gameID, string ID)
->>>>>>> Stashed changes
         {
             // verify the required parameter 'body' is set
             if (body == null)
                 throw new ApiException(400, "Missing required parameter 'body' when calling BlockchainReSTAPIApi->CreateEvent");
             // verify the required parameter 'ID' is set
-<<<<<<< Updated upstream
-            if (ID == null)
-                throw new ApiException(400, "Missing required parameter 'ID' when calling BlockchainReSTAPIApi->CreateEvent");
-
-            var localVarPath = "/api/createEvent/{ID}";
-=======
             if (gameID == null)
                 throw new ApiException(400, "Missing required parameter 'gameId' when calling BlockchainReSTAPIApi->CreateEvent");
             if (ID == null)
@@ -1098,7 +1066,6 @@ namespace IO.Swagger.Api
 
 
             var localVarPath = "/api/createEvent/{gameID}/{ID}";
->>>>>>> Stashed changes
             var localVarPathParams = new Dictionary<string, string>();
             var localVarQueryParams = new List<KeyValuePair<string, string>>();
             var localVarHeaderParams = new Dictionary<string, string>(Configuration.DefaultHeader);
@@ -1120,13 +1087,9 @@ namespace IO.Swagger.Api
             if (localVarHttpHeaderAccept != null)
                 localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
 
-<<<<<<< Updated upstream
-            if (ID != null) localVarPathParams.Add("ID", Configuration.ApiClient.ParameterToString(ID)); // path parameter
-=======
             if (gameID != null) localVarPathParams.Add("gameID", Configuration.ApiClient.ParameterToString(gameID));
             if (ID != null) localVarPathParams.Add("ID", Configuration.ApiClient.ParameterToString(ID));
 
->>>>>>> Stashed changes
             if (body != null && body.GetType() != typeof(byte[]))
             {
                 localVarPostBody = Configuration.ApiClient.Serialize(body); // http body (model) parameter
@@ -1161,15 +1124,9 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>Task of string</returns>
-<<<<<<< Updated upstream
-        public async System.Threading.Tasks.Task<string> CreateEventAsync(EventDTO body, string ID)
-        {
-            ApiResponse<string> localVarResponse = await CreateEventAsyncWithHttpInfo(body, ID);
-=======
         public async System.Threading.Tasks.Task<string> CreateEventAsync(EventDTO body, string gameId, string eventId)
         {
             ApiResponse<string> localVarResponse = await CreateEventAsyncWithHttpInfo(body, gameId, eventId);
->>>>>>> Stashed changes
             return localVarResponse.Data;
 
         }
@@ -1181,22 +1138,11 @@ namespace IO.Swagger.Api
         /// <param name="body"></param>
         /// <param name="ID">Identificativo dell&#x27;asset su cui registrare l&#x27;evento</param>
         /// <returns>Task of ApiResponse (string)</returns>
-<<<<<<< Updated upstream
-        public async System.Threading.Tasks.Task<ApiResponse<string>> CreateEventAsyncWithHttpInfo(EventDTO body, string ID)
-=======
         public async System.Threading.Tasks.Task<ApiResponse<string>> CreateEventAsyncWithHttpInfo(EventDTO body, string gameID, string ID)
->>>>>>> Stashed changes
         {
             // verify the required parameter 'body' is set
             if (body == null)
                 throw new ApiException(400, "Missing required parameter 'body' when calling BlockchainReSTAPIApi->CreateEvent");
-<<<<<<< Updated upstream
-            // verify the required parameter 'ID' is set
-            if (ID == null)
-                throw new ApiException(400, "Missing required parameter 'ID' when calling BlockchainReSTAPIApi->CreateEvent");
-
-            var localVarPath = "/api/createEvent/{ID}";
-=======
             if (gameID == null)
                 throw new ApiException(400, "Missing required parameter 'gameID' when calling BlockchainReSTAPIApi->CreateEvent");
             if (ID == null)
@@ -1204,7 +1150,6 @@ namespace IO.Swagger.Api
 
 
             var localVarPath = "/api/createEvent/{gameID}/{ID}";
->>>>>>> Stashed changes
             var localVarPathParams = new Dictionary<string, string>();
             var localVarQueryParams = new List<KeyValuePair<string, string>>();
             var localVarHeaderParams = new Dictionary<string, string>(Configuration.DefaultHeader);
@@ -1226,13 +1171,9 @@ namespace IO.Swagger.Api
             if (localVarHttpHeaderAccept != null)
                 localVarHeaderParams.Add("Accept", localVarHttpHeaderAccept);
 
-<<<<<<< Updated upstream
-            if (ID != null) localVarPathParams.Add("ID", Configuration.ApiClient.ParameterToString(ID)); // path parameter
-=======
             if (gameID != null) localVarPathParams.Add("gameID", Configuration.ApiClient.ParameterToString(gameID)); // path parameter
             if (ID != null) localVarPathParams.Add("ID", Configuration.ApiClient.ParameterToString(ID)); // path parameter
 
->>>>>>> Stashed changes
             if (body != null && body.GetType() != typeof(byte[]))
             {
                 localVarPostBody = Configuration.ApiClient.Serialize(body); // http body (model) parameter

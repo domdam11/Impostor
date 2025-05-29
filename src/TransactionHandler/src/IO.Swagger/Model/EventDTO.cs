@@ -44,12 +44,9 @@ namespace IO.Swagger.Model
         [DataMember(Name="descrizione", EmitDefaultValue=false)]
         public string Descrizione { get; set; }
 
-<<<<<<< Updated upstream
-=======
         [DataMember(Name = "metadata", EmitDefaultValue = false)]
         public string Metadata { get; set; }
 
->>>>>>> Stashed changes
         /// <summary>
         /// Returns the string presentation of the object
         /// </summary>

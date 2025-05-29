@@ -8,7 +8,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class ShipEventListener : IEventListener
     {

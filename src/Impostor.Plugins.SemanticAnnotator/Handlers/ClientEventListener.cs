@@ -2,7 +2,7 @@ using Impostor.Api.Events;
 using Impostor.Api.Events.Client;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class ClientEventListener : IEventListener
     {

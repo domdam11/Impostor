@@ -6,11 +6,7 @@ using TransactionHandler.Tasks;
 
 namespace TransactionHandler.Invocables
 {
-<<<<<<< Updated upstream
-    public class CreateEventTask : IInvocable, IInvocableWithPayload<(string gameId, string description)>
-=======
     public class CreateEventTask : IInvocable, IInvocableWithPayload<(string gameId, string eventId, string description, string metadata)>
->>>>>>> Stashed changes
     {
         private readonly ITransactionManager _transactionManager;
         private readonly TaskControlService _taskControlService;
@@ -23,11 +19,7 @@ namespace TransactionHandler.Invocables
         }
 
         // Define a Payload to pass game parameters
-<<<<<<< Updated upstream
-        public (string gameId, string description) Payload { get; set; }
-=======
         public (string gameId, string eventId, string description, string metadata) Payload { get; set; }
->>>>>>> Stashed changes
 
         // Define Invoke method required by IInvocable
         public async Task Invoke()
@@ -41,11 +33,7 @@ namespace TransactionHandler.Invocables
             await _taskControlService.Semaphore.WaitAsync();
             try
             {
-<<<<<<< Updated upstream
-                await _transactionManager.CreateEventAsync(Payload.gameId, Payload.description);
-=======
                 await _transactionManager.CreateEventAsync(Payload.gameId, Payload.eventId, Payload.description, Payload.metadata);
->>>>>>> Stashed changes
             }
             catch (Exception ex)
             {

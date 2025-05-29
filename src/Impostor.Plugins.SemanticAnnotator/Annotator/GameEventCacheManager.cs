@@ -76,21 +76,21 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return new List<string>(_gameCache.Where(a=>a.Key != null).Select(a=>a.Key).ToList());
         }
 
-        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, long timestamp, Boolean destroyed = false)
+        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].CallAnnotate(annotatorEngine, timestamp / 1000, destroyed);
+                return _gameCache[gameCode].CallAnnotate(annotatorEngine, currentTimestamp, destroyed);
 
             }
             return null;
         }
 
-        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, long timestamp, Boolean destroyed = false)
+        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                _gameCache[gameCode].EndGame(annotatorEngine, timestamp, destroyed);
+                _gameCache[gameCode].EndGame(annotatorEngine, currentTimestamp, destroyed);
 
             }
         }
@@ -113,6 +113,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
             }
             else return false;
+        }
+
+        public string GetAnnotationEventId(string gameCode)
+        {
+            if (_gameCache.ContainsKey(gameCode))
+            {
+                return _gameCache[gameCode].Game.Code + "_" + _gameCache[gameCode].CallCount;
+
+            }
+            else return "";
         }
     }
 

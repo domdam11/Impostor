@@ -31,7 +31,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
             // 2. Notarizza le annotazioni semantiche pronte
             while (_resultBuffer.TryGetNext(out var gameCode, out var result))
             {
-                await _notarizationService.NotifyAsync(gameCode, result);
+                await _notarizationService.NotifyAsync(gameCode,"", "", result);
                 _logger.LogInformation($"[GameNotarizationJob] Notarizzazione semantica completata per {gameCode}.");
                 _resultBuffer.MarkAsProcessed(gameCode);
             }

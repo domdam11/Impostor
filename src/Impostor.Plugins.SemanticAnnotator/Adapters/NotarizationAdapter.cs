@@ -23,10 +23,10 @@ public class NotarizationAdapter : INotarizationService
         _logger = logger;
     }
 
-    public async Task NotifyAsync(string gameId, string annotatedReasoning)
+    public async Task NotifyAsync(string gameId, string eventId, string annotatedReasoning, string metadata)
     /*notifica un evento creando una nuova transazione tramite il metodo createeventasync del gestore di transazioni*/
     {
-        await _transactionManager.CreateEventAsync(gameId, annotatedReasoning);
+        await _transactionManager.CreateEventAsync(gameId, eventId, annotatedReasoning, metadata);
         // Crea una nuova transazione per l'evento di annotazione
     }
 
@@ -63,7 +63,7 @@ public class NotarizationAdapter : INotarizationService
 
                             case IGameEndedEvent gameEndedEvent:
 
-                            await _transactionManager.ChangeStateAsync(gameCode, "chiusa");
+                                await _transactionManager.ChangeStateAsync(gameCode, "chiusa");
                             break;
 
                             case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
@@ -74,12 +74,12 @@ public class NotarizationAdapter : INotarizationService
                             case IGameCreatedEvent gameCreatedEvent:
                                
                             {
-                                await _transactionManager.CreateGameSessionAsync(gameCode, "");
+                                await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
                                 break;
                             }
 
                             default:
-                                _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
+                               // _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
                                 break;
                         }
                     }

@@ -35,10 +35,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
         public async Task ProcessAsync(string gameCode)
         {
-            _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
+        
             var isInMatch = _cacheManager.IsInMatch(gameCode);
             if (isInMatch)
             {
+                _logger.LogInformation($"[DSS] Avvio annotazione semantica per {gameCode}...");
                 string owl = await _annotator.AnnotateAsync(gameCode);
 
 
@@ -46,10 +47,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 {
                     if (_argumentationEnabled)
                     {
+                        _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
                         var reasoning = await _argumentation.SendAnnotationsAsync(owl);
                         if (_notarizationEnabled)
                         {
-                            await _notarization.NotifyAsync(gameCode, owl);
+                            await _notarization.NotifyAsync(gameCode, _cacheManager.GetAnnotationEventId(gameCode), owl, "metadata");
                         }
                     }
                 }
@@ -65,6 +67,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             {
                 if(_notarizationEnabled )
                 {
+                    _logger.LogInformation($"[DSS] Solo notarizzazione {gameCode}...");
                     await _notarization.DispatchNotarizationTasksAsync();
                 }
             }

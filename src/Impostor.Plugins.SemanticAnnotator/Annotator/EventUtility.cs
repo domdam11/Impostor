@@ -19,8 +19,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     public class EventUtility
     {
 
-        public DateTimeOffset LastAnnotTimestamp { get; set; }
-        public DateTimeOffset CurrentTimestamp { get; set; }
+        public DateTimeOffset LastAnnotTimestamp { get; private set; }
+        public DateTimeOffset CurrentTimestamp { get; private set; }
         public IGame Game { get; set; }
         public List<IEvent> Events;
         public Dictionary<byte, PlayerStruct> PlayerStates;
@@ -89,29 +89,36 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         }
 
         // end game
-        public void EndGame(AnnotatorEngine annotatorEngine, long totalSeconds, Boolean destroyed = false)
+        public void EndGame(AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
         {
             GameEnded = true;
             if (destroyed)
             {
-                CallAnnotate(annotatorEngine, totalSeconds, true);
+                CallAnnotate(annotatorEngine, currentTimestamp, true);
             }
             else
             {
-                CallAnnotate(annotatorEngine, totalSeconds);
+                CallAnnotate(annotatorEngine, currentTimestamp);
             }
         }
 
-        public string CallAnnotate(AnnotatorEngine annotatorEngine, long totalSeconds, Boolean destroyed = false)
+        public string CallAnnotate(AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
         {
+            CurrentTimestamp = currentTimestamp;
             string owl = null;
             if (GameStarted && Game != null)
             {
                 //game started so annotating makes sense
                 if (Events.Count() != 0)
                 {
+                    if (GameEnded)
+                    {
+                        //annotate cause game is ended
+                        annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
+                    }
+                    else 
                     //something to annotate
-                    if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= totalSeconds)
+                    //if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= totalSeconds)
                     {
                         //2s passed after last annotation  
                         var (playerStates, gameState, owlOutput) = annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
@@ -123,11 +130,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         LastAnnotTimestamp = CurrentTimestamp;
                         return owl;
                     }
-                    else if (GameEnded)
-                    {
-                        //annotate cause game is ended
-                        annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
-                    }
+                    
                 }
             }
             if (GameEnded)
@@ -148,15 +151,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return owl;
         }
 
-        // set time
-        public void SetAnnotTime(DateTimeOffset timestamp)
-        {
-            LastAnnotTimestamp = timestamp;
-        }
-        public void SetCurrentTime(DateTimeOffset timestamp)
-        {
-            CurrentTimestamp = timestamp;
-        }
+
 
         // Method to store event
         public void SaveEvent(IEvent newEvent)

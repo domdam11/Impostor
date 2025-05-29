@@ -3,7 +3,6 @@ using Impostor.Api.Plugins;
 using Impostor.Plugins.SemanticAnnotator.Adapters;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Application;
-using Impostor.Plugins.SemanticAnnotator.Handlers;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
@@ -17,8 +16,10 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using IO.Swagger.Api;
+using Impostor.Plugins.SemanticAnnotator.Handlers;
 
-namespace Impostor.Plugins.SemanticAnnotator
+namespace Impostor.Plugins.SemanticAnnotator 
+
 {
     public class SemanticAnnotatorPluginStartup : IPluginStartup
     {

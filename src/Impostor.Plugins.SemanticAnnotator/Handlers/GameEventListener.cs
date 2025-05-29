@@ -1,48 +1,33 @@
+using System;
 using Impostor.Api.Events;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class GameEventListener : IEventListener
     {
         private readonly ILogger<GameEventListener> _logger;
         private readonly GameEventCacheManager _eventCacheManager;
         private readonly AnnotatorEngine _annotator;
-        private readonly long _windowSize;
 
-        public GameEventListener(ILogger<GameEventListener> logger, GameEventCacheManager eventCacheManager, AnnotatorEngine engine, IOptions<AnnotatorServiceOptions> options)
+        public GameEventListener(ILogger<GameEventListener> logger, GameEventCacheManager eventCacheManager, AnnotatorEngine engine)
         {
             _logger = logger;
             _eventCacheManager = eventCacheManager;
             _annotator = engine;
-            _windowSize = options.Value.AnnotationIntervalMilliseconds;
         }
 
-        [EventListener]
-        public void OnGameCreated(IGameCreationEvent e)
-        {
-            _logger.LogInformation("Game creation requested by {client}", e.Client == null ? "a plugin" : e.Client.Name);
-
-            // TODO: Code below causes the lobby to stop loading and close after 5 secs.
-            // if (e.Client != null)
-            // {
-            //     var gameCode = GameCode.From(e.Client.Name);
-            //
-            //     if (!gameCode.IsInvalid)
-            //     {
-            //         e.GameCode = gameCode;
-            //     }
-            // }
-        }
+ 
 
         [EventListener]
         public void OnGameCreated(IGameCreatedEvent e)
         {
             _logger.LogInformation("Game {code} > created", e.Game.Code);
             if (e is not null) _eventCacheManager.CreateGame(e.Game);
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
         [EventListener]
@@ -65,6 +50,7 @@ namespace Impostor.Plugins.Example.Handlers
 
                 _logger.LogInformation("- {player} is {role}", info.PlayerName, info.RoleType);
             }
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
         [EventListener]
@@ -73,7 +59,8 @@ namespace Impostor.Plugins.Example.Handlers
             CsvUtility.CsvGeneratorEndGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > ended because {reason}", e.Game.Code, e.GameOverReason);
             // eng game -> stop annotate
-            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, _windowSize/1000);
+            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, DateTime.UtcNow);
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
         [EventListener]
@@ -81,7 +68,8 @@ namespace Impostor.Plugins.Example.Handlers
         {
             _logger.LogInformation("Game {code} > destroyed", e.Game.Code);
             //end game -> stop game
-            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, _windowSize/1000, true);
+            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, DateTime.UtcNow, true);
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
         [EventListener]
@@ -109,12 +97,14 @@ namespace Impostor.Plugins.Example.Handlers
         public void OnPlayerJoined(IGamePlayerJoinedEvent e)
         {
             _logger.LogInformation("Game {code} > {player} joined", e.Game.Code, e.Player.Client.Name);
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
         [EventListener]
         public void OnPlayerLeftGame(IGamePlayerLeftEvent e)
         {
             _logger.LogInformation("Game {code} > {player} left", e.Game.Code, e.Player.Client.Name);
+            _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
     }
 }

@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Coravel.Invocable;
 using Impostor.Plugins.SemanticAnnotator.Ports;
-using Impostor.Plugins.SemanticAnnotator.Handlers;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 
 namespace Impostor.Plugins.SemanticAnnotator.Jobs

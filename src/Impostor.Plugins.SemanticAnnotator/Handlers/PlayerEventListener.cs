@@ -9,7 +9,7 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
-namespace Impostor.Plugins.Example.Handlers
+namespace Impostor.Plugins.SemanticAnnotator.Handlers
 {
     public class PlayerEventListener : IEventListener
     {
