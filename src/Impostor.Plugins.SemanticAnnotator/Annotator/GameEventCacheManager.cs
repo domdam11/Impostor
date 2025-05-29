@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
@@ -12,14 +15,55 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     public class GameEventCacheManager
     {
         // Dictionary with gameCode as the key and GameState as the value
-        private readonly Dictionary<string, GameState> _gameCache;
+        private readonly Dictionary<string, EventUtility> _gameCache;
 
         /// <summary>
         /// Initializes the dictionary for caching game states.
         /// </summary>
         public GameEventCacheManager()
         {
-            _gameCache = new Dictionary<string, GameState>();
+            _gameCache = new Dictionary<string, EventUtility>();
+        }
+
+        public void SaveEvent(string gameCode, IEvent newEvent)
+        {
+            if(!_gameCache.ContainsKey(gameCode))
+            {
+                _gameCache.Add(gameCode, new EventUtility());
+
+            }
+            _gameCache[gameCode].SaveEvent(newEvent);
+        }
+
+        public void CreateGame(IGame game, int numRestarts = 0)
+        {
+            if (!_gameCache.ContainsKey(game.Code))
+            {
+                var eventUtil = new EventUtility()
+                {
+                    Game = game,
+                    Events = new List<IEvent>(),
+                    PlayerStates = new Dictionary<byte, PlayerStruct>(),
+                    GameState = "none",
+                    NumRestarts = 0,
+                    CallCount = 0,
+                    GameStarted = false,
+                    GameEnded = false
+                };
+                _gameCache.Add(game.Code, eventUtil);
+
+            }
+            
+        }
+
+        public void StartGame(IGame game)
+        {
+            if (!_gameCache.ContainsKey(game.Code))
+            {
+                _gameCache.Add(game.Code, new EventUtility());
+
+            }
+            _gameCache[game.Code].StartGame(game);
         }
 
         /// <summary>
@@ -29,203 +73,47 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public List<string> GetActiveSessions()
         {
             // Returns only the keys (gameCodes) of active sessions
-            return new List<string>(_gameCache.Where(a=>a.Value.GameCode != null).Select(a=>a.Key).ToList());
+            return new List<string>(_gameCache.Where(a=>a.Key != null).Select(a=>a.Key).ToList());
         }
 
-        /// <summary>
-        /// Adds a new game session to the cache.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="gameState">Initial state of the game.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task AddGameAsync(string gameCode, GameState gameState)
-        {
-            if (gameCode != "unassigned")
-            {
-                // Adds the game to the cache (if it doesn't already exist)
-                if (!_gameCache.ContainsKey(gameCode))
-                    _gameCache[gameCode] = gameState;
-            }
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Retrieves the state of a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <returns>Game state or null if not found.</returns>
-        public async Task<GameState> GetGameStateAsync(string gameCode)
+        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, long timestamp, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
-                return await Task.FromResult(_gameCache[gameCode]);
+            {
+                return _gameCache[gameCode].CallAnnotate(annotatorEngine, timestamp / 1000, destroyed);
 
+            }
             return null;
         }
 
-        /// <summary>
-        /// Updates the state of a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="gameState">New state of the game.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task UpdateGameStateAsync(string gameCode, GameState gameState)
-        {
-            if (_gameCache.ContainsKey(gameCode))
-                _gameCache[gameCode] = gameState;
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Adds an event to a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="eventData">Event data.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task AddEventAsync(string gameCode, Dictionary<string, object> eventData)
-        {
-            if (!_gameCache.ContainsKey(gameCode))
-                return;
-
-            // Adds the event to the game history
-            _gameCache[gameCode].EventHistory.Add(eventData);
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Retrieves all events for a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <returns>List of events or an empty list if none exist.</returns>
-        public async Task<List<Dictionary<string, object>>> GetEventsByGameCodeAsync(string gameCode)
+        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, long timestamp, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return await Task.FromResult(_gameCache[gameCode].EventHistory);
-            }
+                _gameCache[gameCode].EndGame(annotatorEngine, timestamp, destroyed);
 
-            return await Task.FromResult(new List<Dictionary<string, object>>());
+            }
         }
 
-        /// <summary>
-        /// Retrieves all events for all games.
-        /// </summary>
-        /// <returns>Dictionary containing all events for each GameCode.</returns>
-        public async Task<Dictionary<string, List<Dictionary<string, object>>>> GetAllEventsAsync()
-        {
-            // Creates a temporary dictionary to return the events
-            var allEvents = _gameCache.ToDictionary(
-                entry => entry.Key,
-                entry => entry.Value.EventHistory
-            );
-
-            return await Task.FromResult(allEvents);
-        }
-
-        /// <summary>
-        /// Adds or updates the state of a player within a game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="playerState">Player state information.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task AddOrUpdatePlayerAsync(string gameCode, PlayerState playerState)
-        {
-            if (!_gameCache.ContainsKey(gameCode))
-                return;
-
-            var gameState = _gameCache[gameCode];
-            var existingPlayer = gameState.Players.FirstOrDefault(p => p.Name.Equals(playerState.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (existingPlayer != null)
-            {
-                // Updates the existing player's state
-                existingPlayer.Role = playerState.Role;
-                existingPlayer.IsDead = playerState.IsDead;
-                existingPlayer.State = playerState.State;
-                existingPlayer.Movements = playerState.Movements;
-                existingPlayer.VoteCount = playerState.VoteCount;
-            }
-            else
-            {
-                // Adds a new player to the game state
-                gameState.Players.Add(playerState);
-            }
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Removes a player from a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="playerName">Player name to be removed.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task RemovePlayerAsync(string gameCode, string playerName)
-        {
-            if (!_gameCache.ContainsKey(gameCode))
-                return;
-
-            var gameState = _gameCache[gameCode];
-            var player = gameState.Players.FirstOrDefault(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase));
-
-            if (player != null)
-            {
-                gameState.Players.Remove(player);
-            }
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Clears the event history for a specific game session.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task ClearGameEventsAsync(string gameCode)
+        public IEnumerable<IEvent> GetEventsByGameCodeAsync(string gameCode)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                _gameCache[gameCode].EventHistory.Clear();
-            }
+                return _gameCache[gameCode].Events;
 
-            await Task.CompletedTask;
+            }
+            else return Enumerable.Empty<IEvent>();
         }
 
-        /// <summary>
-        /// Creates or resets the state of a game session, including restarts and call count.
-        /// </summary>
-        /// <param name="gameCode">Game session code.</param>
-        /// <param name="isRestart">Indicates whether it is a game restart.</param>
-        /// <returns>Asynchronous Task.</returns>
-        public async Task CreateOrResetGameAsync(string gameCode, bool isRestart = false)
+        public bool IsInMatch(string gameCode)
         {
-            if (!_gameCache.ContainsKey(gameCode))
+            if (_gameCache.ContainsKey(gameCode))
             {
-                _gameCache[gameCode] = new GameState(gameCode);
-            }
-            else if (isRestart)
-            {
-                _gameCache[gameCode].NumRestarts++;
-                _gameCache[gameCode].Players.Clear();
-                _gameCache[gameCode].EventHistory.Clear();
-                _gameCache[gameCode].GameStateName = "lobby";
-                _gameCache[gameCode].AlivePlayers = 0;
-                _gameCache[gameCode].GameStarted = false;
-                _gameCache[gameCode].GameEnded = false;
-                _gameCache[gameCode].CallCount = 0;
-            }
+                return _gameCache[gameCode].GameStarted;
 
-            await Task.CompletedTask;
+            }
+            else return false;
         }
-
-
-        
-
-        
-
-
     }
 
 

@@ -1,46 +1,42 @@
-using Impostor.Plugins.SemanticAnnotator.Annotator;
-using Impostor.Plugins.SemanticAnnotator.Ports;
-using System.Threading.Tasks;
 using System;
+using System.Threading.Tasks;
+using Impostor.Api.Games;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using Microsoft.Extensions.Options;
 
 public class AnnotatorService : IAnnotator
 {
     private readonly AnnotatorEngine _engine;
     private readonly GameEventCacheManager _cacheManager;
     private readonly IAnnotationBuffer? _buffer;
+    private readonly long _windowSize;
 
-    public AnnotatorService(AnnotatorEngine engine, GameEventCacheManager cacheManager, IAnnotationBuffer? buffer = null)
+    public AnnotatorService(AnnotatorEngine engine, GameEventCacheManager cacheManager, IAnnotationBuffer? buffer = null, IOptions<AnnotatorServiceOptions> options = null)
     {
         _engine = engine;
         _cacheManager = cacheManager;
         _buffer = buffer;
+        _windowSize = options.Value.AnnotationIntervalMilliseconds;
     }
 
     public async Task<string> AnnotateAsync(string gameCode)
     {
         if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
             return string.Empty;
-
-        var gameState = await _cacheManager.GetGameStateAsync(gameCode);
-        if (gameState == null)
-            return string.Empty;
-
-        var (results, newGameStateName) = _engine.Annotate(
-            gameCode,
-            _cacheManager,
-            gameState.CallCount + 1,
-            gameState.NumRestarts,
-            DateTimeOffset.UtcNow
-        );
-
-        string owl = _engine.GetLastOwl();
+        var owl = _cacheManager.CallAnnotate(gameCode, _engine, _windowSize);
+        
+     
         _buffer?.Save(gameCode, owl); // save to buffer only if it's configured
 
-        gameState.CallCount += 1;
-        gameState.GameStateName = newGameStateName;
-        await _cacheManager.UpdateGameStateAsync(gameCode, gameState);
-        await _cacheManager.ClearGameEventsAsync(gameCode);
+        //gameState.CallCount += 1;
+        //gameState.GameStateName = newGameStateName;
+        //await _cacheManager.UpdateGameStateAsync(gameCode, gameState);
+        //await _cacheManager.ClearGameEventsAsync(gameCode);
 
         return owl;
     }
+
+    
 }

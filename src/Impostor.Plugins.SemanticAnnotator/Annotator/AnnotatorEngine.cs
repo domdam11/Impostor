@@ -15,12 +15,12 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Innersloth.Maps;
-using Impostor.Plugins.SemanticAnnotator.Annotator;
+
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Options;
 
 
-namespace Impostor.Plugins.SemanticAnnotator.Utils
+namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
 
     public class AnnotatorEngine
@@ -37,7 +37,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
         /// </summary>
         /// <returns>The annotation.</returns>
 
-        public (Dictionary<byte, PlayerStruct>, string) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, PlayerStruct> playerStates, string gameState, int numAnnot, int numRestarts, DateTimeOffset timestamp)
+        public (Dictionary<byte, PlayerStruct>, string, string) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, PlayerStruct> playerStates, string gameState, int numAnnot, int numRestarts, DateTimeOffset timestamp)
         {
            // string filePath = "../../../../Impostor.Plugins.SemanticAnnotator/Annotator/properties.json";  // JSON file with thresholds
             string nameSpace = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/";
@@ -708,8 +708,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
             string result = System.Text.Encoding.UTF8.GetString(byteArray);
 
-            var result2 = Task.Run(async () => await CallArgumentationAsync(result));
-            result2.Wait();
             //Console.WriteLine(result2.Result);
 
             foreach (var instance in instancesToRelease)
@@ -730,27 +728,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
                 pStates.Add(p.Id, ps);
             }
-            return (pStates, gameState);
-        }
-
-        public static async Task<string> CallArgumentationAsync(string annotations)
-        {
-            string url_owl = "http://127.0.0.1:18080/update";
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    var StringContent = new StringContent(annotations, System.Text.Encoding.UTF8);
-                    HttpResponseMessage response_1 = await client.PostAsync(url_owl, StringContent);
-                    string result = await response_1.Content.ReadAsStringAsync();
-                    return result;
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine($"Errore nella richiesta: {e.Message}");
-                    return "Errore nella richiesta";
-                }
-            }
+            return (pStates, gameState, result);
         }
 
 
@@ -764,7 +742,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Utils
 
     }
 
-  
+
 
 
 }

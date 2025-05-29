@@ -1,3 +1,4 @@
+using Impostor.Api.Events;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Logging;
@@ -38,84 +39,53 @@ public class NotarizationAdapter : INotarizationService
 
         foreach (var gameCode in sessions)
         {
-            var events = await _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
+            var events = _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
 
             foreach (var ev in events)
             {
-                if (!ev.TryGetValue("EventType", out var typeObj) || !ev.TryGetValue("Timestamp", out var _))
-                    continue;
-
-                string eventType = typeObj.ToString();
-
                 // Cattura delle variabili nel contesto giusto
                 //tasks.Add(Task.Run(async () =>
                 //{
                     //await semaphore.WaitAsync();
                     try
                     {
-                        switch (eventType)
+                        switch (ev)
                         {
-                            case "UpdateDescription":
-                                if (ev.TryGetValue("Description", out var description))
-                                    await _transactionManager.UpdateDescriptionAsync(gameCode, description.ToString());
+                            case IGamePlayerLeftEvent gamePlayerLeftEvent:
+                               
+                                await _transactionManager.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
                                 break;
 
-                            case "PlayerLeftGame":
-                                if (ev.TryGetValue("Player", out var player))
-                                    await _transactionManager.RemovePlayerAsync(gameCode, player.ToString(), "");
+                            case IGameStartedEvent gameStartedEvent:
+                               
+                                await _transactionManager.ChangeStateAsync(gameCode, "in corso");
                                 break;
 
-                            case "ChangeState":
-                                if (ev.TryGetValue("State", out var state))
-                                    await _transactionManager.ChangeStateAsync(gameCode, state.ToString());
+                            case IGameEndedEvent gameEndedEvent:
+
+                            await _transactionManager.ChangeStateAsync(gameCode, "chiusa");
+                            break;
+
+                            case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
+                             
+                                await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
                                 break;
 
-                            case "PlayerJoined":
-                                if (ev.TryGetValue("Player", out var newPlayer))
-                                    await _transactionManager.AddPlayerAsync(gameCode, newPlayer.ToString(), "");
-                                break;
-
-                            case "ReadEvent":
-                                await _transactionManager.GetEventDetailsAsync(gameCode);
-                                break;
-
-                            case "ReadAsset":
-                                await _transactionManager.GetGameDetailsAsync(gameCode);
-                                break;
-
-                            case "GameCreated":
+                            case IGameCreatedEvent gameCreatedEvent:
+                               
                             {
-                                var data1 = await _eventCacheManager.GetGameStateAsync(gameCode);
-                                await _transactionManager.CreateGameSessionAsync(gameCode, data1.ToJson(false));
+                                await _transactionManager.CreateGameSessionAsync(gameCode, "");
                                 break;
                             }
-
-                            case "GetClientID":
-                                await _transactionManager.GetClientIdAsync();
-                                break;
-
-                            case "GameStarted":
-                            {
-                                var data2 = await _eventCacheManager.GetGameStateAsync(gameCode);
-                                await _transactionManager.UpdateDescriptionAsync(gameCode, data2.ToJson(false));
-                                await _transactionManager.ChangeStateAsync(gameCode, "started");
-                                break;
-                            }
-
-                            case "GameEnded":
-                                var data = await _eventCacheManager.GetGameStateAsync(gameCode);
-                                await _transactionManager.UpdateDescriptionAsync(gameCode, data.ToJson(false));
-                                await _transactionManager.EndGameSessionAsync(gameCode);
-                                break;
 
                             default:
-                                _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", eventType, gameCode);
+                                _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
                                 break;
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", eventType, gameCode);
+                        _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
                     }
                     /*finally
                     {

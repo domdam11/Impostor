@@ -36,8 +36,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         public async Task ProcessAsync(string gameCode)
         {
             _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
-            var gameState = await _cacheManager.GetGameStateAsync(gameCode);
-            if (gameState.IsInMatch)
+            var isInMatch = _cacheManager.IsInMatch(gameCode);
+            if (isInMatch)
             {
                 string owl = await _annotator.AnnotateAsync(gameCode);
 
