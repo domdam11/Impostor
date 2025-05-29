@@ -10,7 +10,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
 {
     public class Player
     {
-        public string Id { get; set; }
+        public byte Id { get; set; }
         public string Name { get; set; }
         public string State { get; set; }
         public CowlClass Cls { get; set; }
@@ -21,14 +21,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
         public List<CowlObjQuant> objQuantRestrictionsPlayer { get; set; }
         public List<CowlDataQuant> dataQuantRestrictionsPlayer { get; set; }
 
-        public Player(string id, string name, CowlClass cls, string sesCls, List<CustomMovement> movements, CustomMovement initialMov, string state, int voteCount)
+        public Player(byte id, string name, CowlClass cls, string sesCls, List<CustomMovement> movements, CustomMovement initialMov, string state, int voteCount)
         {
             Id = id;
             Name = name.Replace(" ", "");
             State = state;
             Cls = cls; //class of the player
             SessionCls = sesCls; //class of the player for the session
-            if (movements.Count() == 0 && initialMov != null)
+            if (movements.Count() == 0)
             {
                 Movements = new List<CustomMovement> { initialMov };
             }
