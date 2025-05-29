@@ -29,9 +29,18 @@ namespace IO.Swagger.Test
         private IScheduler _scheduler;
         private readonly SemaphoreSlim _taskLock = new(1, 1);
         private string _gameId;
+<<<<<<< Updated upstream
         private string _event1 = "Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>) Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>) Prefix(owl:=<http://www.w3.org/2002/07/owl#>) Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>) Ontology(ClassAssertion(ObjectIntersectionOf(:CrewMateAlive ObjectAllValuesFrom(:Calls :EmergencyCall) ObjectHasValue(:Reports :Stormynest) ObjectHasValue(:GetCloseTo :Retroindex) ObjectHasValue(:IsInFOV :Retroindex) ObjectHasValue(:IsInFOV :Fallpalmy) DataAllValuesFrom(:HasNPlayersInFOV DataOneOf(\"2\"^^xsd:integer)) DataAllValuesFrom(:HasCoordinates DataOneOf(\"<0,80169046. 1,4780272>\"))) :AldoMoro))";
         private string _event2 = "Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>) Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>) Prefix(owl:=<http://www.w3.org/2002/07/owl#>) Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>) Ontology(ClassAssertion(ObjectIntersectionOf(:CrewMateAlive :CrewMateDead) :AldoMoro))";
 
+=======
+        private string _eventId;
+        private string _event1 = "Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>) Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>) Prefix(owl:=<http://www.w3.org/2002/07/owl#>) Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>) Ontology(ClassAssertion(ObjectIntersectionOf(:CrewMateAlive ObjectAllValuesFrom(:Calls :EmergencyCall) ObjectHasValue(:Reports :Stormynest) ObjectHasValue(:GetCloseTo :Retroindex) ObjectHasValue(:IsInFOV :Retroindex) ObjectHasValue(:IsInFOV :Fallpalmy) DataAllValuesFrom(:HasNPlayersInFOV DataOneOf(\"2\"^^xsd:integer)) DataAllValuesFrom(:HasCoordinates DataOneOf(\"<0,80169046. 1,4780272>\"))) :AldoMoro))";
+        private string _event2 = "Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>) Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>) Prefix(owl:=<http://www.w3.org/2002/07/owl#>) Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>) Ontology(ClassAssertion(ObjectIntersectionOf(:CrewMateAlive :CrewMateDead) :AldoMoro))";
+
+        private string _metadata = "";
+
+>>>>>>> Stashed changes
         [SetUp]
         public async Task Setup()
         {
@@ -61,6 +70,10 @@ namespace IO.Swagger.Test
         {
             // Generate a new game id
             _gameId = Guid.NewGuid().ToString();
+<<<<<<< Updated upstream
+=======
+            _eventId = Guid.NewGuid().ToString();
+>>>>>>> Stashed changes
 
             // Create a game session
             _queue.QueueAsyncTask(async () =>
@@ -113,7 +126,11 @@ namespace IO.Swagger.Test
             }
 
             // Queue an event using the annotation
+<<<<<<< Updated upstream
             _queue.QueueAsyncTask(async () => await _transactionManager.CreateEventAsync(_gameId, _event1));
+=======
+            _queue.QueueAsyncTask(async () => await _transactionManager.CreateEventAsync(_gameId, _eventId, _event1, _metadata));
+>>>>>>> Stashed changes
 
             // Remove players
             for (int i = 0; i < 4; i++)

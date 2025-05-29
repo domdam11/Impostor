@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using IO.Swagger.Api;
 using IO.Swagger.Model;
@@ -7,9 +7,9 @@ namespace TransactionHandler.Tasks
 {
     public class TransactionManager : ITransactionManager
     {
-        private readonly IBlockchainReSTAPIApi _client;
+        private readonly BlockchainReSTAPIApi _client;
 
-        public TransactionManager(IBlockchainReSTAPIApi client)
+        public TransactionManager(BlockchainReSTAPIApi client)
         {
             _client = client;
         }
@@ -78,20 +78,37 @@ namespace TransactionHandler.Tasks
         }
 
         // Create a generic game event
+<<<<<<< Updated upstream
         public async Task CreateEventAsync(string gameId, string description)
         {
             try
             {
                 Console.WriteLine($"Creating a new event in game {gameId}...");
+=======
+        public async Task CreateEventAsync(string gameId, string eventId, string description, string metadata)
+        {
+            try
+            {
+                Console.WriteLine($"Creating a new event with id {eventId} in game {gameId}...");
+>>>>>>> Stashed changes
 
                 // Build the EventDTO object
                 var eventDto = new EventDTO
                 {
+<<<<<<< Updated upstream
                     Descrizione = description
                 };
 
                 // Call the API
                 await Task.Run(() => _client.CreateEvent(eventDto, gameId));
+=======
+                    Descrizione = description,
+                    Metadata = metadata
+                };
+
+                // Call the API
+                await Task.Run(() => _client.CreateEvent(eventDto, gameId, eventId));
+>>>>>>> Stashed changes
                 Console.WriteLine($"Event created successfully.");
             }
             catch (Exception ex)
