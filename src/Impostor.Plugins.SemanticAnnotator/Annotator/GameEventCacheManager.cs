@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Utils;
 using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
@@ -16,13 +17,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
     {
         // Dictionary with gameCode as the key and GameState as the value
         private readonly Dictionary<string, EventUtility> _gameCache;
+        private readonly IDateTimeProvider _dateTimeService;
 
         /// <summary>
         /// Initializes the dictionary for caching game states.
         /// </summary>
-        public GameEventCacheManager()
+        public GameEventCacheManager(IDateTimeProvider dateTimeService)
         {
             _gameCache = new Dictionary<string, EventUtility>();
+            _dateTimeService = dateTimeService;
         }
 
         public void SaveEvent(string gameCode, IEvent newEvent)
@@ -32,6 +35,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 _gameCache.Add(gameCode, new EventUtility());
 
             }
+            _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
             _gameCache[gameCode].SaveEvent(newEvent);
         }
 
@@ -51,7 +55,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     GameEnded = false
                 };
                 _gameCache.Add(game.Code, eventUtil);
-
+                _gameCache[game.Code].SetCurrentTime(_dateTimeService.UtcNow);
             }
             
         }
@@ -76,21 +80,23 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return new List<string>(_gameCache.Where(a=>a.Key != null).Select(a=>a.Key).ToList());
         }
 
-        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
+        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].CallAnnotate(annotatorEngine, currentTimestamp, destroyed);
+                _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
+                return _gameCache[gameCode].CallAnnotate(annotatorEngine, destroyed);
 
             }
             return null;
         }
 
-        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
+        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, Boolean destroyed = false)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                _gameCache[gameCode].EndGame(annotatorEngine, currentTimestamp, destroyed);
+                _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
+                _gameCache[gameCode].EndGame(annotatorEngine, destroyed);
 
             }
         }

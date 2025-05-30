@@ -59,7 +59,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
             CsvUtility.CsvGeneratorEndGame(e.Game.Code, CsvUtility.TimeStamp.ToUnixTimeMilliseconds().ToString());
             _logger.LogInformation("Game {code} > ended because {reason}", e.Game.Code, e.GameOverReason);
             // eng game -> stop annotate
-            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, DateTime.UtcNow);
+            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator);
             _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 
@@ -68,7 +68,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
         {
             _logger.LogInformation("Game {code} > destroyed", e.Game.Code);
             //end game -> stop game
-            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, DateTime.UtcNow, true);
+            if (e is not null) _eventCacheManager.EndGame(e.Game.Code, _annotator, true);
             _eventCacheManager.SaveEvent(e.Game.Code, e);
         }
 

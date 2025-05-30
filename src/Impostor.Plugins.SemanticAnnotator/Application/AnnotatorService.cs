@@ -23,7 +23,7 @@ public class AnnotatorService : IAnnotator
     {
         if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
             return string.Empty;
-        var owl = _cacheManager.CallAnnotate(gameCode, _engine, DateTime.UtcNow);
+        var owl = _cacheManager.CallAnnotate(gameCode, _engine);
         
      
         _buffer?.Save(gameCode, owl); // save to buffer only if it's configured

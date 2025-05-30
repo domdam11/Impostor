@@ -89,22 +89,21 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         }
 
         // end game
-        public void EndGame(AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
+        public void EndGame(AnnotatorEngine annotatorEngine, Boolean destroyed = false)
         {
             GameEnded = true;
             if (destroyed)
             {
-                CallAnnotate(annotatorEngine, currentTimestamp, true);
+                CallAnnotate(annotatorEngine, true);
             }
             else
             {
-                CallAnnotate(annotatorEngine, currentTimestamp);
+                CallAnnotate(annotatorEngine);
             }
         }
 
-        public string CallAnnotate(AnnotatorEngine annotatorEngine, DateTime currentTimestamp, Boolean destroyed = false)
+        public string CallAnnotate(AnnotatorEngine annotatorEngine, Boolean destroyed = false)
         {
-            CurrentTimestamp = currentTimestamp;
             string owl = null;
             if (GameStarted && Game != null)
             {
@@ -151,7 +150,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return owl;
         }
 
-
+  
+        public void SetAnnotationTime(DateTimeOffset timestamp)
+        {
+            LastAnnotTimestamp = timestamp;
+        }
+        public void SetCurrentTime(DateTimeOffset timestamp)
+        {
+            CurrentTimestamp = timestamp;
+        }
 
         // Method to store event
         public void SaveEvent(IEvent newEvent)
