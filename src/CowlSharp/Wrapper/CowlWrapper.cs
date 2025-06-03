@@ -14,7 +14,7 @@ namespace CowlSharp.Wrapper
         /// <param name="objQuantsIri">The IRIs of the object quantifiers.</param>
         /// <param name="instancesToRelease">The list of instances to release.</param>
         /// <returns>The CowlRet value.</returns>
-        public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri, IEnumerable<CowlObjQuant> objQuantsIri, IEnumerable<CowlDataQuant>? dataQuantsIri, List<nint> instancesToRelease, Boolean isPlayer = true)
+        public static CowlRet CreateIndividual(CowlOntology onto, string individualIri, IEnumerable<CowlClass> classesIri, IEnumerable<CowlObjQuant> objQuantsIri, IEnumerable<CowlDataQuant>? dataQuantsIri, List<nint> instancesToRelease, Boolean isPlayer = true, IEnumerable<CowlObjCard>? cardrestriction = null)
         {
             var operands = cowl_vector.UvecCowlObjectPtr();
 
@@ -32,11 +32,22 @@ namespace CowlSharp.Wrapper
                     cowl_vector.UvecPushCowlObjectPtr(operands, objQuant.__Instance);
                 }
             }
-
-            foreach (var dataQuant in dataQuantsIri)
+            
+            if (cardrestriction != null)
             {
-                cowl_vector.UvecPushCowlObjectPtr(operands, dataQuant.__Instance);
+                foreach (var card in cardrestriction)
+                {
+                    cowl_vector.UvecPushCowlObjectPtr(operands, card.__Instance);  
+                }  
             }
+            
+            if (dataQuantsIri != null)
+            {
+                foreach (var dataQuant in dataQuantsIri)
+                {
+                    cowl_vector.UvecPushCowlObjectPtr(operands, dataQuant.__Instance);
+                }
+            } 
 
             CowlVector vec = cowl_vector.CowlVector(operands);
             instancesToRelease.Add(vec.__Instance);
@@ -84,7 +95,57 @@ namespace CowlSharp.Wrapper
             instancesToRelease.Add(classObj.__Instance);
             return classObj;
         }
+        
+        /// <summary>
+        /// Creates a min cardinality restriction not qualified (filler = THING)
+        /// </summary>
+        /// <param name="prop">property</param>
+        /// <param name="cardinality">card of restriction</param>
+        /// <param name="instancesToRelease">The list of instances to release.</param>
+        /// <returns>The CowlObjCard object.</returns>
+        public static CowlObjCard CreateCardTypeMin(CowlObjProp prop ,int cardinality, List<nint> instancesToRelease)
+        {
+            
+            CowlClass filler = CreateClassFromIri("http://www.w3.org/2002/07/owl#Thing" ,instancesToRelease);
+            var cardrestriction = cowl_obj_card.CowlObjCard(CowlCardType.COWL_CT_MIN, prop.__Instance, filler.__Instance, (uint)cardinality);
+            instancesToRelease.Add(cardrestriction.__Instance);
+            return cardrestriction;
 
+        }
+        /// <summary>
+        /// Creates a max cardinality restriction not qualified (filler = THING)
+        /// </summary>
+        /// <param name="prop">property</param>
+        /// <param name="cardinality">card of restriction</param>
+        /// <param name="instancesToRelease">The list of instances to release.</param>
+        /// <returns>The CowlClass object.</returns>
+        public static CowlObjCard CreateCardTypeMax(CowlObjProp prop ,int cardinality, List<nint> instancesToRelease)
+        {
+            
+            CowlClass filler = CreateClassFromIri("http://www.w3.org/2002/07/owl#Thing" ,instancesToRelease);
+            var cardrestriction = cowl_obj_card.CowlObjCard(CowlCardType.COWL_CT_MAX, prop.__Instance, filler.__Instance, (uint)cardinality);
+            instancesToRelease.Add(cardrestriction.__Instance);
+            return cardrestriction;
+
+        }
+        
+        /// <summary>
+        /// Creates an exactly cardinality restriction not qualified (filler = THING, exactly = minX and maxX)
+        /// </summary>
+        /// <param name="prop">property</param>
+        /// <param name="cardinality">card of restriction</param>
+        /// <param name="instancesToRelease">The list of instances to release.</param>
+        /// <returns>The CowlClass object.</returns>
+        public static CowlObjCard CreateCardTypeExactly(CowlObjProp prop ,int cardinality, List<nint> instancesToRelease)
+        {
+            
+            CowlClass filler = CreateClassFromIri("http://www.w3.org/2002/07/owl#Thing" ,instancesToRelease);
+            var cardrestriction = cowl_obj_card.CowlObjCard(CowlCardType.COWL_CT_EXACT, prop.__Instance, filler.__Instance, (uint)cardinality);
+            instancesToRelease.Add(cardrestriction.__Instance);
+            return cardrestriction;
+
+        }
+        
         /// <summary>
         /// Creates an all values restriction.
         /// </summary>
