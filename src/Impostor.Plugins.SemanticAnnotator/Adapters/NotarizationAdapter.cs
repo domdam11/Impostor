@@ -43,6 +43,7 @@ public class NotarizationAdapter : INotarizationService
 
             foreach (var ev in events)
             {
+                var assetKey = _eventCacheManager.GetGameSessionUniqueId(gameCode);
                 // Cattura delle variabili nel contesto giusto
                 //tasks.Add(Task.Run(async () =>
                 //{
@@ -53,28 +54,28 @@ public class NotarizationAdapter : INotarizationService
                         {
                             case IGamePlayerLeftEvent gamePlayerLeftEvent:
                                
-                                await _transactionManager.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
+                                await _transactionManager.RemovePlayerAsync(assetKey, gamePlayerLeftEvent.Player.Client.Name, "");
                                 break;
 
                             case IGameStartedEvent gameStartedEvent:
                                
-                                await _transactionManager.ChangeStateAsync(gameCode, "in corso");
+                                await _transactionManager.ChangeStateAsync(assetKey, "in corso");
                                 break;
 
                             case IGameEndedEvent gameEndedEvent:
 
-                                await _transactionManager.ChangeStateAsync(gameCode, "chiusa");
+                                await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
                             break;
 
                             case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
                              
-                                await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
+                                await _transactionManager.AddPlayerAsync(assetKey, gamePlayerJoinedEvent.Player.Client.Name, "");
                                 break;
 
                             case IGameCreatedEvent gameCreatedEvent:
                                
                             {
-                                await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
+                                await _transactionManager.CreateGameSessionAsync(assetKey, gameCreatedEvent.Game.GameState.ToString());
                                 break;
                             }
 
@@ -85,7 +86,7 @@ public class NotarizationAdapter : INotarizationService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
+                        _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, assetKey);
                     }
                     /*finally
                     {

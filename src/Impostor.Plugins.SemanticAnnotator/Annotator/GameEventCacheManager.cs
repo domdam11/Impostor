@@ -130,6 +130,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
             else return "";
         }
+
+        public string GetGameSessionUniqueId(string gameCode)
+        {
+            if (_gameCache.ContainsKey(gameCode))
+            {
+                return _gameCache[gameCode].Game.Code + "_" + _gameCache[gameCode].NumRestarts;
+
+            }
+            else return "";
+        }
     }
 
 
