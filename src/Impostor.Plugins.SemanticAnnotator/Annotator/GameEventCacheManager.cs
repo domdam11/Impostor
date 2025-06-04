@@ -144,7 +144,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
         public string GetGameSessionUniqueId(string gameCode)
         {
-            if (_gameCache.ContainsKey(gameCode))
+            if (_gameCache.ContainsKey(gameCode) && _gameCache[gameCode].Game != null)
             {
                 return _gameCache[gameCode].Game.Code+"_"+ _gameCache[gameCode].NumRestarts;
 

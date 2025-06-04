@@ -53,8 +53,8 @@ public class NotarizationAdapter : INotarizationService
                         switch (ev)
                         {
                             case IGamePlayerLeftEvent gamePlayerLeftEvent:
-                               
-                                await _transactionManager.RemovePlayerAsync(assetKey, gamePlayerLeftEvent.Player.Client.Name, "");
+                                
+                                //await _transactionManager.RemovePlayerAsync(assetKey, gamePlayerLeftEvent.Player.Client.Name, "");
                                 break;
 
                             case IGameStartedEvent gameStartedEvent:
