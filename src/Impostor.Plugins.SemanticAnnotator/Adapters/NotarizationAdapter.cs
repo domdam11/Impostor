@@ -58,26 +58,35 @@ public class NotarizationAdapter : INotarizationService
                                 break;
 
                             case IGameStartedEvent gameStartedEvent:
-                               
-                                await _transactionManager.ChangeStateAsync(assetKey, "in corso");
-                                break;
+
+                                await _transactionManager.CreateGameSessionAsync(assetKey, "nuova sessione");
+                                var players = _eventCacheManager.GetPlayerList(gameCode);
+                                foreach (var player in players)
+                                {
+                                    await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");
+                                }
+                            break;
 
                             case IGameEndedEvent gameEndedEvent:
 
                                 await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
                             break;
 
-                            case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
+                           /* case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
                              
                                 await _transactionManager.AddPlayerAsync(assetKey, gamePlayerJoinedEvent.Player.Client.Name, "");
-                                break;
+                                break;*/
 
-                            case IGameCreatedEvent gameCreatedEvent:
+                           /* case IGameCreatedEvent gameCreatedEvent:
                                
                             {
                                 await _transactionManager.CreateGameSessionAsync(assetKey, gameCreatedEvent.Game.GameState.ToString());
+                                var players = _eventCacheManager.GetPlayerList(gameCode);
+                                foreach (var player in players) {
+                                    await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");
+                                }
                                 break;
-                            }
+                            }*/
 
                             default:
                                // _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);

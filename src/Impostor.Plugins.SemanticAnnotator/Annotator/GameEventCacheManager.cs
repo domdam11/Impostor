@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
 using Impostor.Api.Utils;
 using Impostor.Plugins.SemanticAnnotator.Models;
 
@@ -121,6 +122,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             else return false;
         }
 
+        public IEnumerable<IClientPlayer> GetPlayerList(string gameCode)
+        {
+            if (_gameCache.ContainsKey(gameCode))
+            {
+                return _gameCache[gameCode].Game.Players;
+
+            }
+            else return new List<IClientPlayer>();
+        }
+
         public string GetAnnotationEventId(string gameCode)
         {
             if (_gameCache.ContainsKey(gameCode))
@@ -135,7 +146,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].Game.Code + "_" + _gameCache[gameCode].NumRestarts;
+                return _gameCache[gameCode].Game.Code+"_"+ _gameCache[gameCode].NumRestarts;
 
             }
             else return "";
