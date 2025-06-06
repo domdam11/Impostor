@@ -1,0 +1,1315 @@
+Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs>
+Annotation(rdfs:comment "Ontologia sulle strategie in Among Us per vincere come
+impostore")
+
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC>))
+Declaration(Class(:Action))
+Declaration(Class(:Admin))
+Declaration(Class(:AdminFixWiring))
+Declaration(Class(:AdminOxygenDepleted))
+Declaration(Class(:AdminTask))
+Declaration(Class(:AdminVent))
+Declaration(Class(:Admin_Sabotage))
+Declaration(Class(:AliveCrewmateMessage))
+Declaration(Class(:AliveImpostorMessage))
+Declaration(Class(:BigYVent))
+Declaration(Class(:CafeVent))
+Declaration(Class(:Cafeteria))
+Declaration(Class(:CafeteriaDownloadData))
+Declaration(Class(:CafeteriaEmptyGarbage))
+Declaration(Class(:CafeteriaFixWiring))
+Declaration(Class(:CafeteriaTask))
+Declaration(Class(:CalibrateDistributor))
+Declaration(Class(:ChartCourse))
+Declaration(Class(:CleanO2Filter))
+Declaration(Class(:ClearAsteroids))
+Declaration(Class(:CommsSabotaged))
+Declaration(Class(:Communications))
+Declaration(Class(:CommunicationsAcceptDivertedPower))
+Declaration(Class(:CommunicationsDownloadData))
+Declaration(Class(:CommunicationsTask))
+Declaration(Class(:Communications_Sabotage))
+Declaration(Class(:Corridor))
+Declaration(Class(:CorridorCAS))
+Declaration(Class(:CorridorCW))
+Declaration(Class(:CorridorLSRU))
+Declaration(Class(:CorridorSCS))
+Declaration(Class(:CorridorSEL))
+Declaration(Class(:CorridorUMC))
+Declaration(Class(:CorridorWONS))
+Declaration(Class(:CrewMate))
+Declaration(Class(:CrewMateAlive))
+Declaration(Class(:CrewMateDead))
+Declaration(Class(:DeadCrewmateMessage))
+Declaration(Class(:DivertPower))
+Declaration(Class(:ElecVent))
+Declaration(Class(:Electrical))
+Declaration(Class(:ElectricalDownloadData))
+Declaration(Class(:ElectricalFixWiring))
+Declaration(Class(:ElectricalTask))
+Declaration(Class(:Electrical_Sabotage))
+Declaration(Class(:EmergencyCall))
+Declaration(Class(:EngineVent))
+Declaration(Class(:Engineer))
+Declaration(Class(:ExiledImpostorMessage))
+Declaration(Class(:FixLight))
+Declaration(Class(:Game))
+Declaration(Class(:GuardianAngel))
+Declaration(Class(:Impostor))
+Declaration(Class(:ImpostorAlive))
+Declaration(Class(:ImpostorExiled))
+Declaration(Class(:InspectSample))
+Declaration(Class(:Kill))
+Declaration(Class(:LEngineVent))
+Declaration(Class(:LowerEngine))
+Declaration(Class(:LowerEngineAcceptDivertedPower))
+Declaration(Class(:LowerEngineAlignEngineOutput))
+Declaration(Class(:LowerEngineFuelEngines))
+Declaration(Class(:LowerEngineTask))
+Declaration(Class(:MedBay))
+Declaration(Class(:MedBaytask))
+Declaration(Class(:MedVent))
+Declaration(Class(:Message))
+Declaration(Class(:NavVentNorth))
+Declaration(Class(:NavVentSouth))
+Declaration(Class(:Navigation))
+Declaration(Class(:NavigationAcceptDivertedPower))
+Declaration(Class(:NavigationDownloadData))
+Declaration(Class(:NavigationFixWiring))
+Declaration(Class(:NavigationTask))
+Declaration(Class(:NavigationVent))
+Declaration(Class(:NoiseMaker))
+Declaration(Class(:O2))
+Declaration(Class(:O2AcceptDivertedPower))
+Declaration(Class(:O2EmptyChute))
+Declaration(Class(:O2Oxygendepleted))
+Declaration(Class(:O2Task))
+Declaration(Class(:O2_Sabotage))
+Declaration(Class(:Phantom))
+Declaration(Class(:Player))
+Declaration(Class(:Player1))
+Declaration(Class(:Player2))
+Declaration(Class(:Player4))
+Declaration(Class(:Player5))
+Declaration(Class(:Player6))
+Declaration(Class(:PrimeShields))
+Declaration(Class(:REngineVent))
+Declaration(Class(:Reactor))
+Declaration(Class(:ReactorMeltdown))
+Declaration(Class(:ReactorTask))
+Declaration(Class(:ReactorVent))
+Declaration(Class(:Reactor_Sabotage))
+Declaration(Class(:Room))
+Declaration(Class(:Sabotage))
+Declaration(Class(:SabotageCommsSabotaged))
+Declaration(Class(:SabotageDoorSabotage))
+Declaration(Class(:SabotageFixLights))
+Declaration(Class(:SabotageMedScan))
+Declaration(Class(:SabotageOxygenDepleted))
+Declaration(Class(:SabotageReactorMeltdown))
+Declaration(Class(:SabotageSecurity))
+Declaration(Class(:SabotageVentilation))
+Declaration(Class(:Sabotage_Task))
+Declaration(Class(:Scientist))
+Declaration(Class(:Security))
+Declaration(Class(:SecurityAcceptDivertedPower))
+Declaration(Class(:SecurityFixWiring))
+Declaration(Class(:SecurityTask))
+Declaration(Class(:SecurityVent))
+Declaration(Class(:Shapeshifter))
+Declaration(Class(:Shields))
+Declaration(Class(:ShieldsAcceeptDivertedPower))
+Declaration(Class(:ShieldsTask))
+Declaration(Class(:ShieldsVent))
+Declaration(Class(:Skeld))
+Declaration(Class(:StabilizeSteering))
+Declaration(Class(:StartReactor))
+Declaration(Class(:Storage))
+Declaration(Class(:StorageEmptyChute))
+Declaration(Class(:StorageEmptyGarbage))
+Declaration(Class(:StorageFixWiring))
+Declaration(Class(:StorageFuelEngines))
+Declaration(Class(:StorageTask))
+Declaration(Class(:Strategy))
+Declaration(Class(:StrategyA))
+Declaration(Class(:StrategyB))
+Declaration(Class(:StrategyC))
+Declaration(Class(:SubmitScan))
+Declaration(Class(:SwipeCARD))
+Declaration(Class(:Task))
+Declaration(Class(:Test))
+Declaration(Class(:Tracker))
+Declaration(Class(:UnlockManifolds))
+Declaration(Class(:UploadData))
+Declaration(Class(:UpperEngine))
+Declaration(Class(:UpperEngineAcceptDivertedPower))
+Declaration(Class(:UpperEngineAlignEngineOutput))
+Declaration(Class(:UpperEngineFuelEngines))
+Declaration(Class(:UpperEngineTask))
+Declaration(Class(:UpperReactorVent))
+Declaration(Class(:Vent))
+Declaration(Class(:WeaponDownloadData))
+Declaration(Class(:WeaponTask))
+Declaration(Class(:Weapons))
+Declaration(Class(:WeaponsAcceptDivertedPower))
+Declaration(Class(:WeaponsVent))
+Declaration(ObjectProperty(:AreCamerasActive))
+Declaration(ObjectProperty(:Calls))
+Declaration(ObjectProperty(:CloseDoors))
+Declaration(ObjectProperty(:Completed))
+Declaration(ObjectProperty(:Does))
+Declaration(ObjectProperty(:EnterVent))
+Declaration(ObjectProperty(:ExitVent))
+Declaration(ObjectProperty(:Fake))
+Declaration(ObjectProperty(:GetCloseTo))
+Declaration(ObjectProperty(:HasCurrentStatus))
+Declaration(ObjectProperty(:HasInFOV))
+Declaration(ObjectProperty(:HasInFOVFromTask))
+Declaration(ObjectProperty(:HasNAlivePlayers))
+Declaration(ObjectProperty(:ImpostorIsInFOV))
+Declaration(ObjectProperty(:ImpostorIsInFOVFromTask))
+Declaration(ObjectProperty(:IsArgumentFor))
+Declaration(ObjectProperty(:IsIn))
+Declaration(ObjectProperty(:IsInFOV))
+Declaration(ObjectProperty(:IsInFOVFromTask))
+Declaration(ObjectProperty(:IsNearC))
+Declaration(ObjectProperty(:IsNearR))
+Declaration(ObjectProperty(:Kills))
+Declaration(ObjectProperty(:NextTo))
+Declaration(ObjectProperty(:Reads))
+Declaration(ObjectProperty(:Repairs))
+Declaration(ObjectProperty(:Reports))
+Declaration(ObjectProperty(:Sabotages))
+Declaration(ObjectProperty(:SuggestedAction1))
+Declaration(ObjectProperty(:SuggestedAction2))
+Declaration(ObjectProperty(:SuggestedAction3))
+Declaration(ObjectProperty(:TransformInto))
+Declaration(ObjectProperty(:VentLeadsToCorridor))
+Declaration(ObjectProperty(:VentLeadsToRoom))
+Declaration(ObjectProperty(:VentTo))
+Declaration(ObjectProperty(:VeryNear))
+Declaration(ObjectProperty(:Votes))
+Declaration(ObjectProperty(:Writes))
+Declaration(DataProperty(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ImpostorHasNCrewmatesInFOV>))
+Declaration(DataProperty(:AnimationsEnabled))
+Declaration(DataProperty(:AnonymousVotesEnabled))
+Declaration(DataProperty(:AreCamerasActive))
+Declaration(DataProperty(:ConfirmEjects))
+Declaration(DataProperty(:CurrentState))
+Declaration(DataProperty(:GotExiled))
+Declaration(DataProperty(:HasCoordinates))
+Declaration(DataProperty(:HasNCrewmatesInFOV))
+Declaration(DataProperty(:HasNImpostorsInFOV))
+Declaration(DataProperty(:HasStatus))
+Declaration(DataProperty(:IsFixed))
+Declaration(DataProperty(:IsTaskDone))
+Declaration(DataProperty(:IsTaskVisual))
+Declaration(DataProperty(:PlayerName))
+Declaration(DataProperty(:UseMap))
+Declaration(DataProperty(:VisualTasksEnabled))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy>))
+Declaration(NamedIndividual(:CantEnterVent))
+Declaration(NamedIndividual(:CantExitVent))
+Declaration(NamedIndividual(:KillToSovrapposition))
+Declaration(NamedIndividual(:KillToWin))
+Declaration(NamedIndividual(:PassTheBlame))
+Declaration(NamedIndividual(:SabotaggioPostKill3Vivi))
+Declaration(NamedIndividual(:UccidiESpegniLuci))
+Declaration(AnnotationProperty(:formatDescription))
+
+############################
+#   Object Properties
+############################
+
+# Object Property: :Calls (:Calls)
+
+AnnotationAssertion(rdfs:comment :Calls "Crewmate or Impostor calls the
+emergency call")
+ObjectPropertyDomain(:Calls :CrewMateAlive)
+ObjectPropertyDomain(:Calls :ImpostorAlive)
+ObjectPropertyRange(:Calls :EmergencyCall)
+
+# Object Property: :CloseDoors (:CloseDoors)
+
+ObjectPropertyDomain(:CloseDoors :Impostor)
+ObjectPropertyRange(:CloseDoors :Room)
+
+# Object Property: :Completed (:Completed)
+
+AnnotationAssertion(rdfs:comment :Completed "Crewmate completed a task")
+ObjectPropertyDomain(:Completed :CrewMate)
+ObjectPropertyRange(:Completed :Task)
+
+# Object Property: :Does (:Does)
+
+AnnotationAssertion(rdfs:comment :Does "Crewmate does the tasks")
+ObjectPropertyDomain(:Does :CrewMate)
+ObjectPropertyRange(:Does :Sabotage_Task)
+ObjectPropertyRange(:Does :Task)
+
+# Object Property: :EnterVent (:EnterVent)
+
+ObjectPropertyDomain(:EnterVent :Engineer)
+ObjectPropertyDomain(:EnterVent :ImpostorAlive)
+ObjectPropertyRange(:EnterVent :Vent)
+
+# Object Property: :ExitVent (:ExitVent)
+
+ObjectPropertyDomain(:ExitVent :Engineer)
+ObjectPropertyDomain(:ExitVent :ImpostorAlive)
+ObjectPropertyRange(:ExitVent :Vent)
+DisjointObjectProperties(:ExitVent :Kills)
+
+# Object Property: :Fake (:Fake)
+
+AnnotationAssertion(rdfs:comment :Fake "Impostor fake to do the tasks")
+ObjectPropertyDomain(:Fake :ImpostorAlive)
+ObjectPropertyRange(:Fake :Sabotage_Task)
+ObjectPropertyRange(:Fake :Task)
+
+# Object Property: :GetCloseTo (:GetCloseTo)
+
+ObjectPropertyDomain(:GetCloseTo :Player)
+ObjectPropertyRange(:GetCloseTo :Player)
+
+# Object Property: :HasInFOVFromTask (:HasInFOVFromTask)
+
+ObjectPropertyDomain(:HasInFOVFromTask :CrewMateAlive)
+ObjectPropertyRange(:HasInFOVFromTask :Player)
+
+# Object Property: :ImpostorIsInFOV (:ImpostorIsInFOV)
+
+AnnotationAssertion(rdfs:comment :ImpostorIsInFOV "L'impostore è nella FOV di qualcuno")
+ObjectPropertyDomain(:ImpostorIsInFOV :Player)
+ObjectPropertyRange(:ImpostorIsInFOV :Player)
+
+# Object Property: :ImpostorIsInFOVFromTask (:ImpostorIsInFOVFromTask)
+
+AnnotationAssertion(rdfs:comment :ImpostorIsInFOVFromTask "L'impostore viene visto da qualcuno che sta facendo un task")
+
+# Object Property: :IsIn (:IsIn)
+
+ObjectPropertyDomain(:IsIn :Player)
+ObjectPropertyRange(:IsIn :Room)
+
+# Object Property: :IsInFOV (:IsInFOV)
+
+SymmetricObjectProperty(:IsInFOV)
+ObjectPropertyDomain(:IsInFOV :Player)
+ObjectPropertyRange(:IsInFOV :Player)
+
+# Object Property: :IsInFOVFromTask (:IsInFOVFromTask)
+
+AnnotationAssertion(rdfs:comment :IsInFOVFromTask "Un crewmate viene visto da qualcuno che sta facendo un task")
+
+# Object Property: :IsNearC (:IsNearC)
+
+ObjectPropertyDomain(:IsNearC :Room)
+ObjectPropertyRange(:IsNearC :Corridor)
+
+# Object Property: :IsNearR (:IsNearR)
+
+ObjectPropertyDomain(:IsNearR :Corridor)
+ObjectPropertyDomain(:IsNearR :Room)
+ObjectPropertyRange(:IsNearR :Room)
+
+# Object Property: :Kills (:Kills)
+
+AnnotationAssertion(rdfs:comment :Kills "Impostor kills the crewmate")
+ObjectPropertyDomain(:Kills :ImpostorAlive)
+ObjectPropertyRange(:Kills :CrewMateAlive)
+
+# Object Property: :NextTo (:NextTo)
+
+ObjectPropertyDomain(:NextTo :Player)
+ObjectPropertyRange(:NextTo :Task)
+ObjectPropertyRange(:NextTo :Vent)
+
+# Object Property: :Reads (:Reads)
+
+ObjectPropertyDomain(:Reads :CrewMate)
+ObjectPropertyDomain(:Reads :Impostor)
+ObjectPropertyRange(:Reads :AliveCrewmateMessage)
+ObjectPropertyRange(:Reads :AliveImpostorMessage)
+
+# Object Property: :Repairs (:Repairs)
+
+AnnotationAssertion(rdfs:comment :Repairs "Crewmate repairs system")
+ObjectPropertyDomain(:Repairs :CrewMate)
+ObjectPropertyRange(:Repairs :Sabotage_Task)
+
+# Object Property: :Reports (:Reports)
+
+SubObjectPropertyOf(:Reports owl:topObjectProperty)
+ObjectPropertyDomain(:Reports :CrewMateAlive)
+ObjectPropertyDomain(:Reports :ImpostorAlive)
+ObjectPropertyRange(:Reports :CrewMateDead)
+
+# Object Property: :Sabotages (:Sabotages)
+
+AnnotationAssertion(rdfs:comment :Sabotages "Impostor sabotages something in
+the skeld map")
+ObjectPropertyDomain(:Sabotages :ImpostorAlive)
+ObjectPropertyRange(:Sabotages :Sabotage)
+
+# Object Property: :SuggestedAction1 (:SuggestedAction1)
+
+ObjectPropertyRange(:SuggestedAction1 :Action)
+
+# Object Property: :SuggestedAction2 (:SuggestedAction2)
+
+SubObjectPropertyOf(:SuggestedAction2 owl:topObjectProperty)
+ObjectPropertyDomain(:SuggestedAction2 :Action)
+
+# Object Property: :SuggestedAction3 (:SuggestedAction3)
+
+ObjectPropertyRange(:SuggestedAction3 :Action)
+
+# Object Property: :TransformInto (:TransformInto)
+
+ObjectPropertyDomain(:TransformInto :Shapeshifter)
+ObjectPropertyRange(:TransformInto :Player)
+
+# Object Property: :VentLeadsToCorridor (:VentLeadsToCorridor)
+
+SubObjectPropertyOf(:VentLeadsToCorridor owl:topObjectProperty)
+ObjectPropertyDomain(:VentLeadsToCorridor :Vent)
+ObjectPropertyRange(:VentLeadsToCorridor :Corridor)
+
+# Object Property: :VentLeadsToRoom (:VentLeadsToRoom)
+
+SubObjectPropertyOf(:VentLeadsToRoom owl:topObjectProperty)
+ObjectPropertyDomain(:VentLeadsToRoom :Vent)
+ObjectPropertyRange(:VentLeadsToRoom :Room)
+
+# Object Property: :VentTo (:VentTo)
+
+ObjectPropertyDomain(:VentTo :Engineer)
+ObjectPropertyDomain(:VentTo :ImpostorAlive)
+ObjectPropertyRange(:VentTo :Vent)
+
+# Object Property: :VeryNear (:VeryNear)
+
+AnnotationAssertion(rdfs:comment :VeryNear "Proprietà che segnala la vicinanza forte tra player => deve essere talmente piccolo da essere assimilabile al caso in cui vi trovate tutti quasi nella stessa posizione rispetto all'impostore")
+
+# Object Property: :Votes (:Votes)
+
+ObjectPropertyDomain(:Votes :CrewMateAlive)
+ObjectPropertyDomain(:Votes :ImpostorAlive)
+ObjectPropertyRange(:Votes :CrewMateAlive)
+ObjectPropertyRange(:Votes :ImpostorAlive)
+
+# Object Property: :Writes (:Writes)
+
+ObjectPropertyDomain(:Writes :Player)
+ObjectPropertyRange(:Writes :Message)
+
+
+############################
+#   Data Properties
+############################
+
+# Data Property: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ImpostorHasNCrewmatesInFOV> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ImpostorHasNCrewmatesInFOV>)
+
+DataPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ImpostorHasNCrewmatesInFOV> :Impostor)
+DataPropertyRange(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ImpostorHasNCrewmatesInFOV> xsd:integer)
+
+# Data Property: :AnimationsEnabled (:AnimationsEnabled)
+
+SubDataPropertyOf(:AnimationsEnabled owl:topDataProperty)
+DataPropertyDomain(:AnimationsEnabled :Game)
+DataPropertyRange(:AnimationsEnabled xsd:boolean)
+
+# Data Property: :AnonymousVotesEnabled (:AnonymousVotesEnabled)
+
+DataPropertyDomain(:AnonymousVotesEnabled :Game)
+DataPropertyRange(:AnonymousVotesEnabled xsd:boolean)
+
+# Data Property: :AreCamerasActive (:AreCamerasActive)
+
+SubDataPropertyOf(:AreCamerasActive owl:topDataProperty)
+DataPropertyDomain(:AreCamerasActive :Game)
+DataPropertyRange(:AreCamerasActive xsd:boolean)
+
+# Data Property: :ConfirmEjects (:ConfirmEjects)
+
+SubDataPropertyOf(:ConfirmEjects owl:topDataProperty)
+DataPropertyDomain(:ConfirmEjects :Game)
+DataPropertyRange(:ConfirmEjects xsd:boolean)
+
+# Data Property: :CurrentState (:CurrentState)
+
+DataPropertyDomain(:CurrentState :Game)
+DataPropertyRange(:CurrentState DataOneOf("Meeting" "None" "Sabotage"))
+
+# Data Property: :GotExiled (:GotExiled)
+
+DataPropertyDomain(:GotExiled :Player)
+DataPropertyRange(:GotExiled xsd:boolean)
+
+# Data Property: :HasCoordinates (:HasCoordinates)
+
+AnnotationAssertion(:formatDescription :HasCoordinates "Expected format: <latitude. longitude>. Example: '<0,95750046. 1,0109138>' ")
+DataPropertyDomain(:HasCoordinates :Player)
+DataPropertyRange(:HasCoordinates xsd:string)
+
+# Data Property: :HasNCrewmatesInFOV (:HasNCrewmatesInFOV)
+
+DataPropertyDomain(:HasNCrewmatesInFOV :Player)
+DataPropertyRange(:HasNCrewmatesInFOV xsd:integer)
+
+# Data Property: :HasNImpostorsInFOV (:HasNImpostorsInFOV)
+
+DataPropertyDomain(:HasNImpostorsInFOV :Player)
+DataPropertyRange(:HasNImpostorsInFOV xsd:integer)
+
+# Data Property: :HasStatus (:HasStatus)
+
+DataPropertyDomain(:HasStatus :Player)
+DataPropertyRange(:HasStatus DataOneOf("None" "Suspected" "Trusted"))
+
+# Data Property: :IsFixed (:IsFixed)
+
+DataPropertyDomain(:IsFixed :Player)
+DataPropertyRange(:IsFixed xsd:boolean)
+
+# Data Property: :IsTaskDone (:IsTaskDone)
+
+SubDataPropertyOf(:IsTaskDone owl:topDataProperty)
+DataPropertyDomain(:IsTaskDone :Task)
+DataPropertyRange(:IsTaskDone xsd:boolean)
+
+# Data Property: :IsTaskVisual (:IsTaskVisual)
+
+SubDataPropertyOf(:IsTaskVisual owl:topDataProperty)
+DataPropertyDomain(:IsTaskVisual :Task)
+DataPropertyRange(:IsTaskVisual xsd:boolean)
+
+# Data Property: :PlayerName (:PlayerName)
+
+SubDataPropertyOf(:PlayerName owl:topDataProperty)
+DataPropertyDomain(:PlayerName :Player)
+DataPropertyRange(:PlayerName xsd:string)
+
+# Data Property: :UseMap (:UseMap)
+
+DataPropertyDomain(:UseMap :Game)
+DataPropertyRange(:UseMap xsd:string)
+
+# Data Property: :VisualTasksEnabled (:VisualTasksEnabled)
+
+SubDataPropertyOf(:VisualTasksEnabled owl:topDataProperty)
+DataPropertyDomain(:VisualTasksEnabled :Game)
+DataPropertyRange(:VisualTasksEnabled xsd:boolean)
+
+
+
+############################
+#   Classes
+############################
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3> :Player)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :Player)
+DisjointClasses(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :CrewMateDead)
+DisjointClasses(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :ImpostorExiled)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC> :StrategyC)
+
+# Class: :Action (:Action)
+
+SubClassOf(:Action :Game)
+
+# Class: :Admin (:Admin)
+
+SubClassOf(:Admin :Room)
+
+# Class: :AdminFixWiring (:AdminFixWiring)
+
+SubClassOf(:AdminFixWiring :AdminTask)
+
+# Class: :AdminOxygenDepleted (:AdminOxygenDepleted)
+
+SubClassOf(:AdminOxygenDepleted :Admin_Sabotage)
+
+# Class: :AdminTask (:AdminTask)
+
+SubClassOf(:AdminTask :Task)
+
+# Class: :AdminVent (:AdminVent)
+
+EquivalentClasses(:AdminVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToCorridor :CorridorWONS) ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation)))
+SubClassOf(:AdminVent :Vent)
+
+# Class: :Admin_Sabotage (:Admin_Sabotage)
+
+SubClassOf(:Admin_Sabotage :Sabotage_Task)
+
+# Class: :AliveCrewmateMessage (:AliveCrewmateMessage)
+
+SubClassOf(:AliveCrewmateMessage :Message)
+
+# Class: :AliveImpostorMessage (:AliveImpostorMessage)
+
+SubClassOf(:AliveImpostorMessage :Message)
+
+# Class: :BigYVent (:BigYVent)
+
+EquivalentClasses(:BigYVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Admin) ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria)))
+SubClassOf(:BigYVent :Vent)
+
+# Class: :CafeVent (:CafeVent)
+
+EquivalentClasses(:CafeVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToCorridor :CorridorWONS) ObjectAllValuesFrom(:VentLeadsToRoom :Admin) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation) ObjectAllValuesFrom(:VentLeadsToRoom :Weapons)))
+SubClassOf(:CafeVent :Vent)
+
+# Class: :Cafeteria (:Cafeteria)
+
+EquivalentClasses(:Cafeteria ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCAS) ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :Admin) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :Storage) ObjectAllValuesFrom(:IsNearR :Weapons)))
+SubClassOf(:Cafeteria :Room)
+DisjointClasses(:Cafeteria :Communications)
+DisjointClasses(:Cafeteria :Electrical)
+DisjointClasses(:Cafeteria :LowerEngine)
+DisjointClasses(:Cafeteria :MedBay)
+DisjointClasses(:Cafeteria :Navigation)
+DisjointClasses(:Cafeteria :Reactor)
+DisjointClasses(:Cafeteria :Security)
+DisjointClasses(:Cafeteria :Shields)
+DisjointClasses(:Cafeteria :Storage)
+DisjointClasses(:Cafeteria :UpperEngine)
+DisjointClasses(:Cafeteria :Weapons)
+
+# Class: :CafeteriaDownloadData (:CafeteriaDownloadData)
+
+SubClassOf(:CafeteriaDownloadData :CafeteriaTask)
+
+# Class: :CafeteriaEmptyGarbage (:CafeteriaEmptyGarbage)
+
+SubClassOf(:CafeteriaEmptyGarbage :CafeteriaTask)
+
+# Class: :CafeteriaFixWiring (:CafeteriaFixWiring)
+
+SubClassOf(:CafeteriaFixWiring :CafeteriaTask)
+
+# Class: :CafeteriaTask (:CafeteriaTask)
+
+SubClassOf(:CafeteriaTask :Task)
+
+# Class: :CalibrateDistributor (:CalibrateDistributor)
+
+SubClassOf(:CalibrateDistributor :ElectricalTask)
+
+# Class: :ChartCourse (:ChartCourse)
+
+SubClassOf(:ChartCourse :NavigationTask)
+
+# Class: :CleanO2Filter (:CleanO2Filter)
+
+SubClassOf(:CleanO2Filter :O2Task)
+
+# Class: :ClearAsteroids (:ClearAsteroids)
+
+SubClassOf(:ClearAsteroids :WeaponTask)
+
+# Class: :CommsSabotaged (:CommsSabotaged)
+
+SubClassOf(:CommsSabotaged :Communications_Sabotage)
+
+# Class: :Communications (:Communications)
+
+EquivalentClasses(:Communications ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
+SubClassOf(:Communications :Room)
+DisjointClasses(:Communications :Electrical)
+DisjointClasses(:Communications :LowerEngine)
+DisjointClasses(:Communications :MedBay)
+DisjointClasses(:Communications :Navigation)
+DisjointClasses(:Communications :Reactor)
+DisjointClasses(:Communications :Security)
+DisjointClasses(:Communications :Shields)
+DisjointClasses(:Communications :Storage)
+DisjointClasses(:Communications :UpperEngine)
+DisjointClasses(:Communications :Weapons)
+
+# Class: :CommunicationsAcceptDivertedPower (:CommunicationsAcceptDivertedPower)
+
+SubClassOf(:CommunicationsAcceptDivertedPower :CommunicationsTask)
+
+# Class: :CommunicationsDownloadData (:CommunicationsDownloadData)
+
+SubClassOf(:CommunicationsDownloadData :CommunicationsTask)
+
+# Class: :CommunicationsTask (:CommunicationsTask)
+
+SubClassOf(:CommunicationsTask :Task)
+
+# Class: :Communications_Sabotage (:Communications_Sabotage)
+
+SubClassOf(:Communications_Sabotage :Sabotage_Task)
+
+# Class: :Corridor (:Corridor)
+
+SubClassOf(:Corridor :Skeld)
+DisjointClasses(:Corridor :Vent)
+DisjointClasses(:Corridor :Weapons)
+
+# Class: :CorridorCAS (:CorridorCAS)
+
+SubClassOf(:CorridorCAS :Corridor)
+
+# Class: :CorridorCW (:CorridorCW)
+
+EquivalentClasses(:CorridorCW ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Weapons)))
+SubClassOf(:CorridorCW :Corridor)
+DisjointClasses(:CorridorCW :CorridorLSRU)
+DisjointClasses(:CorridorCW :CorridorSCS)
+DisjointClasses(:CorridorCW :CorridorSEL)
+DisjointClasses(:CorridorCW :CorridorUMC)
+DisjointClasses(:CorridorCW :CorridorWONS)
+
+# Class: :CorridorLSRU (:CorridorLSRU)
+
+EquivalentClasses(:CorridorLSRU ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:CorridorLSRU :Corridor)
+DisjointClasses(:CorridorLSRU :CorridorSCS)
+DisjointClasses(:CorridorLSRU :CorridorSEL)
+DisjointClasses(:CorridorLSRU :CorridorUMC)
+DisjointClasses(:CorridorLSRU :CorridorWONS)
+
+# Class: :CorridorSCS (:CorridorSCS)
+
+EquivalentClasses(:CorridorSCS ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
+SubClassOf(:CorridorSCS :Corridor)
+DisjointClasses(:CorridorSCS :CorridorSEL)
+DisjointClasses(:CorridorSCS :CorridorUMC)
+DisjointClasses(:CorridorSCS :CorridorWONS)
+
+# Class: :CorridorSEL (:CorridorSEL)
+
+EquivalentClasses(:CorridorSEL ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Storage)))
+SubClassOf(:CorridorSEL :Corridor)
+DisjointClasses(:CorridorSEL :CorridorUMC)
+DisjointClasses(:CorridorSEL :CorridorWONS)
+
+# Class: :CorridorUMC (:CorridorUMC)
+
+EquivalentClasses(:CorridorUMC ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:CorridorUMC :Corridor)
+DisjointClasses(:CorridorUMC :CorridorWONS)
+
+# Class: :CorridorWONS (:CorridorWONS)
+
+EquivalentClasses(:CorridorWONS ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :O2)))
+SubClassOf(:CorridorWONS :Corridor)
+
+# Class: :CrewMate (:CrewMate)
+
+SubClassOf(:CrewMate :Player)
+DisjointClasses(:CrewMate :Impostor)
+
+# Class: :CrewMateAlive (:CrewMateAlive)
+
+SubClassOf(:CrewMateAlive :CrewMate)
+DisjointClasses(:CrewMateAlive :CrewMateDead)
+
+# Class: :CrewMateDead (:CrewMateDead)
+
+SubClassOf(:CrewMateDead :CrewMate)
+
+# Class: :DeadCrewmateMessage (:DeadCrewmateMessage)
+
+SubClassOf(:DeadCrewmateMessage :Message)
+
+# Class: :DivertPower (:DivertPower)
+
+SubClassOf(:DivertPower :ElectricalTask)
+
+# Class: :ElecVent (:ElecVent)
+
+EquivalentClasses(:ElecVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :MedBay) ObjectAllValuesFrom(:VentLeadsToRoom :Security)))
+SubClassOf(:ElecVent :Vent)
+
+# Class: :Electrical (:Electrical)
+
+EquivalentClasses(:Electrical ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Storage)))
+SubClassOf(:Electrical :Room)
+DisjointClasses(:Electrical :LowerEngine)
+DisjointClasses(:Electrical :MedBay)
+DisjointClasses(:Electrical :Navigation)
+DisjointClasses(:Electrical :Reactor)
+DisjointClasses(:Electrical :Security)
+DisjointClasses(:Electrical :Shields)
+DisjointClasses(:Electrical :Storage)
+DisjointClasses(:Electrical :UpperEngine)
+DisjointClasses(:Electrical :Weapons)
+
+# Class: :ElectricalDownloadData (:ElectricalDownloadData)
+
+SubClassOf(:ElectricalDownloadData :ElectricalTask)
+
+# Class: :ElectricalFixWiring (:ElectricalFixWiring)
+
+SubClassOf(:ElectricalFixWiring :ElectricalTask)
+
+# Class: :ElectricalTask (:ElectricalTask)
+
+SubClassOf(:ElectricalTask :Task)
+
+# Class: :Electrical_Sabotage (:Electrical_Sabotage)
+
+SubClassOf(:Electrical_Sabotage :Sabotage_Task)
+
+# Class: :EmergencyCall (:EmergencyCall)
+
+SubClassOf(:EmergencyCall :Action)
+
+# Class: :EngineVent (:EngineVent)
+
+SubClassOf(:EngineVent :Vent)
+
+# Class: :Engineer (:Engineer)
+
+SubClassOf(:Engineer :CrewMateAlive)
+
+# Class: :ExiledImpostorMessage (:ExiledImpostorMessage)
+
+SubClassOf(:ExiledImpostorMessage :Message)
+
+# Class: :FixLight (:FixLight)
+
+SubClassOf(:FixLight :Electrical_Sabotage)
+
+# Class: :GuardianAngel (:GuardianAngel)
+
+SubClassOf(:GuardianAngel :CrewMateAlive)
+
+# Class: :Impostor (:Impostor)
+
+SubClassOf(:Impostor :Player)
+
+# Class: :ImpostorAlive (:ImpostorAlive)
+
+SubClassOf(:ImpostorAlive :Impostor)
+
+# Class: :ImpostorExiled (:ImpostorExiled)
+
+SubClassOf(:ImpostorExiled :Impostor)
+
+# Class: :InspectSample (:InspectSample)
+
+SubClassOf(:InspectSample :MedBaytask)
+
+# Class: :Kill (:Kill)
+
+SubClassOf(:Kill :Action)
+
+# Class: :LEngineVent (:LEngineVent)
+
+EquivalentClasses(:LEngineVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Reactor) ObjectAllValuesFrom(:VentLeadsToRoom :UpperEngine)))
+SubClassOf(:LEngineVent :EngineVent)
+
+# Class: :LowerEngine (:LowerEngine)
+
+EquivalentClasses(:LowerEngine ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:LowerEngine :Room)
+DisjointClasses(:LowerEngine :MedBay)
+DisjointClasses(:LowerEngine :Navigation)
+DisjointClasses(:LowerEngine :Reactor)
+DisjointClasses(:LowerEngine :Security)
+DisjointClasses(:LowerEngine :Shields)
+DisjointClasses(:LowerEngine :Storage)
+DisjointClasses(:LowerEngine :UpperEngine)
+DisjointClasses(:LowerEngine :Weapons)
+
+# Class: :LowerEngineAcceptDivertedPower (:LowerEngineAcceptDivertedPower)
+
+SubClassOf(:LowerEngineAcceptDivertedPower :LowerEngineTask)
+
+# Class: :LowerEngineAlignEngineOutput (:LowerEngineAlignEngineOutput)
+
+SubClassOf(:LowerEngineAlignEngineOutput :LowerEngineTask)
+
+# Class: :LowerEngineFuelEngines (:LowerEngineFuelEngines)
+
+SubClassOf(:LowerEngineFuelEngines :LowerEngineTask)
+
+# Class: :LowerEngineTask (:LowerEngineTask)
+
+SubClassOf(:LowerEngineTask :Task)
+
+# Class: :MedBay (:MedBay)
+
+EquivalentClasses(:MedBay ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:MedBay :Room)
+DisjointClasses(:MedBay :Navigation)
+DisjointClasses(:MedBay :Reactor)
+DisjointClasses(:MedBay :Security)
+DisjointClasses(:MedBay :Shields)
+DisjointClasses(:MedBay :Storage)
+DisjointClasses(:MedBay :UpperEngine)
+DisjointClasses(:MedBay :Weapons)
+
+# Class: :MedBaytask (:MedBaytask)
+
+SubClassOf(:MedBaytask :Task)
+
+# Class: :MedVent (:MedVent)
+
+EquivalentClasses(:MedVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Electrical) ObjectAllValuesFrom(:VentLeadsToRoom :Security)))
+SubClassOf(:MedVent :Vent)
+
+# Class: :Message (:Message)
+
+SubClassOf(:Message :Game)
+
+# Class: :NavVentNorth (:NavVentNorth)
+
+EquivalentClasses(:NavVentNorth ObjectAllValuesFrom(:VentLeadsToRoom :Weapons))
+SubClassOf(:NavVentNorth :NavigationVent)
+
+# Class: :NavVentSouth (:NavVentSouth)
+
+EquivalentClasses(:NavVentSouth ObjectAllValuesFrom(:VentLeadsToRoom :Shields))
+SubClassOf(:NavVentSouth :NavigationVent)
+
+# Class: :Navigation (:Navigation)
+
+EquivalentClasses(:Navigation ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Weapons)))
+SubClassOf(:Navigation :Room)
+DisjointClasses(:Navigation :Reactor)
+DisjointClasses(:Navigation :Security)
+DisjointClasses(:Navigation :Shields)
+DisjointClasses(:Navigation :Storage)
+DisjointClasses(:Navigation :UpperEngine)
+DisjointClasses(:Navigation :Weapons)
+
+# Class: :NavigationAcceptDivertedPower (:NavigationAcceptDivertedPower)
+
+SubClassOf(:NavigationAcceptDivertedPower :NavigationTask)
+
+# Class: :NavigationDownloadData (:NavigationDownloadData)
+
+SubClassOf(:NavigationDownloadData :NavigationTask)
+
+# Class: :NavigationFixWiring (:NavigationFixWiring)
+
+SubClassOf(:NavigationFixWiring :NavigationTask)
+
+# Class: :NavigationTask (:NavigationTask)
+
+SubClassOf(:NavigationTask :Task)
+
+# Class: :NavigationVent (:NavigationVent)
+
+SubClassOf(:NavigationVent :Vent)
+
+# Class: :NoiseMaker (:NoiseMaker)
+
+SubClassOf(:NoiseMaker :CrewMateAlive)
+
+# Class: :O2 (:O2)
+
+SubClassOf(:O2 :Room)
+DisjointClasses(:O2 :Test)
+
+# Class: :O2AcceptDivertedPower (:O2AcceptDivertedPower)
+
+SubClassOf(:O2AcceptDivertedPower :O2Task)
+
+# Class: :O2EmptyChute (:O2EmptyChute)
+
+SubClassOf(:O2EmptyChute :O2Task)
+
+# Class: :O2Oxygendepleted (:O2Oxygendepleted)
+
+SubClassOf(:O2Oxygendepleted :O2_Sabotage)
+
+# Class: :O2Task (:O2Task)
+
+SubClassOf(:O2Task :Task)
+
+# Class: :O2_Sabotage (:O2_Sabotage)
+
+SubClassOf(:O2_Sabotage :Sabotage_Task)
+
+# Class: :Phantom (:Phantom)
+
+SubClassOf(:Phantom :ImpostorAlive)
+
+# Class: :Player (:Player)
+
+AnnotationAssertion(rdfs:comment :Player "-Potresti aggiungere un altra sotto classe chiamata player dead e player alive. Non sono connesse direttamente a crewmate e impostor")
+SubClassOf(:Player :Game)
+
+# Class: :Player1 (:Player1)
+
+SubClassOf(:Player1 :Player)
+
+# Class: :Player2 (:Player2)
+
+SubClassOf(:Player2 :Player)
+
+# Class: :Player4 (:Player4)
+
+SubClassOf(:Player4 :Player)
+
+# Class: :Player5 (:Player5)
+
+SubClassOf(:Player5 :Player)
+
+# Class: :Player6 (:Player6)
+
+SubClassOf(:Player6 :Player)
+
+# Class: :PrimeShields (:PrimeShields)
+
+SubClassOf(:PrimeShields :ShieldsTask)
+
+# Class: :REngineVent (:REngineVent)
+
+EquivalentClasses(:REngineVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :LowerEngine) ObjectAllValuesFrom(:VentLeadsToRoom :Reactor)))
+SubClassOf(:REngineVent :EngineVent)
+
+# Class: :Reactor (:Reactor)
+
+EquivalentClasses(:Reactor ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:Reactor :Room)
+DisjointClasses(:Reactor :Security)
+DisjointClasses(:Reactor :Shields)
+DisjointClasses(:Reactor :Storage)
+DisjointClasses(:Reactor :UpperEngine)
+DisjointClasses(:Reactor :Weapons)
+
+# Class: :ReactorMeltdown (:ReactorMeltdown)
+
+SubClassOf(:ReactorMeltdown :Reactor_Sabotage)
+
+# Class: :ReactorTask (:ReactorTask)
+
+SubClassOf(:ReactorTask :Task)
+
+# Class: :ReactorVent (:ReactorVent)
+
+EquivalentClasses(:ReactorVent ObjectAllValuesFrom(:VentLeadsToRoom :LowerEngine))
+SubClassOf(:ReactorVent :Vent)
+
+# Class: :Reactor_Sabotage (:Reactor_Sabotage)
+
+SubClassOf(:Reactor_Sabotage :Sabotage_Task)
+
+# Class: :Room (:Room)
+
+SubClassOf(:Room :Skeld)
+
+# Class: :Sabotage (:Sabotage)
+
+SubClassOf(:Sabotage :Skeld)
+
+# Class: :SabotageCommsSabotaged (:SabotageCommsSabotaged)
+
+SubClassOf(:SabotageCommsSabotaged :Sabotage)
+
+# Class: :SabotageDoorSabotage (:SabotageDoorSabotage)
+
+SubClassOf(:SabotageDoorSabotage :Sabotage)
+
+# Class: :SabotageFixLights (:SabotageFixLights)
+
+SubClassOf(:SabotageFixLights :Sabotage)
+
+# Class: :SabotageMedScan (:SabotageMedScan)
+
+SubClassOf(:SabotageMedScan :Sabotage)
+
+# Class: :SabotageOxygenDepleted (:SabotageOxygenDepleted)
+
+SubClassOf(:SabotageOxygenDepleted :Sabotage)
+
+# Class: :SabotageReactorMeltdown (:SabotageReactorMeltdown)
+
+SubClassOf(:SabotageReactorMeltdown :Sabotage)
+
+# Class: :SabotageSecurity (:SabotageSecurity)
+
+SubClassOf(:SabotageSecurity :Sabotage)
+
+# Class: :SabotageVentilation (:SabotageVentilation)
+
+SubClassOf(:SabotageVentilation :Sabotage)
+
+# Class: :Sabotage_Task (:Sabotage_Task)
+
+SubClassOf(:Sabotage_Task :Skeld)
+
+# Class: :Scientist (:Scientist)
+
+SubClassOf(:Scientist :CrewMateAlive)
+
+# Class: :Security (:Security)
+
+EquivalentClasses(:Security ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
+SubClassOf(:Security :Room)
+DisjointClasses(:Security :Shields)
+DisjointClasses(:Security :Storage)
+DisjointClasses(:Security :UpperEngine)
+DisjointClasses(:Security :Weapons)
+
+# Class: :SecurityAcceptDivertedPower (:SecurityAcceptDivertedPower)
+
+SubClassOf(:SecurityAcceptDivertedPower :SecurityTask)
+
+# Class: :SecurityFixWiring (:SecurityFixWiring)
+
+SubClassOf(:SecurityFixWiring :SecurityTask)
+
+# Class: :SecurityTask (:SecurityTask)
+
+SubClassOf(:SecurityTask :Task)
+
+# Class: :SecurityVent (:SecurityVent)
+
+EquivalentClasses(:SecurityVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Electrical) ObjectAllValuesFrom(:VentLeadsToRoom :MedBay)))
+SubClassOf(:SecurityVent :Vent)
+
+# Class: :Shapeshifter (:Shapeshifter)
+
+SubClassOf(:Shapeshifter :ImpostorAlive)
+
+# Class: :Shields (:Shields)
+
+EquivalentClasses(:Shields ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Navigation) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Storage) ObjectAllValuesFrom(:IsNearR :Weapons)))
+SubClassOf(:Shields :Room)
+DisjointClasses(:Shields :Storage)
+DisjointClasses(:Shields :UpperEngine)
+DisjointClasses(:Shields :Weapons)
+
+# Class: :ShieldsAcceeptDivertedPower (:ShieldsAcceeptDivertedPower)
+
+SubClassOf(:ShieldsAcceeptDivertedPower :ShieldsTask)
+
+# Class: :ShieldsTask (:ShieldsTask)
+
+SubClassOf(:ShieldsTask :Task)
+
+# Class: :ShieldsVent (:ShieldsVent)
+
+EquivalentClasses(:ShieldsVent ObjectAllValuesFrom(:VentLeadsToRoom :Navigation))
+SubClassOf(:ShieldsVent :Vent)
+
+# Class: :StabilizeSteering (:StabilizeSteering)
+
+SubClassOf(:StabilizeSteering :NavigationTask)
+
+# Class: :StartReactor (:StartReactor)
+
+SubClassOf(:StartReactor :ReactorTask)
+
+# Class: :Storage (:Storage)
+
+EquivalentClasses(:Storage ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCAS) ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :Admin) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Weapons)))
+SubClassOf(:Storage :Room)
+DisjointClasses(:Storage :UpperEngine)
+DisjointClasses(:Storage :Weapons)
+
+# Class: :StorageEmptyChute (:StorageEmptyChute)
+
+SubClassOf(:StorageEmptyChute :StorageTask)
+
+# Class: :StorageEmptyGarbage (:StorageEmptyGarbage)
+
+SubClassOf(:StorageEmptyGarbage :StorageTask)
+
+# Class: :StorageFixWiring (:StorageFixWiring)
+
+SubClassOf(:StorageFixWiring :StorageTask)
+
+# Class: :StorageFuelEngines (:StorageFuelEngines)
+
+SubClassOf(:StorageFuelEngines :StorageTask)
+
+# Class: :StorageTask (:StorageTask)
+
+SubClassOf(:StorageTask :Task)
+
+# Class: :Strategy (:Strategy)
+
+AnnotationAssertion(rdfs:comment :Strategy "See StrategyA and StrategyB individuals for insert descriptions")
+SubClassOf(:Strategy :Skeld)
+
+# Class: :StrategyA (:StrategyA)
+
+SubClassOf(:StrategyA :Strategy)
+DisjointClasses(:StrategyA :StrategyB)
+DisjointClasses(:StrategyA :StrategyC)
+
+# Class: :StrategyB (:StrategyB)
+
+SubClassOf(:StrategyB :Strategy)
+DisjointClasses(:StrategyB :StrategyC)
+
+# Class: :StrategyC (:StrategyC)
+
+SubClassOf(:StrategyC :Strategy)
+
+# Class: :SubmitScan (:SubmitScan)
+
+SubClassOf(:SubmitScan :MedBaytask)
+
+# Class: :SwipeCARD (:SwipeCARD)
+
+SubClassOf(:SwipeCARD :AdminTask)
+
+# Class: :Task (:Task)
+
+AnnotationAssertion(rdfs:comment :Task "Qui puoi dire in generale una caratt di un task => isVisual
+task specifico => qui dici se è visuale o meno")
+SubClassOf(:Task :Skeld)
+
+# Class: :Test (:Test)
+
+SubClassOf(:Test :Room)
+
+# Class: :Tracker (:Tracker)
+
+SubClassOf(:Tracker :CrewMateAlive)
+
+# Class: :UnlockManifolds (:UnlockManifolds)
+
+SubClassOf(:UnlockManifolds :ReactorTask)
+
+# Class: :UploadData (:UploadData)
+
+SubClassOf(:UploadData :AdminTask)
+
+# Class: :UpperEngine (:UpperEngine)
+
+EquivalentClasses(:UpperEngine ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security)))
+SubClassOf(:UpperEngine :Room)
+DisjointClasses(:UpperEngine :Weapons)
+
+# Class: :UpperEngineAcceptDivertedPower (:UpperEngineAcceptDivertedPower)
+
+SubClassOf(:UpperEngineAcceptDivertedPower :UpperEngineTask)
+
+# Class: :UpperEngineAlignEngineOutput (:UpperEngineAlignEngineOutput)
+
+SubClassOf(:UpperEngineAlignEngineOutput :UpperEngineTask)
+
+# Class: :UpperEngineFuelEngines (:UpperEngineFuelEngines)
+
+SubClassOf(:UpperEngineFuelEngines :UpperEngineTask)
+
+# Class: :UpperEngineTask (:UpperEngineTask)
+
+SubClassOf(:UpperEngineTask :Task)
+
+# Class: :UpperReactorVent (:UpperReactorVent)
+
+EquivalentClasses(:UpperReactorVent ObjectAllValuesFrom(:VentLeadsToRoom :UpperEngine))
+SubClassOf(:UpperReactorVent :Vent)
+
+# Class: :Vent (:Vent)
+
+SubClassOf(:Vent :Skeld)
+
+# Class: :WeaponDownloadData (:WeaponDownloadData)
+
+SubClassOf(:WeaponDownloadData :WeaponTask)
+
+# Class: :WeaponTask (:WeaponTask)
+
+SubClassOf(:WeaponTask :Task)
+
+# Class: :Weapons (:Weapons)
+
+EquivalentClasses(:Weapons ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Navigation) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
+SubClassOf(:Weapons :Room)
+
+# Class: :WeaponsAcceptDivertedPower (:WeaponsAcceptDivertedPower)
+
+SubClassOf(:WeaponsAcceptDivertedPower :WeaponTask)
+
+# Class: :WeaponsVent (:WeaponsVent)
+
+EquivalentClasses(:WeaponsVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation)))
+SubClassOf(:WeaponsVent :Vent)
+
+
+############################
+#   Named Individuals
+############################
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy>)
+
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Analizzando il log potresti ricavare nuove strategie da applicare:
+-uccidere in una camera e poi scappare dalla ventola
+-saboti sistema elettrico => uccidi player vicino => scappi dalla ventola
+-camera killer => è uno pseudo task che anche l'impostore può fare
+-strategie di accusa reciproca fra i crewmate , qui non uccidi ma gli spingi ad accusarsi a vicenda
+-informazioni delle videocamere da ottenere => se una telecamera lampeggia allora vuol dire che c'è qualcuno che sta guardando")
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Potrei modellare l'uccisione usando il passato nella ontologia in modo SOFT, solo per dire da quante foto l'impostore sta solo")
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Ci sono dei momenti in cui l'impostore è solo per cui potrebbe applicare delle semi strategie apposite, come cercare altri player, impostori, sabotaggi, o altro")
+
+# Individual: :CantEnterVent (:CantEnterVent)
+
+AnnotationAssertion(rdfs:comment :CantEnterVent "Spiegazione:
+-IsInFOV: serve per negativizzare il supporto dei player nelle vicinanze dell'impostore, usando qualsiasi proprietà che faccia esplicito riferimento all'impostore non è possibile dato quel player non sa chi è l'impostore
+-ImpostorIsInFOV: serve per negativizzare il supporto dell'impostore
+-con il ruolo dell'ingegnere potresti pensare di attivare la strategia ventola in altri casi più specifici perchè un crewmate esterno potrebbe pensare che tu sia l'ingegnere a meno che questo sia morto")
+ClassAssertion(ObjectIntersectionOf(ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectMinCardinality(1 :IsInFOV)) :CantEnterVent)
+
+# Individual: :CantExitVent (:CantExitVent)
+
+ClassAssertion(ObjectIntersectionOf(ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectMinCardinality(1 :IsInFOV)) :CantExitVent)
+
+# Individual: :KillToSovrapposition (:KillToSovrapposition)
+
+AnnotationAssertion(rdfs:comment :KillToSovrapposition "Qui uccidi quando siete sovrapposti in almeno 4 player , 3 compreso chi osserva sono 4")
+ClassAssertion(ObjectIntersectionOf(:StrategyA ObjectAllValuesFrom(:VeryNear :Player) ObjectMinCardinality(3 :VeryNear)) :KillToSovrapposition)
+
+# Individual: :KillToWin (:KillToWin)
+
+AnnotationAssertion(rdfs:comment :KillToWin "Potrei anche aggiungere il suggerimento di sabotare sistemi per fare andare le persone in un luogo e poi ucciderne uno non appena lo vedi")
+AnnotationAssertion(rdfs:comment :KillToWin "Qui in questa casistica potresti anche pensare di suggerire questa cosa se il cooldown ce l'hai e c'è qualcuno nelle vicinanze. Ma se il cooldown non c'è l'hai invece potresti suggerire di sabotare i sistemi vitali per recuperare tempo e dopo ucciderne il player non appena lo vedi oppure suggerire di andare nei sistemi vitali sabotati ad attendere il player che sicuro almeno 1 verrà")
+AnnotationAssertion(rdfs:comment :KillToWin "Qui vorrei racchiudere il caso che i player di fatto non apportano nuova informazione sul matching => il loro bonus dovrebbe annullarsi in positivo o in negativo cioè sia nell'attacco che nel supporto.
+Se un player non supporta davvero ne attacca davvero allora è nullo")
+ClassAssertion(ObjectIntersectionOf(:StrategyB ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectExactCardinality(3 :HasNAlivePlayers) ObjectMaxCardinality(2 :ImpostorIsInFOV)) :KillToWin)
+
+# Individual: :PassTheBlame (:PassTheBlame)
+
+AnnotationAssertion(rdfs:comment :PassTheBlame "Potrei aggiunge IsInFOVFromTask anche per i crewmate")
+AnnotationAssertion(rdfs:comment :PassTheBlame "Proprietà da aggiungere:
+-HasInFOVFromTask: un player che sta facendo un task: ok
+-ImpostorIsInFOVFromTask: l'impostore viene visto da x giocatori che stanno facendo un task: ok
+-AreCamerasActive: objectproperty da inserire in tutti gli individui => Questo crea una disgiunzione generale anche se le condizioni sono soddisfatte => una disgiunzione per ogni player: Agisce come un blocco preliminare se le condizioni sono soddisfatte ma qualcuno ti potrebbe vedere
+-PlayerAlive: player vivo disgiunto da un crewmate morto => serve per evitare supporti da crewmate non più vivi: ok")
+ClassAssertion(ObjectIntersectionOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> ObjectAllValuesFrom(:Does :Task) ObjectAllValuesFrom(:HasInFOVFromTask :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:ImpostorIsInFOVFromTask :Player) ObjectAllValuesFrom(:IsInFOVFromTask :Player) ObjectExactCardinality(0 :AreCamerasActive) ObjectExactCardinality(1 :Does) ObjectExactCardinality(2 :HasInFOVFromTask) ObjectExactCardinality(2 :ImpostorIsInFOV) ObjectExactCardinality(2 :ImpostorIsInFOVFromTask) ObjectExactCardinality(1 :IsInFOVFromTask)) :PassTheBlame)
+
+# Individual: :SabotaggioPostKill3Vivi (:SabotaggioPostKill3Vivi)
+
+AnnotationAssertion(rdfs:comment :SabotaggioPostKill3Vivi "Decidi di sabotare un sistema se siete rimasti solo 3 a giocare cosi da evitare che i player premano il tasto di emergenza e prendere tempo per uccidere quelli mancanti")
+
+# Individual: :UccidiESpegniLuci (:UccidiESpegniLuci)
+
+AnnotationAssertion(rdfs:comment :UccidiESpegniLuci "E' una strategia generica di uccisione, quando ci siete solo tu e un altro player nella visuale puoi decidere di ucciderlo e sabotare il sistema di luci cosa che in effetti accade nelle partite reali. Qui servirebbe annotarsi anche:
+-CoolDown delle uccisioni
+-CoolDown dei sabotaggi")
+ClassAssertion(ObjectIntersectionOf(:StrategyC ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(4 :HasNAlivePlayers) ObjectExactCardinality(1 :ImpostorIsInFOV) ObjectExactCardinality(1 :IsInFOV)) :UccidiESpegniLuci)
+
+
+)

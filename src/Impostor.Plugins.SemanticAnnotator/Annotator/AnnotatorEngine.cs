@@ -65,9 +65,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             var onto = cowl_manager.CowlManagerGetOntology(manager, cowl_ontology_id.CowlOntologyIdAnonymous());
 
             // note: the game passed as argument represent the last status of the game to which events passed as argument are "applied"   
-            // Classes
+            // Classes and objects to use throughout the process
             var crewmateClass = CowlWrapper.CreateClassFromIri(CowlWrapper.GetFullIri(nameSpace, "CrewMateAlive"), instancesToRelease);
             var crewmateDeadClass = CowlWrapper.CreateClassFromIri(CowlWrapper.GetFullIri(nameSpace, "CrewMateDead"), instancesToRelease);
+            var playerClass = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Player";
             var impostorClass = CowlWrapper.CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorAlive", instancesToRelease);
             var impostorDeadClass = CowlWrapper.CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorExiled", instancesToRelease);
             var gameClass = CowlWrapper.CreateClassFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Game", instancesToRelease);
@@ -157,19 +158,20 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     }
                     else
                     {
+                        //Cerca il player a cui si riferisce l'evento analizzato
                         player = players.Find(p => p.Id == playerEvent.ClientPlayer.Character.PlayerId);
                     }
                 }
                 switch (ev)
                 {
-                    // EnterVent
+                    // EnterVent: mi segno un player è entrato in una vent => per ora la può fare solo l'impostore(non c'è l'ingegnere)
                     case IPlayerEnterVentEvent enterVentEvent:
                         var enterVentIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{enterVentEvent.Vent.Name}";
                         var objQuantEnterVent = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/EnterVent", new[] { enterVentIri }, instancesToRelease);
                         player.objQuantRestrictionsPlayer.Add(objQuantEnterVent);
                         break;
 
-                    // VentTo
+                    // VentTo: andare verso un altro luogo dopo che sei entrato in una ventola
                     case IPlayerVentEvent VentEvent:
                         var VentIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{VentEvent.NewVent.Name}";
                         var objQuantVent = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/VentTo", new[] { VentIri }, instancesToRelease);
@@ -178,7 +180,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         player.objQuantRestrictionsPlayer.Add(objQuantVent);
                         break;
 
-                    // ExitVent
+                    // ExitVent: sei uscito definitivamente da un condotto
                     case IPlayerExitVentEvent exitVentEvent:
                         var exitVentIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{exitVentEvent.Vent.Name}";
                         var objQuantExitVent = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ExitVent", new[] { exitVentIri }, instancesToRelease);
@@ -214,7 +216,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                             break;
                         }
 
-                    // CompletedTask
+                    // CompletedTask: come rendere permanente l'informazione al player che ha visto, del tipo: X Know that Y is trusted
                     case IPlayerCompletedTaskEvent completedTaskEvent:
                         var taskIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{completedTaskEvent.Task.Task.Type}";
 
@@ -324,7 +326,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                     //scan ship events
 
-                    // shipSabotage 
+                    // shipSabotage => informazione generale disponibile a tutti i player => valutare di mettere una restr cardinale
                     case IShipSabotageEvent shipSabotageEvent:
                         player = players.Find(p => p.Id == shipSabotageEvent.ClientPlayer.Character.PlayerId);
                         //mapping to adapt to the ontology
@@ -348,7 +350,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         break;
 
                     // scan meeting events
-
+                    //---------------------------Quando inizia un meeting l'annotazione o dev'essere bloccata o deve durare quanto il meeting stesso----------------------
                     //meetingStarted
                     case IMeetingStartedEvent meetingStartedEvent:
                         gameState = "meeting";
@@ -368,6 +370,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                                 nAlivePlayers++;
                             }
                         }
+                        //------------------Questa info è interessante perchè tutti i player vedono le votazioni per cui questa potrebbe essere una info valido fino al prox meeting--------------
                         // set a status for each player (trusted/suspected/none)
                         foreach (var p in players)
                         {
@@ -411,12 +414,42 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 //Console.WriteLine(ev);
             }
 
-            // when all events have been analyzed, for each player create the individual with all collected properties
-            foreach (var player in players)
+            // when all events have been analyzed, for each player create the individual with all collected properties: esclusedere player non in FOV
+            // create a list to hold the players List<Player> players = new List<Player>();
+            //Infomrazioni utili: -cooldown -telecamere attive -altreinfo -Eliminare casi finali in cui l'impostore viene espulso o muore -Ferma annotatore nei meeting
+            
+            //--------------------Filtraggio dei player attorno all'impostore(in generale attorno al target)-----------------------------------------
+            //Dovrebbe tener conto dei muri
+            List<Player> playersInFOVImpostor = new List<Player>();
+            var ImpostorPlayer = players.Find(p => p.Cls == impostorClass || p.Cls == impostorDeadClass);
+            var dimFuori = ImpostorPlayer.Movements.Count();
+            foreach (var op in players) {
+                if (op.Cls != crewmateDeadClass && op.Cls != impostorClass) {
+                    var dimOp = op.Movements.Count();
+                    var dist = CalcDistance(ImpostorPlayer.Movements[dimFuori-1].Position, op.Movements[dimOp-1].Position); 
+                    if (dist <= _thresholds.FOV) {
+                        playersInFOVImpostor.Add(op);
+                    }
+                }
+            }
+            playersInFOVImpostor.Add(ImpostorPlayer);
+            //--------------------Filtraggio dei player attorno all'impostore-----------------------------------------
+            //Ipotesi di conoscenza generale dei player su quanti rimangono vivi => per attivare KillToWin
+            int NumeroPlayerVivi = 0;
+            foreach (var p in players) {
+                if (p.Cls == impostorClass || p.Cls == crewmateClass) {
+                    //he's alive
+                    NumeroPlayerVivi++;
+                }
+            }
+            //Qui dovresti considerare solo le informazioni a cui può accedere l'impostore: -non puoi vedere ciò che è oltre la tua visuale => se un player vede qualcuno che tu non vedi non lo sai fattualmente
+            foreach (var player in playersInFOVImpostor)
             {
 
                 var dim = player.Movements.Count();
                 var nCrewmatesFOV = 0;
+                var nCrewMatesHasImpostorsFOV = 0;//numero di crewmate che vedo un impostor
+                var nPlayerVeryNear = 0;
                 var nImpostorsFOV = 0;
 
                 // check if player fixed or moving towards someone
@@ -465,43 +498,65 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                             var getClosePlayer = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{p.SessionCls}";
                             var objQuantGetClose = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/GetCloseTo", new[] { getClosePlayer }, instancesToRelease);
 
-                            player.objQuantRestrictionsPlayer.Add(objQuantGetClose);
+                            //player.objQuantRestrictionsPlayer.Add(objQuantGetClose);
                         }
                     }
                 }
 
                 // check if player is InFOV other players
-                foreach (var op in players)
-                {
+                bool IsInFOV = false;
+                //Lista di player che vedono l'impostore: utile per capire quali fra questi sta svolgendo un task anche
+                foreach (var op in players) {
                     //if dead player, skip
-                    if (op != player && op.Cls != crewmateDeadClass && op.Cls != impostorDeadClass)
-                    {
+                    if (op != player && op.Cls != crewmateDeadClass && op.Cls != impostorDeadClass) {
                         var dimOp = op.Movements.Count();
-                        // euclidean distance
-                        var dist = CalcDistance(player.Movements[dim - 1].Position, op.Movements[dimOp - 1].Position);
+                        // euclidean distance: potrei mettere la posizione dell'impostore => tu vedi i player che vede l'impostore
+                        var dist = CalcDistance(player.Movements[dim-1].Position, op.Movements[dimOp-1].Position); 
                         // if distance < threshold then IsInFOV for both players 
-                        if (dist <= _thresholds.FOV)
-                        {
-                            var InFovIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{op.SessionCls}";
-                            var objQuantIsInFOV = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", new[] { InFovIri }, instancesToRelease);
-                            player.objQuantRestrictionsPlayer.Add(objQuantIsInFOV);
-                            if (op.Cls == crewmateClass)
-                            {
+                        if (dist <= _thresholds.FOV) {
+                            var InFovIri = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{op.SessionCls}";  
+                            if(player.Cls == impostorClass){
+                                var objQuantIsInFOV = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorIsInFOV", new[] {InFovIri}, instancesToRelease);
+                                player.objQuantRestrictionsPlayer.Add(objQuantIsInFOV);
+                                nCrewMatesHasImpostorsFOV++;
+                            } else {
+                                var objQuantIsInFOV = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", new[] {InFovIri}, instancesToRelease);
+                                player.objQuantRestrictionsPlayer.Add(objQuantIsInFOV);
+                                IsInFOV = true;//serve per capire quante persone vede il player che sta facendo un task
                                 nCrewmatesFOV++;
                             }
-                            else
+
+                            if (dist < _thresholds.FOV/3)
                             {
-                                nImpostorsFOV++;
+                                nPlayerVeryNear++; 
                             }
                         }
                     }
                 }
 
-                //counter of players in FOV
-                var dataQuantNCrewmatesFOV = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNCrewmatesInFOV", new[] { nCrewmatesFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
-                player.dataQuantRestrictionsPlayer.Add(dataQuantNCrewmatesFOV);
-                var dataQuantNImpostorsFOV = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNImpostorsInFOV", new[] { nImpostorsFOV.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
-                player.dataQuantRestrictionsPlayer.Add(dataQuantNImpostorsFOV);
+                //counter of players in FOV: cambia l'object property in base al fatto che sia un impostore oppure no => serve a distinguere nelle strategie impostori da crewmate
+                if(player.Cls == impostorClass){
+                    var objproperty = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorIsInFOV", instancesToRelease);
+                    var cardexact = CowlWrapper.CreateCardTypeExactly(objproperty, nCrewMatesHasImpostorsFOV, instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(cardexact);
+                }else {
+                    var objproperty = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOV", instancesToRelease);
+                    var cardexact = CowlWrapper.CreateCardTypeExactly(objproperty, nCrewmatesFOV, instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(cardexact);
+                
+                }
+                
+                //counter of players in FOVVeryNear => da definire meglio (thresholds.FOV/3)
+                var objQuantVeryNear = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/VeryNear", new[] {playerClass}, instancesToRelease);
+                var objPropVeryNear = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/VeryNear", instancesToRelease);
+                var exactVeryNear = CowlWrapper.CreateCardTypeExactly(objPropVeryNear, nPlayerVeryNear, instancesToRelease);
+                if (nPlayerVeryNear == 0)
+                {
+                    player.objCardRestrictionsPlayer.Add(exactVeryNear);
+                }else{
+                    player.objQuantRestrictionsPlayer.Add(objQuantVeryNear);
+                    player.objCardRestrictionsPlayer.Add(exactVeryNear);
+                }
 
                 // check if player is nextTo a vent
                 foreach (var v in MapData.Maps[game.Options.Map].Vents)
@@ -526,7 +581,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     {
                         var coordsTask = t.Value.Position[i];
                         var dist = CalcDistance(player.Movements[dim - 1].Position, coordsTask);
-                        if (dist <= _thresholds.NextToVent)
+                        if (dist <= _thresholds.NextToTask)
                         {
                             var task = $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{t.Value.Type}";
                             var objQuantNextToTask = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/NextTo", new[] { task }, instancesToRelease);
@@ -538,7 +593,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     }
                     if (nextTo) break;
                 }
-
+                
+                bool DoesGeneric = false;
                 // loop through player positions
                 for (var j = 0; j < dim; j++)
                 {
@@ -584,51 +640,113 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                             {
 
                                 // check timespan between movements
-                                if (j < dim - 1)
+                                if (j < dim - 1) 
                                 {
                                     var nextMovement = player.Movements[j + 1];
                                     var timeDiff = (nextMovement.Timestamp - playerMovement.Timestamp).TotalSeconds;
-
-                                    // if timespan compatible with time to perform task
-                                    if (timeDiff >= timeThreshold)
+                                        
+                                    // if timespan compatible with time to perform task: ipotesi attinente di svolgimento del task
+                                    if (timeDiff >= timeThreshold)  
                                     {
-                                        if (player.Cls == impostorClass)
-                                        {
-                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task }, instancesToRelease);
-
+                                        if (player.Cls == impostorClass) {
+                                            //annota cosa fa l'impostore
+                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task },  instancesToRelease);
+                                            var objPropFake = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", instancesToRelease);
+                                            var ExactFake = CowlWrapper.CreateCardTypeExactly(objPropFake, 1, instancesToRelease);
                                             player.objQuantRestrictionsPlayer.Add(objQuantFake);
-                                        }
-                                        else
-                                        {
-                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task }, instancesToRelease);
-
+                                            player.objCardRestrictionsPlayer.Add(ExactFake);
+                                        } else {
+                                            //annota cosa fa il crewmate
+                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task },  instancesToRelease);
+                                            var propertyDoes = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", instancesToRelease);
+                                            var ExactDoes = CowlWrapper.CreateCardTypeExactly(propertyDoes, 1, instancesToRelease);
+                                            player.objCardRestrictionsPlayer.Add(ExactDoes);
                                             player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                            //annota chi vede il crewmate mentre fa il task:utilizzi IsInFOV per dire quanti ne guardi mentre fai il task
+                                            //IsInFOV se esiste => prelevi la restr cardinali per capire come costruire HasInFOVFromTask
+                                            if(IsInFOV){
+                                                var objQuantHasInFOVFromTask = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", new[] {playerClass},  instancesToRelease);
+                                                var propertyHasInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", instancesToRelease);
+                                                var ExactHasInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyHasInFOVFromTask, nCrewmatesFOV, instancesToRelease);
+                                                player.objCardRestrictionsPlayer.Add(ExactHasInFOVFromTask);
+                                                player.objQuantRestrictionsPlayer.Add(objQuantHasInFOVFromTask);
+                                            }
+                                            else
+                                            {
+                                                var propertyHasInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", instancesToRelease);
+                                                var ExactHasInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyHasInFOVFromTask, 0, instancesToRelease);
+                                                player.objCardRestrictionsPlayer.Add(ExactHasInFOVFromTask);  
+                                            }
+                                            //Controllo se un player generico viene visto da un altro che fa un task(escluso sè stesso)
+                                            foreach (var op in playersInFOVImpostor.Where(op => op.SessionCls != player.SessionCls)) {
+                                                var dimOp = op.Movements.Count();
+                                                var dist_1 = CalcDistance(player.Movements[dim-1].Position, op.Movements[dimOp-1].Position); 
+                                                if (dist_1 <= _thresholds.FOV)
+                                                {
+                                                    if (op.Cls == impostorClass & player.Cls != crewmateDeadClass) {
+                                                        op.objCardRestricCodependent["ImpostorIsInFOVFromTask"] = op.objCardRestricCodependent.TryGetValue("ImpostorIsInFOVFromTask", out var val) ? val + 1 : 1;
+                                                    }else if(op.Cls == crewmateClass & player.Cls != crewmateDeadClass)
+                                                    {
+                                                        op.objCardRestricCodependent["IsInFOVFromTask"] = op.objCardRestricCodependent.TryGetValue("IsInFOVFromTask", out var val) ? val + 1 : 1;
+                                                    }
+                                                }
+                                                
+                                            }   
                                         }
                                         does = true;
+                                        DoesGeneric = does;
                                         break;
                                     }
-                                }
-                                else
-                                {
+                                } else {
                                     // if last position, check time from last movement and now
                                     var timeDiff = (timestamp - playerMovement.Timestamp).TotalSeconds;
-                                    if (timeDiff >= timeThreshold)
-                                    {
-                                        if (player.Cls == impostorClass)
-                                        {
-                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task }, instancesToRelease);
-
+                                    if (timeDiff >= timeThreshold) {
+                                        if (player.Cls == impostorClass) {
+                                            var objQuantFake = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", new[] { task },  instancesToRelease);
+                                            var objPropFake = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", instancesToRelease);
+                                            var ExactFake = CowlWrapper.CreateCardTypeExactly(objPropFake, 1, instancesToRelease);
                                             player.objQuantRestrictionsPlayer.Add(objQuantFake);
-                                        }
-                                        else
-                                        {
-                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task }, instancesToRelease);
-
+                                            player.objCardRestrictionsPlayer.Add(ExactFake);
+                                        } else {
+                                            var objQuantDoes = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", new[] { task },  instancesToRelease);
+                                            var propertyDoes = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", instancesToRelease);
+                                            var ExactDoes = CowlWrapper.CreateCardTypeExactly(propertyDoes, 1, instancesToRelease);
+                                            player.objCardRestrictionsPlayer.Add(ExactDoes);
                                             player.objQuantRestrictionsPlayer.Add(objQuantDoes);
+                                            //potremmo aggiustarla nel caso restringendo a solo quello che l'impostore vede => il player è un contenitore associato al player target
+                                            if(IsInFOV){
+                                                var objQuantHasInFOVFromTask = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", new[] {playerClass},  instancesToRelease);
+                                                var propertyHasInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", instancesToRelease);
+                                                var ExactHasInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyHasInFOVFromTask, nCrewmatesFOV, instancesToRelease);
+                                                player.objCardRestrictionsPlayer.Add(ExactHasInFOVFromTask);
+                                                player.objQuantRestrictionsPlayer.Add(objQuantHasInFOVFromTask);
+                                            }
+                                            else
+                                            {
+                                                var propertyHasInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasInFOVFromTask", instancesToRelease);
+                                                var ExactHasInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyHasInFOVFromTask, 0, instancesToRelease);
+                                                player.objCardRestrictionsPlayer.Add(ExactHasInFOVFromTask);  
+                                            }
+                                            //Siccome i player sono tutti nella visuale qui puoi semplificare
+                                            foreach (var op in playersInFOVImpostor.Where(op => op.SessionCls != player.SessionCls)) {
+                                                    var dimOp = op.Movements.Count();
+                                                    var dist_1 = CalcDistance(player.Movements[dim-1].Position, op.Movements[dimOp-1].Position); 
+                                                    if (dist_1 <= _thresholds.FOV)
+                                                    {
+                                                        if (op.Cls == impostorClass & player.Cls != crewmateDeadClass) {
+                                                            op.objCardRestricCodependent["ImpostorIsInFOVFromTask"] = op.objCardRestricCodependent.TryGetValue("ImpostorIsInFOVFromTask", out var val) ? val + 1 : 1;
+                                                        }else if(op.Cls == crewmateClass & player.Cls != crewmateDeadClass)
+                                                        {
+                                                            op.objCardRestricCodependent["IsInFOVFromTask"] = op.objCardRestricCodependent.TryGetValue("IsInFOVFromTask", out var val) ? val + 1 : 1;
+                                                        }
+                                                    }
+                                                
+                                            } 
                                         }
-                                        does = true;
+                                        does=true;
+                                        DoesGeneric = does;
                                         break;
-                                    }
+                                    } 
                                 }
                             }
                             if (does) break;
@@ -636,13 +754,41 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         if (does) break;
                     }
                 }
-
-                var dataQuantHasCoordinates = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim - 1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+                if(DoesGeneric == false & player.Cls == crewmateClass) {
+                    var propertyDoes = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Does", instancesToRelease);
+                    var ExactDoes = CowlWrapper.CreateCardTypeExactly(propertyDoes, 0, instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(ExactDoes);
+                }else if (DoesGeneric == false & player.Cls == impostorClass)
+                {
+                    var objPropFake = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/Fake", instancesToRelease);
+                    var ExactFake = CowlWrapper.CreateCardTypeExactly(objPropFake, 0, instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(ExactFake);
+                }
+                var dataQuantHasCoordinates = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim-1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
                 player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
+                var objPropRestrictionNPlayers = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { playerClass }, instancesToRelease);
+                var propertyRestrictionNPlayers = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", instancesToRelease);
+                var ExactRestrictionNPlayers = CowlWrapper.CreateCardTypeExactly(propertyRestrictionNPlayers, NumeroPlayerVivi, instancesToRelease);
+                player.objQuantRestrictionsPlayer.Add(objPropRestrictionNPlayers);
+                player.objCardRestrictionsPlayer.Add(ExactRestrictionNPlayers);
+
+            }
+            
+            //Inserimento dei player all'interno dell'ontologia => post iterazione su tutti i player per memorizzare informazioni codipendenti tra di loro
+            foreach (var player in playersInFOVImpostor)
+            {
+                //Mi segno da quante persone che fanno un task l'impostore è visto in un certo momento
+                if(player.Cls == impostorClass) {
+                    var propertyImpostorIsInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ImpostorIsInFOVFromTask", instancesToRelease);
+                    var ExactImpostorIsInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyImpostorIsInFOVFromTask, player.objCardRestricCodependent.GetValueOrDefault("ImpostorIsInFOVFromTask", 0), instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(ExactImpostorIsInFOVFromTask);
+                }else if(player.Cls == crewmateClass) {
+                    var propertyIsInFOVFromTask = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/IsInFOVFromTask", instancesToRelease);
+                    var ExactImpostorIsInFOVFromTask = CowlWrapper.CreateCardTypeExactly(propertyIsInFOVFromTask, player.objCardRestricCodependent.GetValueOrDefault("IsInFOVFromTask", 0), instancesToRelease);
+                    player.objCardRestrictionsPlayer.Add(ExactImpostorIsInFOVFromTask);
+                }
                 var sessionClass = CowlWrapper.CreateClassFromIri($"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.SessionCls}", instancesToRelease);
-
-                var resultCreatePlayer = CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls, sessionClass }, player.objQuantRestrictionsPlayer.ToArray(), player.dataQuantRestrictionsPlayer.ToArray(), instancesToRelease);
-
+                CowlWrapper.CreateIndividual(onto,$"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{player.Name}", new[] { player.Cls, sessionClass }, player.objQuantRestrictionsPlayer.ToArray(), player.dataQuantRestrictionsPlayer.ToArray(), instancesToRelease, true, player.objCardRestrictionsPlayer.ToArray());
             }
 
             var alive = 0;
@@ -681,8 +827,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             var dataQuantRestrictionState = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CurrentState", new[] { gameState }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
             var dataQuantRestrictionNPlayers = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { alive.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
 
-
-            var resultCreateGame = CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
+            //Individuo game può essere utile => metto solo 2 atomi per evitare sballamento punteggi in altre strategie
+            //CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
 
             //write to file
             string folderPath = $"gameSession{game.Code}";
@@ -728,6 +874,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 pStates.Add(p.Id, ps);
             }
+            Console.WriteLine(absoluteHeaderDirectory);
             return (pStates, gameState, result);
         }
 

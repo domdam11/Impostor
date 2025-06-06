@@ -39,16 +39,18 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             var isInMatch = _cacheManager.IsInMatch(gameCode);
             if (isInMatch)
             {
-                _logger.LogInformation($"[DSS] Avvio annotazione semantica per {gameCode}...");
+                //_logger.LogInformation($"[DSS] Avvio annotazione semantica per {gameCode}...");
                 string owl = await _annotator.AnnotateAsync(gameCode);
+                string result = null;
 
 
                 if (!string.IsNullOrWhiteSpace(owl))
                 {
                     if (_argumentationEnabled)
                     {
-                        _logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
+                        //_logger.LogInformation($"[DSS] Avvio processo decisionale per {gameCode}...");
                         var reasoning = await _argumentation.SendAnnotationsAsync(owl);
+                        result = reasoning;
                         if (_notarizationEnabled)
                         {
                             await _notarization.NotifyAsync(gameCode, _cacheManager.GetAnnotationEventId(gameCode), owl, "metadata");
@@ -61,7 +63,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 }
 
 
-                _logger.LogInformation($"[DSS] Processo decisionale completato per {gameCode}");
+                //_logger.LogInformation($"[DSS] Processo decisionale completato per {gameCode}");
+                Console.WriteLine(result);
             }
             else
             {

@@ -1,4 +1,0 @@
-Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>)
-Ontology(
-ClassAssertion(ObjectIntersectionOf(:Impostor) :ImpostorAnnotatedPlayer)
-)

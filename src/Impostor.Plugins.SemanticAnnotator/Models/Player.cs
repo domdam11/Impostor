@@ -20,6 +20,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
         public List<CowlObjHasValue> objHasValueRestrictionsPlayer { get; set; }
         public List<CowlObjQuant> objQuantRestrictionsPlayer { get; set; }
         public List<CowlDataQuant> dataQuantRestrictionsPlayer { get; set; }
+        public List<CowlObjCard> objCardRestrictionsPlayer { get; set; }
+        // dizionario con all'interno card codipendenti
+        public Dictionary<string, int> objCardRestricCodependent { get; set; }
+        
 
         public Player(byte id, string name, CowlClass cls, string sesCls, List<CustomMovement> movements, CustomMovement initialMov, string state, int voteCount)
         {
@@ -41,6 +45,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
             objHasValueRestrictionsPlayer = new List<CowlObjHasValue>();
             objQuantRestrictionsPlayer = new List<CowlObjQuant>();
             dataQuantRestrictionsPlayer = new List<CowlDataQuant>();
+            objCardRestrictionsPlayer = new List<CowlObjCard>();
+            objCardRestricCodependent = new Dictionary<string, int>();
         }
         public void IncrementScore()
         {
