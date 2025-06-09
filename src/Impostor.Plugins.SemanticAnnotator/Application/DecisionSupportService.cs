@@ -53,7 +53,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                         result = reasoning;
                         if (_notarizationEnabled)
                         {
-                            await _notarization.NotifyAsync(gameCode, _cacheManager.GetAnnotationEventId(gameCode), owl, "metadata");
+                            await _notarization.NotifyAsync(gameCode, _cacheManager.GetAnnotationEventId(gameCode), owl, result);
                         }
                     }
                 }

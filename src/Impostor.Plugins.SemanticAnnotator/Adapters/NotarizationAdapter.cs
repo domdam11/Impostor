@@ -54,7 +54,7 @@ public class NotarizationAdapter : INotarizationService
                         {
                             case IGamePlayerLeftEvent gamePlayerLeftEvent:
                                 
-                                //await _transactionManager.RemovePlayerAsync(assetKey, gamePlayerLeftEvent.Player.Client.Name, "");
+                                await _transactionManager.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
                                 break;
 
                             case IGameStartedEvent gameStartedEvent:
@@ -72,21 +72,17 @@ public class NotarizationAdapter : INotarizationService
                                 await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
                             break;
 
-                           /* case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
+                            case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
                              
-                                await _transactionManager.AddPlayerAsync(assetKey, gamePlayerJoinedEvent.Player.Client.Name, "");
-                                break;*/
+                                await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
+                                break;
 
-                           /* case IGameCreatedEvent gameCreatedEvent:
+                            case IGameCreatedEvent gameCreatedEvent:
                                
                             {
-                                await _transactionManager.CreateGameSessionAsync(assetKey, gameCreatedEvent.Game.GameState.ToString());
-                                var players = _eventCacheManager.GetPlayerList(gameCode);
-                                foreach (var player in players) {
-                                    await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");
-                                }
+                                await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
                                 break;
-                            }*/
+                            }
 
                             default:
                                // _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);

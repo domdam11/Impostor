@@ -220,7 +220,7 @@ namespace Impostor.Tools.ServerReplay
                     totalTimeframe += _fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
                     var milliseconds = (int)_fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
                     // Sleep for the entire duration
-                    //await Task.Delay(Math.Min(milliseconds, 100));
+                    await Task.Delay(Math.Min(milliseconds, 100));
                     // Interpret the individual packet
                     await ParsePacket(readerInner);
                     var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;

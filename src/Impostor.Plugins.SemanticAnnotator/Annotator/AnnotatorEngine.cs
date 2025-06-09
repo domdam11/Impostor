@@ -421,25 +421,31 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             //--------------------Filtraggio dei player attorno all'impostore(in generale attorno al target)-----------------------------------------
             //Dovrebbe tener conto dei muri
             List<Player> playersInFOVImpostor = new List<Player>();
-            var ImpostorPlayer = players.Find(p => p.Cls == impostorClass || p.Cls == impostorDeadClass);
-            var dimFuori = ImpostorPlayer.Movements.Count();
-            foreach (var op in players) {
-                if (op.Cls != crewmateDeadClass && op.Cls != impostorClass) {
-                    var dimOp = op.Movements.Count();
-                    var dist = CalcDistance(ImpostorPlayer.Movements[dimFuori-1].Position, op.Movements[dimOp-1].Position); 
-                    if (dist <= _thresholds.FOV) {
-                        playersInFOVImpostor.Add(op);
+            var impostorPlayer = players.Find(p => p.Cls == impostorClass || p.Cls == impostorDeadClass);
+            if (impostorPlayer != null && impostorPlayer.Movements != null)
+            {
+                var dimFuori = impostorPlayer.Movements.Count();
+                foreach (var op in players)
+                {
+                    if (op.Cls != crewmateDeadClass && op.Cls != impostorClass)
+                    {
+                        var dimOp = op.Movements.Count();
+                        var dist = CalcDistance(impostorPlayer.Movements[dimFuori - 1].Position, op.Movements[dimOp - 1].Position);
+                        if (dist <= _thresholds.FOV)
+                        {
+                            playersInFOVImpostor.Add(op);
+                        }
                     }
                 }
+                playersInFOVImpostor.Add(impostorPlayer);
             }
-            playersInFOVImpostor.Add(ImpostorPlayer);
             //--------------------Filtraggio dei player attorno all'impostore-----------------------------------------
             //Ipotesi di conoscenza generale dei player su quanti rimangono vivi => per attivare KillToWin
-            int NumeroPlayerVivi = 0;
+            int numeroPlayerVivi = 0;
             foreach (var p in players) {
                 if (p.Cls == impostorClass || p.Cls == crewmateClass) {
                     //he's alive
-                    NumeroPlayerVivi++;
+                    numeroPlayerVivi++;
                 }
             }
             //Qui dovresti considerare solo le informazioni a cui può accedere l'impostore: -non puoi vedere ciò che è oltre la tua visuale => se un player vede qualcuno che tu non vedi non lo sai fattualmente
@@ -768,7 +774,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
                 var objPropRestrictionNPlayers = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { playerClass }, instancesToRelease);
                 var propertyRestrictionNPlayers = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", instancesToRelease);
-                var ExactRestrictionNPlayers = CowlWrapper.CreateCardTypeExactly(propertyRestrictionNPlayers, NumeroPlayerVivi, instancesToRelease);
+                var ExactRestrictionNPlayers = CowlWrapper.CreateCardTypeExactly(propertyRestrictionNPlayers, numeroPlayerVivi, instancesToRelease);
                 player.objQuantRestrictionsPlayer.Add(objPropRestrictionNPlayers);
                 player.objCardRestrictionsPlayer.Add(ExactRestrictionNPlayers);
 
