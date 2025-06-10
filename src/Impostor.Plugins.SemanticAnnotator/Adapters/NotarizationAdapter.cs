@@ -68,24 +68,20 @@ public class NotarizationAdapter : INotarizationService
                             break;
 
                             case IGameEndedEvent gameEndedEvent:
-
                                 await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
                             break;
 
                             case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
-                             
                                 await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
                                 break;
 
                             case IGameCreatedEvent gameCreatedEvent:
-                               
                             {
                                 await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
                                 break;
                             }
 
                             default:
-                               // _logger.LogWarning("Tipo di evento sconosciuto: {EventType} per il gioco {GameCode}", ev.GetType().Name, gameCode);
                                 break;
                         }
                     }
@@ -93,11 +89,7 @@ public class NotarizationAdapter : INotarizationService
                     {
                         _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, assetKey);
                     }
-                    /*finally
-                    {
-                        semaphore.Release();
-                    }*/
-                //}));
+
             }
         }
 

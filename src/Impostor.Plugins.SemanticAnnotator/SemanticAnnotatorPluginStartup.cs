@@ -1,26 +1,47 @@
+using System;
+using System.IO;
+using Coravel;
 using Impostor.Api.Events;
 using Impostor.Api.Plugins;
 using Impostor.Plugins.SemanticAnnotator.Adapters;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Application;
+using Impostor.Plugins.SemanticAnnotator.Handlers;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
+using IO.Swagger.Api;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Coravel;
-using System;
-using TransactionHandler.Tasks;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using IO.Swagger.Api;
-using Impostor.Plugins.SemanticAnnotator.Handlers;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using TransactionHandler.Tasks;
 
 namespace Impostor.Plugins.SemanticAnnotator 
 
 {
+    public static class PrometheusExporterServer
+    {
+        public static void Start()
+        {
+            var builder = WebApplication.CreateBuilder();
+            builder.Services.AddOpenTelemetry()
+                .WithMetrics(metrics =>
+                {
+                    metrics
+                        .AddMeter("SemanticAnnotator.DSS")
+                        .AddPrometheusExporter();
+                });
+
+            var app = builder.Build();
+            app.MapPrometheusScrapingEndpoint(); // Espone /metrics
+            app.RunAsync(); // Non blocca il thread
+        }
+    }
     public class SemanticAnnotatorPluginStartup : IPluginStartup
     {
         private readonly IConfiguration _configuration;
@@ -34,7 +55,8 @@ namespace Impostor.Plugins.SemanticAnnotator
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             _configuration = builder.Build();
-    
+
+
         }
 
         public void ConfigureHost(IHostBuilder host)
@@ -46,9 +68,11 @@ namespace Impostor.Plugins.SemanticAnnotator
         {
             // Coravel
             services.AddScheduler();
+
             services.AddSingleton(_configuration);
+
             // Binding dei Thresholds
-   
+
             services.Configure<AnnotatorServiceOptions>(_configuration.GetSection("AnnotatorService"));
       
 
@@ -102,6 +126,7 @@ namespace Impostor.Plugins.SemanticAnnotator
                 services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
 
             }
+            PrometheusExporterServer.Start();
         }
     }
 }
