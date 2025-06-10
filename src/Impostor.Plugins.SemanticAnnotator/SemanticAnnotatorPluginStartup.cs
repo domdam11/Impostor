@@ -26,20 +26,25 @@ namespace Impostor.Plugins.SemanticAnnotator
 {
     public static class PrometheusExporterServer
     {
+        private static bool _started;
         public static void Start()
         {
-            var builder = WebApplication.CreateBuilder();
-            builder.Services.AddOpenTelemetry()
-                .WithMetrics(metrics =>
-                {
-                    metrics
-                        .AddMeter("SemanticAnnotator.DSS")
-                        .AddPrometheusExporter();
-                });
+            if (!_started)
+            {
+                var builder = WebApplication.CreateBuilder();
+                builder.Services.AddOpenTelemetry()
+                    .WithMetrics(metrics =>
+                    {
+                        metrics
+                            .AddMeter("SemanticAnnotator.DSS")
+                            .AddPrometheusExporter();
+                    });
 
-            var app = builder.Build();
-            app.MapPrometheusScrapingEndpoint(); // Espone /metrics
-            app.RunAsync(); // Non blocca il thread
+                var app = builder.Build();
+                app.MapPrometheusScrapingEndpoint(); // Espone /metrics
+                app.RunAsync(); // Non blocca il thread
+                _started = true;
+            }
         }
     }
     public class SemanticAnnotatorPluginStartup : IPluginStartup

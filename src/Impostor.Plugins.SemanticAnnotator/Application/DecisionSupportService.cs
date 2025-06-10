@@ -135,8 +135,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                     _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
                 }
             }
-
-            
         }
 
         public async Task ProcessMultipleAsync(IEnumerable<string> gameCodes)
