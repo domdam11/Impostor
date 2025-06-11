@@ -219,6 +219,11 @@ namespace Impostor.Tools.ServerReplay
                     _fakeDateTimeProvider.UtcNow = startTime + nextTimeFrame;
                     totalTimeframe += _fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
                     var milliseconds = (int)_fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
+                    if(milliseconds < 0)
+                    {
+                        milliseconds = 0;
+                        totalTimeframe = 0;
+                    }
                     // Sleep for the entire duration
                     try
                     {
@@ -229,7 +234,14 @@ namespace Impostor.Tools.ServerReplay
                         totalTimeframe = 0;
                     }
                     // Interpret the individual packet
-                    await ParsePacket(readerInner);
+                    try
+                    {
+                        await ParsePacket(readerInner);
+                    }
+                    catch (Exception ex)
+                    {
+                        continue;
+                    }
                     var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
                     if (totalTimeframe > options.AnnotationIntervalMilliseconds) {
                        

@@ -30,9 +30,9 @@ namespace TransactionHandler.Tasks
                 };
 
                 // Create the Asset passing the AssetDTO, change the description and the state
-                var response1 = await Task.Run(() => _client.CreateAssetAsync(assetDto));
+                var response1 = await _client.CreateAssetAsync(assetDto);
                 Console.WriteLine($"Game session created:\n {response1}");
-                var response2 = await Task.Run(() => ChangeStateAsync(gameId, "in corso"));
+                var response2 = ChangeStateAsync(gameId, "in corso");
                 Console.WriteLine($"Game started:\n {response2}");
             }
             catch (Exception ex)
@@ -49,7 +49,7 @@ namespace TransactionHandler.Tasks
                 Console.WriteLine($"Closing game session {gameId}... ");
 
                 // Update description and state through the corresponding methods
-                var response = await Task.Run(() => ChangeStateAsync(gameId, "chiuso"));
+                var response = await ChangeStateAsync(gameId, "chiuso");
                 Console.WriteLine($"Game session terminated. \n{response}");
             }
             catch (Exception ex)
@@ -180,7 +180,7 @@ namespace TransactionHandler.Tasks
                 };
 
                 // Call the API
-                var response = await Task.Run(() => _client.UpdateDescriptionAsync(assetDto, gameId));
+                var response = await _client.UpdateDescriptionAsync(assetDto, gameId);
                 return response;
             }
             catch (Exception ex)
@@ -214,7 +214,7 @@ namespace TransactionHandler.Tasks
                 }
 
                 // Call the API
-                var response = await Task.Run(() => _client.ChangeStateAsync(assetDto, gameId));
+                var response = await _client.ChangeStateAsync(assetDto, gameId);
                 return response;
             }
             catch (Exception ex)
@@ -231,7 +231,7 @@ namespace TransactionHandler.Tasks
             {
                 Console.WriteLine($"Retrieving client information...");
                 // Call the API
-                var response = await Task.Run(() => _client.GetClientIDAsync());
+                var response = await _client.GetClientIDAsync();
                 Console.WriteLine($"Information retrieved succesfully. Response: {response}");
                 return response;
             }
