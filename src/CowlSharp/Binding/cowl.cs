@@ -7,6 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 using __CallingConvention = global::System.Runtime.InteropServices.CallingConvention;
 using __IntPtr = global::System.IntPtr;
 
@@ -556,7 +557,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUstringSizing managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -590,7 +591,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -620,19 +621,19 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUstringSizing.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUstringSizing.__Internal*) __Instance) = *((global::cowl.PUstringSizing.__Internal*) _0.__Instance);
+            *((global::cowl.PUstringSizing.__Internal*)__Instance) = *((global::cowl.PUstringSizing.__Internal*)_0.__Instance);
             if (_0.___d_OwnsNativeMemory)
                 this.D = _0.D;
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -666,7 +667,7 @@ namespace cowl
                 var __bytePtr0 = Marshal.AllocHGlobal(__bytes0.Length + 1);
                 Marshal.Copy(__bytes0, 0, __bytePtr0, __bytes0.Length);
                 Marshal.WriteByte(__bytePtr0 + __bytes0.Length, 0);
-                ((__Internal*)__Instance)->_d = (__IntPtr) __bytePtr0;
+                ((__Internal*)__Instance)->_d = (__IntPtr)__bytePtr0;
             }
         }
 
@@ -708,7 +709,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUstringLarge managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -742,7 +743,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -772,19 +773,19 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUstringLarge.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUstringLarge.__Internal*) __Instance) = *((global::cowl.PUstringLarge.__Internal*) _0.__Instance);
+            *((global::cowl.PUstringLarge.__Internal*)__Instance) = *((global::cowl.PUstringLarge.__Internal*)_0.__Instance);
             if (_0.___data_OwnsNativeMemory)
                 this.Data = _0.Data;
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -818,7 +819,7 @@ namespace cowl
                 var __bytePtr0 = Marshal.AllocHGlobal(__bytes0.Length + 1);
                 Marshal.Copy(__bytes0, 0, __bytePtr0, __bytes0.Length);
                 Marshal.WriteByte(__bytePtr0 + __bytes0.Length, 0);
-                ((__Internal*)__Instance)->_data = (__IntPtr) __bytePtr0;
+                ((__Internal*)__Instance)->_data = (__IntPtr)__bytePtr0;
             }
         }
 
@@ -851,7 +852,6 @@ namespace cowl
 
             [FieldOffset(0)]
             internal fixed byte _s[16];
-
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "??0UString@@QEAA@AEBU0@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr cctor(__IntPtr __instance, __IntPtr _0);
 
@@ -868,7 +868,7 @@ namespace cowl
             internal static extern void UstringAssign(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf, ulong length);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_copy", CallingConvention = __CallingConvention.Cdecl)]
-            internal static extern void UstringCopy(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf, ulong length);
+            internal static extern void UstringCopy(__IntPtr @return, __IntPtr buf, ulong length);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_wrap", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UstringWrap(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf, ulong length);
@@ -879,9 +879,11 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_assign_buf", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UstringAssignBuf(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf);
 
+            /*[SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_copy_buf", CallingConvention = __CallingConvention.Cdecl)]
+            internal static extern void UstringCopyBuf(ref UString @return, [MarshalAs(UnmanagedType.LPStr)] string  buf);
+*/
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_copy_buf", CallingConvention = __CallingConvention.Cdecl)]
             public static extern global::cowl.UString.__Internal UstringCopyBuf([MarshalAs(UnmanagedType.LPStr)] string buf);
-
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "ustring_wrap_buf", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern void UstringWrapBuf(__IntPtr @return, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(CppSharp.Runtime.UTF8Marshaller))] string buf);
 
@@ -990,7 +992,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -1023,7 +1025,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -1053,17 +1055,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UString.__Internal*) __Instance) = *((global::cowl.UString.__Internal*) _0.__Instance);
+            *((global::cowl.UString.__Internal*)__Instance) = *((global::cowl.UString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -1130,12 +1132,12 @@ namespace cowl
         /// <param name="buf">String buffer.</param>
         /// <param name="length">Length of the string (excluding the null terminator).</param>
         /// <returns>New string.</returns>
-        public static global::cowl.UString UstringCopy(string buf, ulong length)
+       /* public static global::cowl.UString UstringCopy(string buf, ulong length)
         {
             var ___ret = new global::cowl.UString.__Internal();
             __Internal.UstringCopy(new IntPtr(&___ret), buf, length);
             return global::cowl.UString.__CreateInstance(___ret);
-        }
+        }*/
 
         /// <summary>Initializes a new string by wrapping the specified buffer.</summary>
         /// <param name="buf">String buffer.</param>
@@ -1181,8 +1183,11 @@ namespace cowl
         /// </remarks>
         public static global::cowl.UString UstringAssignBuf(string buf)
         {
+            var ustringBuffer = new UString();
             var ___ret = new global::cowl.UString.__Internal();
-            __Internal.UstringAssignBuf(new IntPtr(&___ret), buf);
+            __Internal.UstringAssignBuf(ustringBuffer.__Instance, buf);
+            var result = Marshal.PtrToStringUTF8(ustringBuffer.__Instance);
+            Console.WriteLine("string" + result);
             return global::cowl.UString.__CreateInstance(___ret);
         }
 
@@ -1194,6 +1199,10 @@ namespace cowl
         {    // Crea un'istanza di __Internal
             var ustr = __Internal.UstringCopyBuf(buf);
             return global::cowl.UString.__CreateInstance(ustr);
+
+
+
+
         }
 
         /// <summary>Initializes a new string by wrapping the specified buffer.</summary>
@@ -1626,7 +1635,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUstringLarge.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUstringLarge.__Internal*)value.__Instance;
             }
         }
 
@@ -1795,7 +1804,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHash_ulib_int managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -1828,7 +1837,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -1858,17 +1867,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHash_ulib_int.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHash_ulib_int.__Internal*) __Instance) = *((global::cowl.UHash_ulib_int.__Internal*) _0.__Instance);
+            *((global::cowl.UHash_ulib_int.__Internal*)__Instance) = *((global::cowl.UHash_ulib_int.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -1922,12 +1931,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_flags;
+                return (uint*)((__Internal*)__Instance)->_flags;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_flags = (__IntPtr) value;
+                ((__Internal*)__Instance)->_flags = (__IntPtr)value;
             }
         }
 
@@ -1937,12 +1946,12 @@ namespace cowl
         {
             get
             {
-                return (int*) ((__Internal*)__Instance)->_keys;
+                return (int*)((__Internal*)__Instance)->_keys;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_keys = (__IntPtr) value;
+                ((__Internal*)__Instance)->_keys = (__IntPtr)value;
             }
         }
 
@@ -1952,7 +1961,7 @@ namespace cowl
         {
             get
             {
-                return (__IntPtr*) ((__Internal*)__Instance)->_vals;
+                return (__IntPtr*)((__Internal*)__Instance)->_vals;
             }
 
             set
@@ -1988,7 +1997,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashLoop_ulib_int managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2021,7 +2030,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2051,17 +2060,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashLoop_ulib_int.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashLoop_ulib_int.__Internal*) __Instance) = *((global::cowl.UHashLoop_ulib_int.__Internal*) _0.__Instance);
+            *((global::cowl.UHashLoop_ulib_int.__Internal*)__Instance) = *((global::cowl.UHashLoop_ulib_int.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -2087,12 +2096,12 @@ namespace cowl
         {
             get
             {
-                return (int*) ((__Internal*)__Instance)->key;
+                return (int*)((__Internal*)__Instance)->key;
             }
 
             set
             {
-                ((__Internal*)__Instance)->key = (__IntPtr) value;
+                ((__Internal*)__Instance)->key = (__IntPtr)value;
             }
         }
 
@@ -2153,7 +2162,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHash_ulib_uint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2186,7 +2195,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2216,17 +2225,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHash_ulib_uint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHash_ulib_uint.__Internal*) __Instance) = *((global::cowl.UHash_ulib_uint.__Internal*) _0.__Instance);
+            *((global::cowl.UHash_ulib_uint.__Internal*)__Instance) = *((global::cowl.UHash_ulib_uint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -2280,12 +2289,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_flags;
+                return (uint*)((__Internal*)__Instance)->_flags;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_flags = (__IntPtr) value;
+                ((__Internal*)__Instance)->_flags = (__IntPtr)value;
             }
         }
 
@@ -2295,12 +2304,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_keys;
+                return (uint*)((__Internal*)__Instance)->_keys;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_keys = (__IntPtr) value;
+                ((__Internal*)__Instance)->_keys = (__IntPtr)value;
             }
         }
 
@@ -2346,7 +2355,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashLoop_ulib_uint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2379,7 +2388,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2409,17 +2418,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashLoop_ulib_uint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashLoop_ulib_uint.__Internal*) __Instance) = *((global::cowl.UHashLoop_ulib_uint.__Internal*) _0.__Instance);
+            *((global::cowl.UHashLoop_ulib_uint.__Internal*)__Instance) = *((global::cowl.UHashLoop_ulib_uint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -2445,12 +2454,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->key;
+                return (uint*)((__Internal*)__Instance)->key;
             }
 
             set
             {
-                ((__Internal*)__Instance)->key = (__IntPtr) value;
+                ((__Internal*)__Instance)->key = (__IntPtr)value;
             }
         }
 
@@ -2511,7 +2520,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHash_ulib_ptr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2544,7 +2553,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2574,17 +2583,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHash_ulib_ptr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHash_ulib_ptr.__Internal*) __Instance) = *((global::cowl.UHash_ulib_ptr.__Internal*) _0.__Instance);
+            *((global::cowl.UHash_ulib_ptr.__Internal*)__Instance) = *((global::cowl.UHash_ulib_ptr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -2638,12 +2647,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_flags;
+                return (uint*)((__Internal*)__Instance)->_flags;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_flags = (__IntPtr) value;
+                ((__Internal*)__Instance)->_flags = (__IntPtr)value;
             }
         }
 
@@ -2710,7 +2719,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashLoop_ulib_ptr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2743,7 +2752,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2773,17 +2782,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashLoop_ulib_ptr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashLoop_ulib_ptr.__Internal*) __Instance) = *((global::cowl.UHashLoop_ulib_ptr.__Internal*) _0.__Instance);
+            *((global::cowl.UHashLoop_ulib_ptr.__Internal*)__Instance) = *((global::cowl.UHashLoop_ulib_ptr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -2881,7 +2890,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -2914,7 +2923,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -2944,17 +2953,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashUString.__Internal*) __Instance) = *((global::cowl.UHashUString.__Internal*) _0.__Instance);
+            *((global::cowl.UHashUString.__Internal*)__Instance) = *((global::cowl.UHashUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -3008,12 +3017,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_flags;
+                return (uint*)((__Internal*)__Instance)->_flags;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_flags = (__IntPtr) value;
+                ((__Internal*)__Instance)->_flags = (__IntPtr)value;
             }
         }
 
@@ -3075,7 +3084,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashLoopUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -3108,7 +3117,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -3138,17 +3147,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashLoopUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashLoopUString.__Internal*) __Instance) = *((global::cowl.UHashLoopUString.__Internal*) _0.__Instance);
+            *((global::cowl.UHashLoopUString.__Internal*)__Instance) = *((global::cowl.UHashLoopUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -4550,7 +4559,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVersion managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -4583,7 +4592,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -4613,17 +4622,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVersion.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVersion.__Internal*) __Instance) = *((global::cowl.UVersion.__Internal*) _0.__Instance);
+            *((global::cowl.UVersion.__Internal*)__Instance) = *((global::cowl.UVersion.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -4890,7 +4899,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingChar managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -4923,7 +4932,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -4953,17 +4962,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingChar.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingChar.__Internal*) __Instance) = *((global::cowl.PUvecSizingChar.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingChar.__Internal*)__Instance) = *((global::cowl.PUvecSizingChar.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -4980,12 +4989,12 @@ namespace cowl
         {
             get
             {
-                return (sbyte*) ((__Internal*)__Instance)->_d;
+                return (sbyte*)((__Internal*)__Instance)->_d;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_d = (__IntPtr) value;
+                ((__Internal*)__Instance)->_d = (__IntPtr)value;
             }
         }
 
@@ -5041,7 +5050,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeChar managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5074,7 +5083,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5104,17 +5113,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeChar.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeChar.__Internal*) __Instance) = *((global::cowl.PUvecLargeChar.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeChar.__Internal*)__Instance) = *((global::cowl.PUvecLargeChar.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5131,12 +5140,12 @@ namespace cowl
         {
             get
             {
-                return (sbyte*) ((__Internal*)__Instance)->_data;
+                return (sbyte*)((__Internal*)__Instance)->_data;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_data = (__IntPtr) value;
+                ((__Internal*)__Instance)->_data = (__IntPtr)value;
             }
         }
 
@@ -5198,7 +5207,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_char managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5231,7 +5240,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5261,17 +5270,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_char.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_char.__Internal*) __Instance) = *((global::cowl.UVec_char.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_char.__Internal*)__Instance) = *((global::cowl.UVec_char.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5293,7 +5302,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeChar.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeChar.__Internal*)value.__Instance;
             }
         }
 
@@ -5340,7 +5349,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_char managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5373,7 +5382,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5403,17 +5412,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_char.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_char.__Internal*) __Instance) = *((global::cowl.UVecLoop_char.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_char.__Internal*)__Instance) = *((global::cowl.UVecLoop_char.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5430,12 +5439,12 @@ namespace cowl
         {
             get
             {
-                return (sbyte*) ((__Internal*)__Instance)->item;
+                return (sbyte*)((__Internal*)__Instance)->item;
             }
 
             set
             {
-                ((__Internal*)__Instance)->item = (__IntPtr) value;
+                ((__Internal*)__Instance)->item = (__IntPtr)value;
             }
         }
 
@@ -5491,7 +5500,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUlibByte managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5524,7 +5533,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5554,17 +5563,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUlibByte.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUlibByte.__Internal*) __Instance) = *((global::cowl.PUvecSizingUlibByte.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUlibByte.__Internal*)__Instance) = *((global::cowl.PUvecSizingUlibByte.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5581,12 +5590,12 @@ namespace cowl
         {
             get
             {
-                return (byte*) ((__Internal*)__Instance)->_d;
+                return (byte*)((__Internal*)__Instance)->_d;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_d = (__IntPtr) value;
+                ((__Internal*)__Instance)->_d = (__IntPtr)value;
             }
         }
 
@@ -5642,7 +5651,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUlibByte managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5675,7 +5684,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5705,17 +5714,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUlibByte.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUlibByte.__Internal*) __Instance) = *((global::cowl.PUvecLargeUlibByte.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUlibByte.__Internal*)__Instance) = *((global::cowl.PUvecLargeUlibByte.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5732,12 +5741,12 @@ namespace cowl
         {
             get
             {
-                return (byte*) ((__Internal*)__Instance)->_data;
+                return (byte*)((__Internal*)__Instance)->_data;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_data = (__IntPtr) value;
+                ((__Internal*)__Instance)->_data = (__IntPtr)value;
             }
         }
 
@@ -5799,7 +5808,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_ulib_byte managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5832,7 +5841,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -5862,17 +5871,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_ulib_byte.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_ulib_byte.__Internal*) __Instance) = *((global::cowl.UVec_ulib_byte.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_ulib_byte.__Internal*)__Instance) = *((global::cowl.UVec_ulib_byte.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -5894,7 +5903,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibByte.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibByte.__Internal*)value.__Instance;
             }
         }
 
@@ -5941,7 +5950,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_ulib_byte managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -5974,7 +5983,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6004,17 +6013,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_ulib_byte.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_ulib_byte.__Internal*) __Instance) = *((global::cowl.UVecLoop_ulib_byte.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_ulib_byte.__Internal*)__Instance) = *((global::cowl.UVecLoop_ulib_byte.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6031,12 +6040,12 @@ namespace cowl
         {
             get
             {
-                return (byte*) ((__Internal*)__Instance)->item;
+                return (byte*)((__Internal*)__Instance)->item;
             }
 
             set
             {
-                ((__Internal*)__Instance)->item = (__IntPtr) value;
+                ((__Internal*)__Instance)->item = (__IntPtr)value;
             }
         }
 
@@ -6092,7 +6101,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUlibInt managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6125,7 +6134,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6155,17 +6164,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUlibInt.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUlibInt.__Internal*) __Instance) = *((global::cowl.PUvecSizingUlibInt.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUlibInt.__Internal*)__Instance) = *((global::cowl.PUvecSizingUlibInt.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6182,12 +6191,12 @@ namespace cowl
         {
             get
             {
-                return (int*) ((__Internal*)__Instance)->_d;
+                return (int*)((__Internal*)__Instance)->_d;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_d = (__IntPtr) value;
+                ((__Internal*)__Instance)->_d = (__IntPtr)value;
             }
         }
 
@@ -6243,7 +6252,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUlibInt managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6276,7 +6285,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6306,17 +6315,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUlibInt.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUlibInt.__Internal*) __Instance) = *((global::cowl.PUvecLargeUlibInt.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUlibInt.__Internal*)__Instance) = *((global::cowl.PUvecLargeUlibInt.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6333,12 +6342,12 @@ namespace cowl
         {
             get
             {
-                return (int*) ((__Internal*)__Instance)->_data;
+                return (int*)((__Internal*)__Instance)->_data;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_data = (__IntPtr) value;
+                ((__Internal*)__Instance)->_data = (__IntPtr)value;
             }
         }
 
@@ -6400,7 +6409,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_ulib_int managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6433,7 +6442,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6463,17 +6472,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_ulib_int.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_ulib_int.__Internal*) __Instance) = *((global::cowl.UVec_ulib_int.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_ulib_int.__Internal*)__Instance) = *((global::cowl.UVec_ulib_int.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6495,7 +6504,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibInt.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibInt.__Internal*)value.__Instance;
             }
         }
 
@@ -6542,7 +6551,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_ulib_int managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6575,7 +6584,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6605,17 +6614,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_ulib_int.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_ulib_int.__Internal*) __Instance) = *((global::cowl.UVecLoop_ulib_int.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_ulib_int.__Internal*)__Instance) = *((global::cowl.UVecLoop_ulib_int.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6632,12 +6641,12 @@ namespace cowl
         {
             get
             {
-                return (int*) ((__Internal*)__Instance)->item;
+                return (int*)((__Internal*)__Instance)->item;
             }
 
             set
             {
-                ((__Internal*)__Instance)->item = (__IntPtr) value;
+                ((__Internal*)__Instance)->item = (__IntPtr)value;
             }
         }
 
@@ -6693,7 +6702,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUlibUint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6726,7 +6735,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6756,17 +6765,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUlibUint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUlibUint.__Internal*) __Instance) = *((global::cowl.PUvecSizingUlibUint.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUlibUint.__Internal*)__Instance) = *((global::cowl.PUvecSizingUlibUint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6783,12 +6792,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_d;
+                return (uint*)((__Internal*)__Instance)->_d;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_d = (__IntPtr) value;
+                ((__Internal*)__Instance)->_d = (__IntPtr)value;
             }
         }
 
@@ -6844,7 +6853,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUlibUint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -6877,7 +6886,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -6907,17 +6916,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUlibUint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUlibUint.__Internal*) __Instance) = *((global::cowl.PUvecLargeUlibUint.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUlibUint.__Internal*)__Instance) = *((global::cowl.PUvecLargeUlibUint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -6934,12 +6943,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_data;
+                return (uint*)((__Internal*)__Instance)->_data;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_data = (__IntPtr) value;
+                ((__Internal*)__Instance)->_data = (__IntPtr)value;
             }
         }
 
@@ -7001,7 +7010,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_ulib_uint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7034,7 +7043,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7064,17 +7073,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_ulib_uint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_ulib_uint.__Internal*) __Instance) = *((global::cowl.UVec_ulib_uint.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_ulib_uint.__Internal*)__Instance) = *((global::cowl.UVec_ulib_uint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7096,7 +7105,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibUint.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibUint.__Internal*)value.__Instance;
             }
         }
 
@@ -7143,7 +7152,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_ulib_uint managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7176,7 +7185,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7206,17 +7215,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_ulib_uint.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_ulib_uint.__Internal*) __Instance) = *((global::cowl.UVecLoop_ulib_uint.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_ulib_uint.__Internal*)__Instance) = *((global::cowl.UVecLoop_ulib_uint.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7233,12 +7242,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->item;
+                return (uint*)((__Internal*)__Instance)->item;
             }
 
             set
             {
-                ((__Internal*)__Instance)->item = (__IntPtr) value;
+                ((__Internal*)__Instance)->item = (__IntPtr)value;
             }
         }
 
@@ -7294,7 +7303,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUlibFloat managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7327,7 +7336,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7357,17 +7366,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUlibFloat.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUlibFloat.__Internal*) __Instance) = *((global::cowl.PUvecSizingUlibFloat.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUlibFloat.__Internal*)__Instance) = *((global::cowl.PUvecSizingUlibFloat.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7384,12 +7393,12 @@ namespace cowl
         {
             get
             {
-                return (double*) ((__Internal*)__Instance)->_d;
+                return (double*)((__Internal*)__Instance)->_d;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_d = (__IntPtr) value;
+                ((__Internal*)__Instance)->_d = (__IntPtr)value;
             }
         }
 
@@ -7445,7 +7454,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUlibFloat managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7478,7 +7487,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7508,17 +7517,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUlibFloat.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUlibFloat.__Internal*) __Instance) = *((global::cowl.PUvecLargeUlibFloat.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUlibFloat.__Internal*)__Instance) = *((global::cowl.PUvecLargeUlibFloat.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7535,12 +7544,12 @@ namespace cowl
         {
             get
             {
-                return (double*) ((__Internal*)__Instance)->_data;
+                return (double*)((__Internal*)__Instance)->_data;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_data = (__IntPtr) value;
+                ((__Internal*)__Instance)->_data = (__IntPtr)value;
             }
         }
 
@@ -7602,7 +7611,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_ulib_float managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7635,7 +7644,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7665,17 +7674,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_ulib_float.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_ulib_float.__Internal*) __Instance) = *((global::cowl.UVec_ulib_float.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_ulib_float.__Internal*)__Instance) = *((global::cowl.UVec_ulib_float.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7697,7 +7706,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibFloat.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibFloat.__Internal*)value.__Instance;
             }
         }
 
@@ -7744,7 +7753,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_ulib_float managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7777,7 +7786,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7807,17 +7816,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_ulib_float.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_ulib_float.__Internal*) __Instance) = *((global::cowl.UVecLoop_ulib_float.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_ulib_float.__Internal*)__Instance) = *((global::cowl.UVecLoop_ulib_float.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -7834,12 +7843,12 @@ namespace cowl
         {
             get
             {
-                return (double*) ((__Internal*)__Instance)->item;
+                return (double*)((__Internal*)__Instance)->item;
             }
 
             set
             {
-                ((__Internal*)__Instance)->item = (__IntPtr) value;
+                ((__Internal*)__Instance)->item = (__IntPtr)value;
             }
         }
 
@@ -7895,7 +7904,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUlibPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -7928,7 +7937,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -7958,17 +7967,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUlibPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUlibPtr.__Internal*) __Instance) = *((global::cowl.PUvecSizingUlibPtr.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUlibPtr.__Internal*)__Instance) = *((global::cowl.PUvecSizingUlibPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8046,7 +8055,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUlibPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8079,7 +8088,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8109,17 +8118,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUlibPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUlibPtr.__Internal*) __Instance) = *((global::cowl.PUvecLargeUlibPtr.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUlibPtr.__Internal*)__Instance) = *((global::cowl.PUvecLargeUlibPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8203,7 +8212,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVec_ulib_ptr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8236,7 +8245,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8266,17 +8275,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVec_ulib_ptr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVec_ulib_ptr.__Internal*) __Instance) = *((global::cowl.UVec_ulib_ptr.__Internal*) _0.__Instance);
+            *((global::cowl.UVec_ulib_ptr.__Internal*)__Instance) = *((global::cowl.UVec_ulib_ptr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8298,7 +8307,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibPtr.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUlibPtr.__Internal*)value.__Instance;
             }
         }
 
@@ -8345,7 +8354,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoop_ulib_ptr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8378,7 +8387,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8408,17 +8417,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoop_ulib_ptr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoop_ulib_ptr.__Internal*) __Instance) = *((global::cowl.UVecLoop_ulib_ptr.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoop_ulib_ptr.__Internal*)__Instance) = *((global::cowl.UVecLoop_ulib_ptr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8496,7 +8505,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8529,7 +8538,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8559,17 +8568,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingUString.__Internal*) __Instance) = *((global::cowl.PUvecSizingUString.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingUString.__Internal*)__Instance) = *((global::cowl.PUvecSizingUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8648,7 +8657,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8681,7 +8690,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8711,17 +8720,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeUString.__Internal*) __Instance) = *((global::cowl.PUvecLargeUString.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeUString.__Internal*)__Instance) = *((global::cowl.PUvecLargeUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8806,7 +8815,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8839,7 +8848,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -8869,17 +8878,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecUString.__Internal*) __Instance) = *((global::cowl.UVecUString.__Internal*) _0.__Instance);
+            *((global::cowl.UVecUString.__Internal*)__Instance) = *((global::cowl.UVecUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -8901,7 +8910,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUString.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeUString.__Internal*)value.__Instance;
             }
         }
 
@@ -8948,7 +8957,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoopUString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -8981,7 +8990,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -9011,17 +9020,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoopUString.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoopUString.__Internal*) __Instance) = *((global::cowl.UVecLoopUString.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoopUString.__Internal*)__Instance) = *((global::cowl.UVecLoopUString.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -13130,7 +13139,7 @@ namespace cowl
                 for (int i = 0; i < __array.Length; i++)
                 {
                     var __element = array[i];
-                    __array[i] = __element is null ? new global::cowl.UString.__Internal() : *(global::cowl.UString.__Internal*) __element.__Instance;
+                    __array[i] = __element is null ? new global::cowl.UString.__Internal() : *(global::cowl.UString.__Internal*)__element.__Instance;
                 }
             }
             var __arg1 = __array;
@@ -13776,7 +13785,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UTime managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -13809,7 +13818,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -13839,17 +13848,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UTime.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UTime.__Internal*) __Instance) = *((global::cowl.UTime.__Internal*) _0.__Instance);
+            *((global::cowl.UTime.__Internal*)__Instance) = *((global::cowl.UTime.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -14203,7 +14212,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UIStream managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -14236,7 +14245,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -14266,17 +14275,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UIStream.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UIStream.__Internal*) __Instance) = *((global::cowl.UIStream.__Internal*) _0.__Instance);
+            *((global::cowl.UIStream.__Internal*)__Instance) = *((global::cowl.UIStream.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -14325,7 +14334,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -14340,7 +14349,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->read;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr));
             }
 
             set
@@ -14358,7 +14367,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->reset;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
             }
 
             set
@@ -14379,7 +14388,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->free;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
             }
 
             set
@@ -14419,7 +14428,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UOStream managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -14452,7 +14461,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -14482,17 +14491,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UOStream.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UOStream.__Internal*) __Instance) = *((global::cowl.UOStream.__Internal*) _0.__Instance);
+            *((global::cowl.UOStream.__Internal*)__Instance) = *((global::cowl.UOStream.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -14541,7 +14550,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -14556,7 +14565,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr___IntPtr_ulong_ulongPtr));
             }
 
             set
@@ -14574,7 +14583,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->flush;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
             }
 
             set
@@ -14595,7 +14604,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->free;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_ustream_ret___IntPtr));
             }
 
             set
@@ -15243,7 +15252,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlIterator managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -15276,7 +15285,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -15306,17 +15315,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlIterator.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlIterator.__Internal*) __Instance) = *((global::cowl.CowlIterator.__Internal*) _0.__Instance);
+            *((global::cowl.CowlIterator.__Internal*)__Instance) = *((global::cowl.CowlIterator.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -15337,7 +15346,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -15347,7 +15356,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->for_each;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
             }
 
             set
@@ -15383,7 +15392,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlFilter managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -15416,7 +15425,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -15446,17 +15455,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlFilter.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlFilter.__Internal*) __Instance) = *((global::cowl.CowlFilter.__Internal*) _0.__Instance);
+            *((global::cowl.CowlFilter.__Internal*)__Instance) = *((global::cowl.CowlFilter.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -15477,7 +15486,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -15487,7 +15496,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->filter;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
             }
 
             set
@@ -15796,7 +15805,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlString managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -15829,7 +15838,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -15914,7 +15923,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlIRI managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -15947,7 +15956,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -15984,7 +15993,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlVector managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -16017,7 +16026,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -16297,7 +16306,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObject managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -16330,7 +16339,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -16724,7 +16733,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotProp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -16757,7 +16766,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -16794,7 +16803,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotValue managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -16827,7 +16836,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -16864,7 +16873,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotAssertAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -16897,7 +16906,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17023,7 +17032,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlEntity managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17056,7 +17065,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17152,7 +17161,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlAnnotPropFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlAnnotPropFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlAnnotProp.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -17187,7 +17196,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotPropDomainAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17220,7 +17229,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17309,7 +17318,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotPropRangeAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17342,7 +17351,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17465,7 +17474,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnnotation managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17498,7 +17507,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17600,7 +17609,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlPrimitive managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17633,7 +17642,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17701,7 +17710,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAnonInd managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17734,7 +17743,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17787,7 +17796,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlAnonIndFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlAnonIndFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlAnonInd.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -17908,7 +17917,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -17941,7 +17950,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -17964,7 +17973,7 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_axiom_get_type", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_axiom_get_type@@YA?AW4CowlAxiomType@@PEAX@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.CowlAxiomType CowlAxiomGetType(__IntPtr axiom);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_axiom_get_annot@@YAPEAUCowlVector@@PEAX@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -18236,7 +18245,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecSizingCowlObjectPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -18269,7 +18278,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -18299,17 +18308,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecSizingCowlObjectPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecSizingCowlObjectPtr.__Internal*) __Instance) = *((global::cowl.PUvecSizingCowlObjectPtr.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecSizingCowlObjectPtr.__Internal*)__Instance) = *((global::cowl.PUvecSizingCowlObjectPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -18385,7 +18394,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.PUvecLargeCowlObjectPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -18418,7 +18427,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -18448,17 +18457,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.PUvecLargeCowlObjectPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.PUvecLargeCowlObjectPtr.__Internal*) __Instance) = *((global::cowl.PUvecLargeCowlObjectPtr.__Internal*) _0.__Instance);
+            *((global::cowl.PUvecLargeCowlObjectPtr.__Internal*)__Instance) = *((global::cowl.PUvecLargeCowlObjectPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -18540,7 +18549,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecCowlObjectPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -18573,7 +18582,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -18603,17 +18612,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecCowlObjectPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecCowlObjectPtr.__Internal*) __Instance) = *((global::cowl.UVecCowlObjectPtr.__Internal*) _0.__Instance);
+            *((global::cowl.UVecCowlObjectPtr.__Internal*)__Instance) = *((global::cowl.UVecCowlObjectPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -18635,7 +18644,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeCowlObjectPtr.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->_l = *(global::cowl.PUvecLargeCowlObjectPtr.__Internal*)value.__Instance;
             }
         }
 
@@ -18682,7 +18691,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UVecLoopCowlObjectPtr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -18715,7 +18724,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -18745,17 +18754,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UVecLoopCowlObjectPtr.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UVecLoopCowlObjectPtr.__Internal*) __Instance) = *((global::cowl.UVecLoopCowlObjectPtr.__Internal*) _0.__Instance);
+            *((global::cowl.UVecLoopCowlObjectPtr.__Internal*)__Instance) = *((global::cowl.UVecLoopCowlObjectPtr.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -19296,7 +19305,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlAxiomFilter managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -19329,7 +19338,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -19359,17 +19368,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlAxiomFilter.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlAxiomFilter.__Internal*) __Instance) = *((global::cowl.CowlAxiomFilter.__Internal*) _0.__Instance);
+            *((global::cowl.CowlAxiomFilter.__Internal*)__Instance) = *((global::cowl.CowlAxiomFilter.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -19406,7 +19415,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->primitives = *(global::cowl.UVecCowlObjectPtr.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->primitives = *(global::cowl.UVecCowlObjectPtr.__Internal*)value.__Instance;
             }
         }
 
@@ -19422,7 +19431,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->closure = *(global::cowl.CowlFilter.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->closure = *(global::cowl.CowlFilter.__Internal*)value.__Instance;
             }
         }
     }
@@ -19580,7 +19589,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlClass managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -19613,7 +19622,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -19665,7 +19674,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlClassFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlClassFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlClass.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -19700,7 +19709,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlClsExp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -19733,7 +19742,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -19770,7 +19779,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlIndividual managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -19803,7 +19812,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -19840,7 +19849,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlClsAssertAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -19873,7 +19882,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20035,7 +20044,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlErrorLoc managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20068,7 +20077,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20098,17 +20107,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlErrorLoc.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlErrorLoc.__Internal*) __Instance) = *((global::cowl.CowlErrorLoc.__Internal*) _0.__Instance);
+            *((global::cowl.CowlErrorLoc.__Internal*)__Instance) = *((global::cowl.CowlErrorLoc.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -20175,7 +20184,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlError managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20208,7 +20217,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20238,17 +20247,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlError.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlError.__Internal*) __Instance) = *((global::cowl.CowlError.__Internal*) _0.__Instance);
+            *((global::cowl.CowlError.__Internal*)__Instance) = *((global::cowl.CowlError.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -20298,7 +20307,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->origin = (__IntPtr) value;
+                ((__Internal*)__Instance)->origin = (__IntPtr)value;
             }
         }
     }
@@ -20328,7 +20337,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSyntaxError managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20361,7 +20370,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20391,17 +20400,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlSyntaxError.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlSyntaxError.__Internal*) __Instance) = *((global::cowl.CowlSyntaxError.__Internal*) _0.__Instance);
+            *((global::cowl.CowlSyntaxError.__Internal*)__Instance) = *((global::cowl.CowlSyntaxError.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -20424,7 +20433,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->super = *(global::cowl.CowlError.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->super = *(global::cowl.CowlError.__Internal*)value.__Instance;
             }
         }
 
@@ -20440,7 +20449,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->loc = *(global::cowl.CowlErrorLoc.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->loc = *(global::cowl.CowlErrorLoc.__Internal*)value.__Instance;
             }
         }
     }
@@ -20506,7 +20515,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlErrorHandler managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20539,7 +20548,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20569,17 +20578,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlErrorHandler.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlErrorHandler.__Internal*) __Instance) = *((global::cowl.CowlErrorHandler.__Internal*) _0.__Instance);
+            *((global::cowl.CowlErrorHandler.__Internal*)__Instance) = *((global::cowl.CowlErrorHandler.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -20600,7 +20609,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -20612,7 +20621,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->handle_error;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Action___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Action___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr___IntPtr));
             }
 
             set
@@ -20629,7 +20638,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->free;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Action___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Action___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr));
             }
 
             set
@@ -20752,7 +20761,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOntology managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20785,7 +20794,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20835,7 +20844,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlImportLoader managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -20868,7 +20877,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -20898,17 +20907,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlImportLoader.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlImportLoader.__Internal*) __Instance) = *((global::cowl.CowlImportLoader.__Internal*) _0.__Instance);
+            *((global::cowl.CowlImportLoader.__Internal*)__Instance) = *((global::cowl.CowlImportLoader.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -20929,7 +20938,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -20942,7 +20951,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->load_ontology;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func___IntPtr___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func___IntPtr___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func___IntPtr___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func___IntPtr___IntPtr___IntPtr));
             }
 
             set
@@ -20959,7 +20968,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->free;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Action___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Action___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Action___IntPtr));
             }
 
             set
@@ -20988,7 +20997,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlIStream managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21021,7 +21030,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21065,7 +21074,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlReader managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21099,7 +21108,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21129,19 +21138,19 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlReader.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlReader.__Internal*) __Instance) = *((global::cowl.CowlReader.__Internal*) _0.__Instance);
+            *((global::cowl.CowlReader.__Internal*)__Instance) = *((global::cowl.CowlReader.__Internal*)_0.__Instance);
             if (_0.__name_OwnsNativeMemory)
                 this.Name = _0.Name;
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -21176,7 +21185,7 @@ namespace cowl
                 var __bytePtr0 = Marshal.AllocHGlobal(__bytes0.Length + 1);
                 Marshal.Copy(__bytes0, 0, __bytePtr0, __bytes0.Length);
                 Marshal.WriteByte(__bytePtr0 + __bytes0.Length, 0);
-                ((__Internal*)__Instance)->name = (__IntPtr) __bytePtr0;
+                ((__Internal*)__Instance)->name = (__IntPtr)__bytePtr0;
             }
         }
 
@@ -21191,7 +21200,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->read;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -21235,7 +21244,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOntologyId managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21268,7 +21277,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21298,17 +21307,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOntologyId.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOntologyId.__Internal*) __Instance) = *((global::cowl.CowlOntologyId.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOntologyId.__Internal*)__Instance) = *((global::cowl.CowlOntologyId.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -21435,7 +21444,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOntologyHeader managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21468,7 +21477,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21498,17 +21507,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOntologyHeader.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOntologyHeader.__Internal*) __Instance) = *((global::cowl.CowlOntologyHeader.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOntologyHeader.__Internal*)__Instance) = *((global::cowl.CowlOntologyHeader.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -21531,7 +21540,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->id = *(global::cowl.CowlOntologyId.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->id = *(global::cowl.CowlOntologyId.__Internal*)value.__Instance;
             }
         }
 
@@ -21594,7 +21603,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlLiteral managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21627,7 +21636,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21664,7 +21673,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSymTable managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21697,7 +21706,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21742,7 +21751,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlStreamWriter managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21775,7 +21784,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21805,17 +21814,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlStreamWriter.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlStreamWriter.__Internal*) __Instance) = *((global::cowl.CowlStreamWriter.__Internal*) _0.__Instance);
+            *((global::cowl.CowlStreamWriter.__Internal*)__Instance) = *((global::cowl.CowlStreamWriter.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -21836,7 +21845,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write_header;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr_cowl_CowlOntologyHeader___Internal) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr_cowl_CowlOntologyHeader___Internal));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr_cowl_CowlOntologyHeader___Internal)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr_cowl_CowlOntologyHeader___Internal));
             }
 
             set
@@ -21855,7 +21864,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write_axiom;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr___IntPtr));
             }
 
             set
@@ -21873,7 +21882,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write_footer;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -21910,7 +21919,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlWriter managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -21944,7 +21953,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -21974,19 +21983,19 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlWriter.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlWriter.__Internal*) __Instance) = *((global::cowl.CowlWriter.__Internal*) _0.__Instance);
+            *((global::cowl.CowlWriter.__Internal*)__Instance) = *((global::cowl.CowlWriter.__Internal*)_0.__Instance);
             if (_0.__name_OwnsNativeMemory)
                 this.Name = _0.Name;
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -22021,7 +22030,7 @@ namespace cowl
                 var __bytePtr0 = Marshal.AllocHGlobal(__bytes0.Length + 1);
                 Marshal.Copy(__bytes0, 0, __bytePtr0, __bytes0.Length);
                 Marshal.WriteByte(__bytePtr0 + __bytes0.Length, 0);
-                ((__Internal*)__Instance)->name = (__IntPtr) __bytePtr0;
+                ((__Internal*)__Instance)->name = (__IntPtr)__bytePtr0;
             }
         }
 
@@ -22039,7 +22048,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write_ontology;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -22062,7 +22071,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->write;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -22084,7 +22093,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->stream = *(global::cowl.CowlStreamWriter.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->stream = *(global::cowl.CowlStreamWriter.__Internal*)value.__Instance;
             }
         }
     }
@@ -22422,7 +22431,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataRange managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22455,7 +22464,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22492,7 +22501,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataPropExp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22525,7 +22534,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22562,7 +22571,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataCard managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22595,7 +22604,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22708,7 +22717,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataCompl managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22741,7 +22750,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22811,7 +22820,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataHasValue managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22844,7 +22853,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22867,13 +22876,13 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_has_value", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_has_value@@YAPEAUCowlDataHasValue@@PEAXPEAUCowlLiteral@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataHasValue(__IntPtr prop, __IntPtr value);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_has_value_get_prop", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_has_value_get_prop@@YAPEAUCowlDataPropExp@@PEAUCowlDataHasValue@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataHasValueGetProp(__IntPtr restr);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_has_value_get_value", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_has_value_get_value@@YAPEAUCowlLiteral@@PEAUCowlDataHasValue@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataHasValueGetValue(__IntPtr restr);
         }
 
@@ -22930,7 +22939,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataOneOf managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -22963,7 +22972,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -22989,7 +22998,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_one_of", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataOneOf(__IntPtr values);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_one_of_get_values", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_one_of_get_values@@YAPEAUCowlVector@@PEAUCowlDataOneOf@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataOneOfGetValues(__IntPtr range);
         }
 
@@ -23034,7 +23043,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataProp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23067,7 +23076,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23119,7 +23128,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlDataPropFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlDataPropFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlDataProp.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -23154,7 +23163,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataPropAssertAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23187,7 +23196,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23210,23 +23219,23 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom@@YAPEAUCowlDataPropAssertAxiom@@PEAX0PEAUCowlLiteral@@PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiom(__IntPtr prop, __IntPtr subj, __IntPtr obj, __IntPtr annot);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_neg_data_prop_assert_axiom", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_neg_data_prop_assert_axiom@@YAPEAUCowlDataPropAssertAxiom@@PEAX0PEAUCowlLiteral@@PEAUCowlVector@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlNegDataPropAssertAxiom(__IntPtr prop, __IntPtr subj, __IntPtr obj, __IntPtr annot);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_is_negative", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_is_negative@@YA_NPEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlDataPropAssertAxiomIsNegative(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_prop", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_prop@@YAPEAUCowlDataPropExp@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetProp(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_subject", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_subject@@YAPEAUCowlIndividual@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetSubject(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_data_prop_assert_axiom_get_object", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_data_prop_assert_axiom_get_object@@YAPEAUCowlLiteral@@PEAUCowlDataPropAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlDataPropAssertAxiomGetObject(__IntPtr axiom);
         }
 
@@ -23322,7 +23331,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataPropDomainAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23355,7 +23364,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23461,7 +23470,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataPropRangeAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23494,7 +23503,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23595,7 +23604,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDataQuant managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23628,7 +23637,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23749,7 +23758,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjPropExp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23782,7 +23791,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23837,7 +23846,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDatatype managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23870,7 +23879,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -23922,7 +23931,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlDatatypeFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlDatatypeFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlDatatype.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -23957,7 +23966,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDatatypeDefAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -23990,7 +23999,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24078,7 +24087,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDatatypeRestr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24111,7 +24120,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24198,7 +24207,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDeclAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24231,7 +24240,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24303,7 +24312,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlDisjUnionAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24336,7 +24345,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24425,7 +24434,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlFacetRestr managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24458,7 +24467,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24545,7 +24554,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlFuncDataPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24578,7 +24587,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24650,7 +24659,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlHasKeyAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24683,7 +24692,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24806,7 +24815,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjProp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24839,7 +24848,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24876,7 +24885,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlInvObjProp managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -24909,7 +24918,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -24980,7 +24989,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlInvObjPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -25013,7 +25022,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -25148,7 +25157,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlString.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -25174,7 +25183,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlStringOpt(*(global::cowl.UString.__Internal*) __arg0, opts);
+            var ___ret = __Internal.CowlStringOpt(*(global::cowl.UString.__Internal*)__arg0, opts);
             var __result0 = global::cowl.CowlString.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -25383,7 +25392,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlIriFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlIriFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -25461,7 +25470,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlIStreamHandlers managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -25494,7 +25503,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -25524,17 +25533,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlIStreamHandlers.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlIStreamHandlers.__Internal*) __Instance) = *((global::cowl.CowlIStreamHandlers.__Internal*) _0.__Instance);
+            *((global::cowl.CowlIStreamHandlers.__Internal*)__Instance) = *((global::cowl.CowlIStreamHandlers.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -25555,7 +25564,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->ctx = (__IntPtr) value;
+                ((__Internal*)__Instance)->ctx = (__IntPtr)value;
             }
         }
 
@@ -25568,7 +25577,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->iri;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -25586,7 +25595,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->version;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -25604,7 +25613,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->import;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -25622,7 +25631,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->annot;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -25640,7 +25649,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->axiom;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_cowl_cowl_ret___IntPtr___IntPtr));
             }
 
             set
@@ -25668,7 +25677,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlManager managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -25701,7 +25710,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -25852,7 +25861,7 @@ namespace cowl
             if (ReferenceEquals(path, null))
                 throw new global::System.ArgumentNullException("path", "Cannot be null because it is passed by value.");
             var __arg1 = path.__Instance;
-            var ___ret = __Internal.CowlIstreamProcessPath(__arg0, *(global::cowl.UString.__Internal*) __arg1);
+            var ___ret = __Internal.CowlIstreamProcessPath(__arg0, *(global::cowl.UString.__Internal*)__arg1);
             return ___ret;
         }
 
@@ -25955,7 +25964,7 @@ namespace cowl
             if (ReferenceEquals(lang, null))
                 throw new global::System.ArgumentNullException("lang", "Cannot be null because it is passed by value.");
             var __arg2 = lang.__Instance;
-            var ___ret = __Internal.CowlLiteralFromString(*(global::cowl.UString.__Internal*) __arg0, *(global::cowl.UString.__Internal*) __arg1, *(global::cowl.UString.__Internal*) __arg2);
+            var ___ret = __Internal.CowlLiteralFromString(*(global::cowl.UString.__Internal*)__arg0, *(global::cowl.UString.__Internal*)__arg1, *(global::cowl.UString.__Internal*)__arg2);
             var __result0 = global::cowl.CowlLiteral.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -26017,7 +26026,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOStream managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -26050,7 +26059,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -26179,7 +26188,7 @@ namespace cowl
             if (ReferenceEquals(reader, null))
                 throw new global::System.ArgumentNullException("reader", "Cannot be null because it is passed by value.");
             var __arg1 = reader.__Instance;
-            __Internal.CowlManagerSetReader(__arg0, *(global::cowl.CowlReader.__Internal*) __arg1);
+            __Internal.CowlManagerSetReader(__arg0, *(global::cowl.CowlReader.__Internal*)__arg1);
         }
 
         /// <summary>Gets the writer.</summary>
@@ -26201,7 +26210,7 @@ namespace cowl
             if (ReferenceEquals(writer, null))
                 throw new global::System.ArgumentNullException("writer", "Cannot be null because it is passed by value.");
             var __arg1 = writer.__Instance;
-            __Internal.CowlManagerSetWriter(__arg0, *(global::cowl.CowlWriter.__Internal*) __arg1);
+            __Internal.CowlManagerSetWriter(__arg0, *(global::cowl.CowlWriter.__Internal*)__arg1);
         }
 
         /// <summary>Gets the import loader.</summary>
@@ -26223,7 +26232,7 @@ namespace cowl
             if (ReferenceEquals(loader, null))
                 throw new global::System.ArgumentNullException("loader", "Cannot be null because it is passed by value.");
             var __arg1 = loader.__Instance;
-            __Internal.CowlManagerSetImportLoader(__arg0, *(global::cowl.CowlImportLoader.__Internal*) __arg1);
+            __Internal.CowlManagerSetImportLoader(__arg0, *(global::cowl.CowlImportLoader.__Internal*)__arg1);
         }
 
         /// <summary>Gets the error handler.</summary>
@@ -26245,7 +26254,7 @@ namespace cowl
             if (ReferenceEquals(handler, null))
                 throw new global::System.ArgumentNullException("handler", "Cannot be null because it is passed by value.");
             var __arg1 = handler.__Instance;
-            __Internal.CowlManagerSetErrorHandler(__arg0, *(global::cowl.CowlErrorHandler.__Internal*) __arg1);
+            __Internal.CowlManagerSetErrorHandler(__arg0, *(global::cowl.CowlErrorHandler.__Internal*)__arg1);
         }
 
         /// <summary>Returns the number of ontologies managed by this manager.</summary>
@@ -26313,7 +26322,7 @@ namespace cowl
             if (ReferenceEquals(path, null))
                 throw new global::System.ArgumentNullException("path", "Cannot be null because it is passed by value.");
             var __arg1 = path.__Instance;
-            var ___ret = __Internal.CowlManagerReadPath(__arg0, *(global::cowl.UString.__Internal*) __arg1);
+            var ___ret = __Internal.CowlManagerReadPath(__arg0, *(global::cowl.UString.__Internal*)__arg1);
             var __result0 = global::cowl.CowlOntology.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -26369,7 +26378,7 @@ namespace cowl
             if (ReferenceEquals(path, null))
                 throw new global::System.ArgumentNullException("path", "Cannot be null because it is passed by value.");
             var __arg2 = path.__Instance;
-            var ___ret = __Internal.CowlManagerWritePath(__arg0, __arg1, *(global::cowl.UString.__Internal*) __arg2);
+            var ___ret = __Internal.CowlManagerWritePath(__arg0, __arg1, *(global::cowl.UString.__Internal*)__arg2);
             return ___ret;
         }
 
@@ -26425,7 +26434,7 @@ namespace cowl
             if (ReferenceEquals(handlers, null))
                 throw new global::System.ArgumentNullException("handlers", "Cannot be null because it is passed by value.");
             var __arg1 = handlers.__Instance;
-            var ___ret = __Internal.CowlManagerGetIstream(__arg0, *(global::cowl.CowlIStreamHandlers.__Internal*) __arg1);
+            var ___ret = __Internal.CowlManagerGetIstream(__arg0, *(global::cowl.CowlIStreamHandlers.__Internal*)__arg1);
             var __result0 = global::cowl.CowlIStream.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -26475,7 +26484,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNamedInd managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -26508,7 +26517,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -26560,7 +26569,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlNamedIndFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlNamedIndFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlNamedInd.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -26633,7 +26642,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryBool managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -26666,7 +26675,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -26751,7 +26760,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryClsAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -26784,7 +26793,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -26871,7 +26880,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryData managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -26904,7 +26913,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -26989,7 +26998,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryDataPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27022,7 +27031,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27109,7 +27118,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryIndAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27142,7 +27151,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27229,7 +27238,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlNAryObjPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27262,7 +27271,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27349,7 +27358,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjCard managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27382,7 +27391,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27495,7 +27504,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjCompl managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27528,7 +27537,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27598,7 +27607,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjHasSelf managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27631,7 +27640,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27701,7 +27710,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjHasValue managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27734,7 +27743,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27819,7 +27828,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjOneOf managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -27852,7 +27861,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -27938,7 +27947,7 @@ namespace cowl
             if (ReferenceEquals(@string, null))
                 throw new global::System.ArgumentNullException("@string", "Cannot be null because it is passed by value.");
             var __arg0 = @string.__Instance;
-            var ___ret = __Internal.CowlObjPropFromString(*(global::cowl.UString.__Internal*) __arg0);
+            var ___ret = __Internal.CowlObjPropFromString(*(global::cowl.UString.__Internal*)__arg0);
             var __result0 = global::cowl.CowlObjProp.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -27973,7 +27982,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjPropAssertAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -28006,7 +28015,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -28139,7 +28148,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjPropCharAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -28172,7 +28181,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -28258,7 +28267,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjPropDomainAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -28291,7 +28300,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -28410,7 +28419,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjPropRangeAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -28443,7 +28452,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -28530,7 +28539,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlObjQuant managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -28563,7 +28572,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -28759,7 +28768,7 @@ namespace cowl
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateRelated(__IntPtr onto, __IntPtr primitive, global::cowl.CowlAxiomType type, byte position, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_sub_classes", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_sub_classes@@YA_NPEAUCowlOntology@@PEAUCowlClass@@PEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateSubClasses(__IntPtr onto, __IntPtr owl_class, __IntPtr iter, bool imports);
 
@@ -29303,7 +29312,7 @@ namespace cowl
             if (ReferenceEquals(header, null))
                 throw new global::System.ArgumentNullException("header", "Cannot be null because it is passed by value.");
             var __arg1 = header.__Instance;
-            var ___ret = __Internal.CowlOstreamWriteHeader(__arg0, *(global::cowl.CowlOntologyHeader.__Internal*) __arg1);
+            var ___ret = __Internal.CowlOstreamWriteHeader(__arg0, *(global::cowl.CowlOntologyHeader.__Internal*)__arg1);
             return ___ret;
         }
 
@@ -29384,7 +29393,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLIRIVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -29417,7 +29426,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -29447,17 +29456,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLIRIVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLIRIVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLIRIVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLIRIVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLIRIVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -29689,7 +29698,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLClassVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -29722,7 +29731,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -29752,17 +29761,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLClassVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLClassVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLClassVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLClassVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLClassVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -29829,7 +29838,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLDatatypeVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -29862,7 +29871,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -29892,17 +29901,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLDatatypeVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLDatatypeVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLDatatypeVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLDatatypeVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLDatatypeVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -29969,7 +29978,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLObjPropVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30002,7 +30011,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30032,17 +30041,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLObjPropVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLObjPropVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLObjPropVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLObjPropVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLObjPropVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -30109,7 +30118,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLDataPropVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30142,7 +30151,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30172,17 +30181,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLDataPropVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLDataPropVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLDataPropVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLDataPropVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLDataPropVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -30252,7 +30261,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLAnnotPropVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30285,7 +30294,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30315,17 +30324,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLAnnotPropVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLAnnotPropVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLAnnotPropVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLAnnotPropVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLAnnotPropVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -30443,7 +30452,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlOWLVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30476,7 +30485,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30506,17 +30515,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlOWLVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlOWLVocab.__Internal*) __Instance) = *((global::cowl.CowlOWLVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlOWLVocab.__Internal*)__Instance) = *((global::cowl.CowlOWLVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -30569,7 +30578,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->iri = *(global::cowl.CowlOWLIRIVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->iri = *(global::cowl.CowlOWLIRIVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -30585,7 +30594,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->cls = *(global::cowl.CowlOWLClassVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->cls = *(global::cowl.CowlOWLClassVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -30601,7 +30610,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->dt = *(global::cowl.CowlOWLDatatypeVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->dt = *(global::cowl.CowlOWLDatatypeVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -30617,7 +30626,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->obj_prop = *(global::cowl.CowlOWLObjPropVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->obj_prop = *(global::cowl.CowlOWLObjPropVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -30633,7 +30642,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->data_prop = *(global::cowl.CowlOWLDataPropVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->data_prop = *(global::cowl.CowlOWLDataPropVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -30649,7 +30658,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->annot_prop = *(global::cowl.CowlOWLAnnotPropVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->annot_prop = *(global::cowl.CowlOWLAnnotPropVocab.__Internal*)value.__Instance;
             }
         }
     }
@@ -30702,7 +30711,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFIRIVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30735,7 +30744,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30765,17 +30774,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFIRIVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFIRIVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFIRIVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFIRIVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFIRIVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -30873,7 +30882,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFDatatypeVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -30906,7 +30915,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -30936,17 +30945,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFDatatypeVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFDatatypeVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFDatatypeVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFDatatypeVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFDatatypeVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31030,7 +31039,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31063,7 +31072,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -31093,17 +31102,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31156,7 +31165,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->iri = *(global::cowl.CowlRDFIRIVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->iri = *(global::cowl.CowlRDFIRIVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -31172,7 +31181,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->dt = *(global::cowl.CowlRDFDatatypeVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->dt = *(global::cowl.CowlRDFDatatypeVocab.__Internal*)value.__Instance;
             }
         }
     }
@@ -31227,7 +31236,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFSIRIVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31260,7 +31269,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -31290,17 +31299,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFSIRIVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFSIRIVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFSIRIVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFSIRIVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFSIRIVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31411,7 +31420,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFSDatatypeVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31444,7 +31453,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -31474,17 +31483,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFSDatatypeVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFSDatatypeVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFSDatatypeVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFSDatatypeVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFSDatatypeVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31538,7 +31547,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFSAnnotPropVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31571,7 +31580,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -31601,17 +31610,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFSAnnotPropVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFSAnnotPropVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFSAnnotPropVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFSAnnotPropVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFSAnnotPropVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31711,7 +31720,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlRDFSVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31744,7 +31753,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -31774,17 +31783,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlRDFSVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlRDFSVocab.__Internal*) __Instance) = *((global::cowl.CowlRDFSVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlRDFSVocab.__Internal*)__Instance) = *((global::cowl.CowlRDFSVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -31837,7 +31846,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->iri = *(global::cowl.CowlRDFSIRIVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->iri = *(global::cowl.CowlRDFSIRIVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -31853,7 +31862,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->dt = *(global::cowl.CowlRDFSDatatypeVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->dt = *(global::cowl.CowlRDFSDatatypeVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -31869,7 +31878,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->annot_prop = *(global::cowl.CowlRDFSAnnotPropVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->annot_prop = *(global::cowl.CowlRDFSAnnotPropVocab.__Internal*)value.__Instance;
             }
         }
     }
@@ -31910,7 +31919,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSubAnnotPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -31943,7 +31952,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32032,7 +32041,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSubClsAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32065,7 +32074,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32152,7 +32161,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSubDataPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32185,7 +32194,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32272,7 +32281,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlSubObjPropAxiom managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32305,7 +32314,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32409,7 +32418,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlTable managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32442,7 +32451,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32573,7 +32582,7 @@ namespace cowl
             if (ReferenceEquals(ns, null))
                 throw new global::System.ArgumentNullException("ns", "Cannot be null because it is passed by value.");
             var __arg2 = ns.__Instance;
-            var ___ret = __Internal.CowlSymTableRegisterPrefixRaw(__arg0, *(global::cowl.UString.__Internal*) __arg1, *(global::cowl.UString.__Internal*) __arg2, overwrite);
+            var ___ret = __Internal.CowlSymTableRegisterPrefixRaw(__arg0, *(global::cowl.UString.__Internal*)__arg1, *(global::cowl.UString.__Internal*)__arg2, overwrite);
             return ___ret;
         }
 
@@ -32628,7 +32637,7 @@ namespace cowl
             if (ReferenceEquals(rem, null))
                 throw new global::System.ArgumentNullException("rem", "Cannot be null because it is passed by value.");
             var __arg2 = rem.__Instance;
-            var ___ret = __Internal.CowlSymTableGetIri(__arg0, *(global::cowl.UString.__Internal*) __arg1, *(global::cowl.UString.__Internal*) __arg2);
+            var ___ret = __Internal.CowlSymTableGetIri(__arg0, *(global::cowl.UString.__Internal*)__arg1, *(global::cowl.UString.__Internal*)__arg2);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -32643,7 +32652,7 @@ namespace cowl
             if (ReferenceEquals(short_iri, null))
                 throw new global::System.ArgumentNullException("short_iri", "Cannot be null because it is passed by value.");
             var __arg1 = short_iri.__Instance;
-            var ___ret = __Internal.CowlSymTableParseShortIri(__arg0, *(global::cowl.UString.__Internal*) __arg1);
+            var ___ret = __Internal.CowlSymTableParseShortIri(__arg0, *(global::cowl.UString.__Internal*)__arg1);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -32661,7 +32670,7 @@ namespace cowl
             if (ReferenceEquals(str, null))
                 throw new global::System.ArgumentNullException("str", "Cannot be null because it is passed by value.");
             var __arg1 = str.__Instance;
-            var ___ret = __Internal.CowlSymTableParseIri(__arg0, *(global::cowl.UString.__Internal*) __arg1);
+            var ___ret = __Internal.CowlSymTableParseIri(__arg0, *(global::cowl.UString.__Internal*)__arg1);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -32675,7 +32684,7 @@ namespace cowl
             if (ReferenceEquals(rem, null))
                 throw new global::System.ArgumentNullException("rem", "Cannot be null because it is passed by value.");
             var __arg2 = rem.__Instance;
-            var ___ret = __Internal.CowlSymTableGetFullIri(__arg0, *(global::cowl.UString.__Internal*) __arg1, *(global::cowl.UString.__Internal*) __arg2);
+            var ___ret = __Internal.CowlSymTableGetFullIri(__arg0, *(global::cowl.UString.__Internal*)__arg1, *(global::cowl.UString.__Internal*)__arg2);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -32686,7 +32695,7 @@ namespace cowl
             if (ReferenceEquals(short_iri, null))
                 throw new global::System.ArgumentNullException("short_iri", "Cannot be null because it is passed by value.");
             var __arg1 = short_iri.__Instance;
-            var ___ret = __Internal.CowlSymTableParseFullIri(__arg0, *(global::cowl.UString.__Internal*) __arg1);
+            var ___ret = __Internal.CowlSymTableParseFullIri(__arg0, *(global::cowl.UString.__Internal*)__arg1);
             var __result0 = global::cowl.CowlIRI.__GetOrCreateInstance(___ret, false);
             return __result0;
         }
@@ -32722,7 +32731,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashCowlObjectTable managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32755,7 +32764,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -32785,17 +32794,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashCowlObjectTable.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashCowlObjectTable.__Internal*) __Instance) = *((global::cowl.UHashCowlObjectTable.__Internal*) _0.__Instance);
+            *((global::cowl.UHashCowlObjectTable.__Internal*)__Instance) = *((global::cowl.UHashCowlObjectTable.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -32849,12 +32858,12 @@ namespace cowl
         {
             get
             {
-                return (uint*) ((__Internal*)__Instance)->_flags;
+                return (uint*)((__Internal*)__Instance)->_flags;
             }
 
             set
             {
-                ((__Internal*)__Instance)->_flags = (__IntPtr) value;
+                ((__Internal*)__Instance)->_flags = (__IntPtr)value;
             }
         }
 
@@ -32867,7 +32876,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->_keys = (__IntPtr) value;
+                ((__Internal*)__Instance)->_keys = (__IntPtr)value;
             }
         }
 
@@ -32880,7 +32889,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->_vals = (__IntPtr) value;
+                ((__Internal*)__Instance)->_vals = (__IntPtr)value;
             }
         }
 
@@ -32889,7 +32898,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->_hfunc;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_uint___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_uint___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_uint___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_uint___IntPtr));
             }
 
             set
@@ -32903,7 +32912,7 @@ namespace cowl
             get
             {
                 var __ptr0 = ((__Internal*)__Instance)->_efunc;
-                return __ptr0 == IntPtr.Zero? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr) Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
+                return __ptr0 == IntPtr.Zero ? null : (global::cowl.Delegates.Func_bool___IntPtr___IntPtr)Marshal.GetDelegateForFunctionPointer(__ptr0, typeof(global::cowl.Delegates.Func_bool___IntPtr___IntPtr));
             }
 
             set
@@ -32939,7 +32948,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.UHashLoopCowlObjectTable managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -32972,7 +32981,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -33002,17 +33011,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.UHashLoopCowlObjectTable.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.UHashLoopCowlObjectTable.__Internal*) __Instance) = *((global::cowl.UHashLoopCowlObjectTable.__Internal*) _0.__Instance);
+            *((global::cowl.UHashLoopCowlObjectTable.__Internal*)__Instance) = *((global::cowl.UHashLoopCowlObjectTable.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -33041,7 +33050,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->key = (__IntPtr) value;
+                ((__Internal*)__Instance)->key = (__IntPtr)value;
             }
         }
 
@@ -33054,7 +33063,7 @@ namespace cowl
 
             set
             {
-                ((__Internal*)__Instance)->val = (__IntPtr) value;
+                ((__Internal*)__Instance)->val = (__IntPtr)value;
             }
         }
 
@@ -33609,7 +33618,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlXSDIRIVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -33642,7 +33651,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -33672,17 +33681,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlXSDIRIVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlXSDIRIVocab.__Internal*) __Instance) = *((global::cowl.CowlXSDIRIVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlXSDIRIVocab.__Internal*)__Instance) = *((global::cowl.CowlXSDIRIVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -34667,7 +34676,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlXSDDatatypeVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -34700,7 +34709,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -34730,17 +34739,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlXSDDatatypeVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlXSDDatatypeVocab.__Internal*) __Instance) = *((global::cowl.CowlXSDDatatypeVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlXSDDatatypeVocab.__Internal*)__Instance) = *((global::cowl.CowlXSDDatatypeVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -35529,7 +35538,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlXSDVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -35562,7 +35571,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -35592,17 +35601,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlXSDVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlXSDVocab.__Internal*) __Instance) = *((global::cowl.CowlXSDVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlXSDVocab.__Internal*)__Instance) = *((global::cowl.CowlXSDVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
@@ -35655,7 +35664,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->iri = *(global::cowl.CowlXSDIRIVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->iri = *(global::cowl.CowlXSDIRIVocab.__Internal*)value.__Instance;
             }
         }
 
@@ -35671,7 +35680,7 @@ namespace cowl
             {
                 if (ReferenceEquals(value, null))
                     throw new global::System.ArgumentNullException("value", "Cannot be null because it is passed by value.");
-                ((__Internal*)__Instance)->dt = *(global::cowl.CowlXSDDatatypeVocab.__Internal*) value.__Instance;
+                ((__Internal*)__Instance)->dt = *(global::cowl.CowlXSDDatatypeVocab.__Internal*)value.__Instance;
             }
         }
     }
@@ -35722,7 +35731,7 @@ namespace cowl
 
         internal static bool __TryGetNativeToManagedMapping(IntPtr native, out global::cowl.CowlVocab managed)
         {
-    
+
             return NativeToManagedMap.TryGetValue(native, out managed);
         }
 
@@ -35755,7 +35764,7 @@ namespace cowl
         private static void* __CopyValue(__Internal native)
         {
             var ret = Marshal.AllocHGlobal(sizeof(__Internal));
-            *(__Internal*) ret = native;
+            *(__Internal*)ret = native;
             return ret.ToPointer();
         }
 
@@ -35785,17 +35794,17 @@ namespace cowl
             __Instance = Marshal.AllocHGlobal(sizeof(global::cowl.CowlVocab.__Internal));
             __ownsNativeInstance = true;
             __RecordNativeToManagedMapping(__Instance, this);
-            *((global::cowl.CowlVocab.__Internal*) __Instance) = *((global::cowl.CowlVocab.__Internal*) _0.__Instance);
+            *((global::cowl.CowlVocab.__Internal*)__Instance) = *((global::cowl.CowlVocab.__Internal*)_0.__Instance);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true, callNativeDtor : __ownsNativeInstance );
+            Dispose(disposing: true, callNativeDtor: __ownsNativeInstance);
         }
 
         partial void DisposePartial(bool disposing);
 
-        internal protected virtual void Dispose(bool disposing, bool callNativeDtor )
+        internal protected virtual void Dispose(bool disposing, bool callNativeDtor)
         {
             if (__Instance == IntPtr.Zero)
                 return;
