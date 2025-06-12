@@ -86,8 +86,24 @@ namespace Impostor.Tools.ServerReplay
             //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
             bool Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             // Read all .dat files from the "sessions" directory
-            foreach (var file in Directory.GetFiles("..\\" +
-                "..\\..\\sessions\\", "*.dat"))
+            string sessionDir;
+
+            // caso 1: esecuzione in Docker o dopo publish
+            string dockerPath = Path.Combine(AppContext.BaseDirectory, "sessions");
+
+            // caso 2: esecuzione in Visual Studio (cartella accanto al .csproj)
+            string localPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.Parent!.Parent!.Parent!.FullName, "sessions");
+
+            // scegli quello che esiste
+            if (Directory.Exists(dockerPath))
+                sessionDir = dockerPath;
+            else if (Directory.Exists(localPath))
+                sessionDir = localPath;
+            else
+                throw new DirectoryNotFoundException("Directory 'sessions' not found in expected locations.");
+
+
+            foreach (var file in Directory.GetFiles(sessionDir, "*.dat"))
             {
                 // Clear dictionaries at the start of each session
                 Connections.Clear();
