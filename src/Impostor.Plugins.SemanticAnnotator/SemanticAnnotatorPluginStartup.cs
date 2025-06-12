@@ -54,14 +54,11 @@ namespace Impostor.Plugins.SemanticAnnotator
 
         public SemanticAnnotatorPluginStartup()
         {
-    
             var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory()) // or use Path.Combine for plugin folder
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             _configuration = builder.Build();
-
-
         }
 
         public void ConfigureHost(IHostBuilder host)
