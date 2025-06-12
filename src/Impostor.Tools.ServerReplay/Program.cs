@@ -86,23 +86,42 @@ namespace Impostor.Tools.ServerReplay
             //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
             bool Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             // Read all .dat files from the "sessions" directory
-            string sessionDir;
+            string sessionDir = Path.Combine(AppContext.BaseDirectory, "sessions");
 
-            // caso 1: esecuzione in Docker o dopo publish
-            string dockerPath = Path.Combine(AppContext.BaseDirectory, "sessions");
+            // Se non esiste in Docker, prova a risalire fino al progetto locale
+            if (!Directory.Exists(sessionDir))
+            {
+                try
+                {
+                    // Risale a partire da bin/Debug/net8.0 verso la cartella progetto
+                    string? projectRoot = Directory.GetParent(AppContext.BaseDirectory)?
+                                                         .Parent?.Parent?.Parent?.FullName;
 
-            // caso 2: esecuzione in Visual Studio (cartella accanto al .csproj)
-            string localPath = Path.Combine(Directory.GetParent(AppContext.BaseDirectory)!.Parent!.Parent!.Parent!.FullName, "sessions");
+                    if (projectRoot != null)
+                    {
+                        string fallback = Path.Combine(projectRoot, "sessions");
+                        if (Directory.Exists(fallback))
+                        {
+                            sessionDir = fallback;
+                        }
+                        else
+                        {
+                            throw new DirectoryNotFoundException($"sessions folder not found at fallback path: {fallback}");
+                        }
+                    }
+                    else
+                    {
+                        throw new DirectoryNotFoundException("Could not determine project root from BaseDirectory.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error locating sessions folder: {ex.Message}");
+                    throw;
+                }
+            }
 
-            // scegli quello che esiste
-            if (Directory.Exists(dockerPath))
-                sessionDir = dockerPath;
-            else if (Directory.Exists(localPath))
-                sessionDir = localPath;
-            else
-                throw new DirectoryNotFoundException("Directory 'sessions' not found in expected locations.");
-
-
+            Console.WriteLine($"Using session directory: {sessionDir}");
             foreach (var file in Directory.GetFiles(sessionDir, "*.dat"))
             {
                 // Clear dictionaries at the start of each session
