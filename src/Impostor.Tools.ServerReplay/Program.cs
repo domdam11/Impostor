@@ -224,6 +224,7 @@ namespace Impostor.Tools.ServerReplay
         /// </summary>
         private static async Task ParseSession(BinaryReader reader)
         {
+            var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
             // Read the version of the recording protocol
             var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
             if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
@@ -262,7 +263,7 @@ namespace Impostor.Tools.ServerReplay
                     // Sleep for the entire duration
                     try
                     {
-                        await Task.Delay(Math.Min(milliseconds, 10));
+                        await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
                     }
                     catch (Exception ex)
                     {
@@ -277,7 +278,7 @@ namespace Impostor.Tools.ServerReplay
                     {
                         continue;
                     }
-                    var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
+                    
                     if (totalTimeframe > options.AnnotationIntervalMilliseconds) {
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();

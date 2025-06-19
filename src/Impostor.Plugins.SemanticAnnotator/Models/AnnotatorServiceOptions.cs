@@ -10,5 +10,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
     {
         public Thresholds Thresholds { get; set; }
         public int AnnotationIntervalMilliseconds { get; set; }
+
+        public int ReplayMinWaitMilliseconds { get; set; }
     }
 }
