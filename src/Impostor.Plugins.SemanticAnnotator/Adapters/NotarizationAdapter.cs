@@ -30,13 +30,13 @@ public class NotarizationAdapter : INotarizationService
         // Crea una nuova transazione per l'evento di annotazione
     }
 
-    public async Task DispatchNotarizationTasksAsync()
+    public async Task<List<IEvent>> DispatchNotarizationTasksAsync()
     /*elabora una serie di eventi di gioco attivi e li gestisce in base al tipo*/
     {
         var sessions = _eventCacheManager.GetActiveSessions();
         var semaphore = new SemaphoreSlim(5); // massimo 5 operazioni concorrenti
-        var tasks = new List<Task>();
-
+      
+        var processedEvents = new List<IEvent>();
         foreach (var gameCode in sessions)
         {
             var events = _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
@@ -44,56 +44,60 @@ public class NotarizationAdapter : INotarizationService
             foreach (var ev in events)
             {
                 var assetKey = _eventCacheManager.GetGameSessionUniqueId(gameCode);
-                // Cattura delle variabili nel contesto giusto
-                //tasks.Add(Task.Run(async () =>
-                //{
-                    //await semaphore.WaitAsync();
-                    try
+
+                try
+                {
+                    switch (ev)
                     {
-                        switch (ev)
-                        {
-                            case IGamePlayerLeftEvent gamePlayerLeftEvent:
-                                
-                                await _transactionManager.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
-                                break;
+                        case IGamePlayerLeftEvent gamePlayerLeftEvent:
 
-                            case IGameStartedEvent gameStartedEvent:
-
-                                await _transactionManager.CreateGameSessionAsync(assetKey, "nuova sessione");
-                                var players = _eventCacheManager.GetPlayerList(gameCode);
-                                foreach (var player in players)
-                                {
-                                    await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");
-                                }
+                            await _transactionManager.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
+                            processedEvents.Add(ev);
                             break;
 
-                            case IGameEndedEvent gameEndedEvent:
-                                await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
-                            break;
+                        case IGameStartedEvent gameStartedEvent:
 
-                            case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
-                                await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
-                                break;
-
-                            case IGameCreatedEvent gameCreatedEvent:
+                            await _transactionManager.CreateGameSessionAsync(assetKey, "nuova sessione");
+                            var players = _eventCacheManager.GetPlayerList(gameCode);
+                            foreach (var player in players)
                             {
-                                await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
-                                break;
+                                await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");
                             }
+                            processedEvents.Add(ev);
+                            break;
 
-                            default:
-                                break;
+                        case IGameEndedEvent gameEndedEvent:
+                            await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
+                            processedEvents.Add(ev);
+                            break;
+
+                        case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
+                            await _transactionManager.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
+                            processedEvents.Add(ev);
+                            break;
+
+                        case IGameCreatedEvent gameCreatedEvent:
+                        {
+                            await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
+                            processedEvents.Add(ev);
+                            break;
                         }
+
+                        default:
+                            break;
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, assetKey);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Errore durante l'elaborazione dell'evento {EventType} per il gioco {GameCode}", ev.GetType().Name, assetKey);
+                }
 
             }
+            _eventCacheManager.ClearEventsByGameCodeAsync(gameCode);
+         
         }
 
-        await Task.WhenAll(tasks);
+        return processedEvents;
     }
-        // Attende il completamento di tutte le operazioni
+  
 }

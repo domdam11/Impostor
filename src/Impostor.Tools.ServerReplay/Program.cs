@@ -260,15 +260,6 @@ namespace Impostor.Tools.ServerReplay
                         milliseconds = 0;
                         totalTimeframe = 0;
                     }
-                    // Sleep for the entire duration
-                    try
-                    {
-                        await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
-                    }
-                    catch (Exception ex)
-                    {
-                        totalTimeframe = 0;
-                    }
                     // Interpret the individual packet
                     try
                     {
@@ -278,15 +269,28 @@ namespace Impostor.Tools.ServerReplay
                     {
                         continue;
                     }
-                    
+                    var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
                     if (totalTimeframe > options.AnnotationIntervalMilliseconds) {
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
-                        var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
-                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions());
+                        
+                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions().Where(a=>options.ValidGameCodes.Contains(a)));
 
                         totalTimeframe = 0;
+                        
                     }
+                    try
+                    {
+                        if (gameCacheManager.GetActiveSessions().Where(a => options.ValidGameCodes.Contains(a)).Any())
+                        {
+                            await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        totalTimeframe = 0;
+                    }
+
                 }
             }
         }

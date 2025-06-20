@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
 
 public interface INotarizationService
 {
@@ -10,5 +12,5 @@ public interface INotarizationService
     /// <summary>
     /// Dispatches notarization tasks based on cached game events.
     /// </summary>
-    Task DispatchNotarizationTasksAsync();
+    Task<List<IEvent>> DispatchNotarizationTasksAsync();
 }

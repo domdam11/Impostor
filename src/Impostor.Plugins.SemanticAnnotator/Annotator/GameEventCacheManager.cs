@@ -149,7 +149,17 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 return _gameCache[gameCode].Game.Code+"_"+ _gameCache[gameCode].NumRestarts;
 
             }
-            else return "";
+            else return null;
+        }
+
+        internal void ClearEventsByGameCodeAsync(string gameCode)
+        {
+            if (_gameCache.ContainsKey(gameCode))
+            {
+                _gameCache[gameCode].Events.Clear();
+
+            }
+      
         }
     }
 

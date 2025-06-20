@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Linq;
 using System.Threading.Tasks;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
@@ -65,6 +66,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
         public async Task ProcessAsync(string gameCode)
         {
+
             var swTotal = Stopwatch.StartNew();
             var annotationKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var isInMatch = _cacheManager.IsInMatch(gameCode);
@@ -125,16 +127,21 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 if (_notarizationEnabled)
                 {
                     var swNot = Stopwatch.StartNew();
-                    _logger.LogInformation("[DSS] Solo notarizzazione per {GameCode}...", annotationKey);
-                    await _notarization.DispatchNotarizationTasksAsync();
+                   
+                    var listEvents = await _notarization.DispatchNotarizationTasksAsync();
                     swNot.Stop();
-                    double notMs = swNot.Elapsed.TotalMilliseconds;
-                    NotarizationDuration.Record(notMs);
-                    _notarizationMin = Math.Min(_notarizationMin, notMs);
-                    _notarizationMax = Math.Max(_notarizationMax, notMs);
-                    _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                    if (listEvents.Any())
+                    {
+                        double notMs = swNot.Elapsed.TotalMilliseconds;
+                        NotarizationDuration.Record(notMs);
+                        _notarizationMin = Math.Min(_notarizationMin, notMs);
+                        _notarizationMax = Math.Max(_notarizationMax, notMs);
+
+                        _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                    }
                 }
             }
+
         }
 
         public async Task ProcessMultipleAsync(IEnumerable<string> gameCodes)

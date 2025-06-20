@@ -320,7 +320,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                         var coordsPlayer = movementEvent.Position;
                         var mov = new CustomMovement(coordsPlayer, movementEvent.Timestamp);
                         // add movement to track path of the player
-                        player.Movements.Add(mov);
+                        
+                        player?.Movements.Add(mov);
 
                         break;
 
