@@ -112,8 +112,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 {
                     if (GameEnded)
                     {
-                        //annotate cause game is ended
-                        annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
+                        if (CallCount > 0)
+                        {
+                            //annotate cause game is ended
+                            annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
+                        }
                     }
                     else 
                     //something to annotate

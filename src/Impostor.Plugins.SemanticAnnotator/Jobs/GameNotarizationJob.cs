@@ -26,7 +26,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
             _logger.LogInformation("[GameNotarizationJob] Esecuzione avviata.");
 
             // 1. Notarizza gli eventi di gioco registrati nella cache
-            await _notarizationService.DispatchNotarizationTasksAsync();
+            await _notarizationService.DispatchNotarizationTasksAsync("");
 
             // 2. Notarizza le annotazioni semantiche pronte
             while (_resultBuffer.TryGetNext(out var gameCode, out var result))

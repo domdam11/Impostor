@@ -70,6 +70,22 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             var swTotal = Stopwatch.StartNew();
             var annotationKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var isInMatch = _cacheManager.IsInMatch(gameCode);
+            if (_notarizationEnabled)
+            {
+                var swNot = Stopwatch.StartNew();
+
+                var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode);
+                swNot.Stop();
+                if (listEvents.Any())
+                {
+                    double notMs = swNot.Elapsed.TotalMilliseconds;
+                    NotarizationDuration.Record(notMs);
+                    _notarizationMin = Math.Min(_notarizationMin, notMs);
+                    _notarizationMax = Math.Max(_notarizationMax, notMs);
+
+                    _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                }
+            }
             if (isInMatch)
             {
                 var swAnnot = Stopwatch.StartNew();
@@ -124,22 +140,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             }
             else
             {
-                if (_notarizationEnabled)
-                {
-                    var swNot = Stopwatch.StartNew();
-                   
-                    var listEvents = await _notarization.DispatchNotarizationTasksAsync();
-                    swNot.Stop();
-                    if (listEvents.Any())
-                    {
-                        double notMs = swNot.Elapsed.TotalMilliseconds;
-                        NotarizationDuration.Record(notMs);
-                        _notarizationMin = Math.Min(_notarizationMin, notMs);
-                        _notarizationMax = Math.Max(_notarizationMax, notMs);
-
-                        _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
-                    }
-                }
+                _cacheManager.ClearEventsByGameCodeAsync(gameCode);
             }
 
         }

@@ -106,7 +106,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].Events;
+                return _gameCache[gameCode].Events.ToList();
 
             }
             else return Enumerable.Empty<IEvent>();
@@ -136,7 +136,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].Game.Code + "_" + _gameCache[gameCode].CallCount;
+                var gameSessionId = GetGameSessionUniqueId(gameCode);
+                return gameSessionId + "_" + _gameCache[gameCode].CallCount;
 
             }
             else return "";

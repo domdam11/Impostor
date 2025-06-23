@@ -1,12 +1,14 @@
-using Impostor.Api.Events;
-using Impostor.Plugins.SemanticAnnotator.Annotator;
-using Impostor.Plugins.SemanticAnnotator.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Impostor.Api.Events;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TransactionHandler.Tasks;
 
 public class NotarizationAdapter : INotarizationService
@@ -23,21 +25,21 @@ public class NotarizationAdapter : INotarizationService
         _logger = logger;
     }
 
-    public async Task NotifyAsync(string gameId, string eventId, string annotatedReasoning, string metadata)
+    public async Task NotifyAsync(string gameSessionId, string eventId, string annotatedReasoning, string metadata)
     /*notifica un evento creando una nuova transazione tramite il metodo createeventasync del gestore di transazioni*/
     {
-        await _transactionManager.CreateEventAsync(gameId, eventId, annotatedReasoning, metadata);
+        await _transactionManager.CreateEventAsync(gameSessionId, eventId, annotatedReasoning, metadata);
         // Crea una nuova transazione per l'evento di annotazione
     }
 
-    public async Task<List<IEvent>> DispatchNotarizationTasksAsync()
+    public async Task<List<IEvent>> DispatchNotarizationTasksAsync(string gameCode)
     /*elabora una serie di eventi di gioco attivi e li gestisce in base al tipo*/
     {
-        var sessions = _eventCacheManager.GetActiveSessions();
-        var semaphore = new SemaphoreSlim(5); // massimo 5 operazioni concorrenti
+        //var sessions = _eventCacheManager.GetActiveSessions();
+        //var semaphore = new SemaphoreSlim(5); // massimo 5 operazioni concorrenti
       
         var processedEvents = new List<IEvent>();
-        foreach (var gameCode in sessions)
+        //foreach (var gameCode in sessions)
         {
             var events = _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
 
@@ -93,8 +95,7 @@ public class NotarizationAdapter : INotarizationService
                 }
 
             }
-            _eventCacheManager.ClearEventsByGameCodeAsync(gameCode);
-         
+ 
         }
 
         return processedEvents;

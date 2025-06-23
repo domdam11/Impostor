@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
+using Coravel;
+using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
 using Impostor.Api.Games.Managers;
@@ -11,13 +15,18 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net;
 using Impostor.Api.Net.Custom;
+using Impostor.Api.Net.Manager;
 using Impostor.Api.Net.Messages;
 using Impostor.Api.Net.Messages.C2S;
-using Impostor.Api.Net.Manager;
 using Impostor.Api.Utils;
-using Impostor.Hazel.Abstractions;
 using Impostor.Hazel;
+using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Extensions;
+// Import namespaces for accessing the Semantic Annotator plugin
+using Impostor.Plugins.SemanticAnnotator;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Server;
 using Impostor.Server.Events;
 using Impostor.Server.Net;
@@ -30,17 +39,9 @@ using Impostor.Tools.ServerReplay.Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Serilog;
 using ILogger = Serilog.ILogger;
-// Import namespaces for accessing the Semantic Annotator plugin
-using Impostor.Plugins.SemanticAnnotator;
-using Impostor.Plugins.SemanticAnnotator.Annotator;
-using Coravel;
-using Impostor.Plugins.SemanticAnnotator.Ports;
-using Impostor.Api.Config;
-using System.Linq;
-using Impostor.Plugins.SemanticAnnotator.Models;
-using Microsoft.Extensions.Options;
 
 namespace Impostor.Tools.ServerReplay
 {
@@ -205,6 +206,7 @@ namespace Impostor.Tools.ServerReplay
 
             // Add Coravel's scheduler services
             services.AddScheduler();
+
             var serviceProvider = services.BuildServiceProvider();
             // Crea un'istanza di SemanticAnnotatorPluginStartup iniettando IConfiguration
             var semanticAnnotatorPluginStartup = ActivatorUtilities.CreateInstance<SemanticAnnotatorPluginStartup>(serviceProvider);
@@ -283,7 +285,7 @@ namespace Impostor.Tools.ServerReplay
                     {
                         if (gameCacheManager.GetActiveSessions().Where(a => options.ValidGameCodes.Contains(a)).Any())
                         {
-                            await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
+                            //Thread.Sleep(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
                         }
                     }
                     catch (Exception ex)
@@ -329,6 +331,7 @@ namespace Impostor.Tools.ServerReplay
 
                     // 3. Store the connection in the dictionary
                     Connections.Add(clientId, connection);
+                    
                     break;
                 }
                 case RecordedPacketType.Disconnect:

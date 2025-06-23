@@ -12,7 +12,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public static DateTimeOffset TimeStamp { get;  set; }
         public static void CsvGenerator(string gameId, string timeStamp, string player, string positionX, string positionY)
         {
-            if(string.IsNullOrEmpty(player))
+            /*if(string.IsNullOrEmpty(player))
             {
                 return;
             }
@@ -31,7 +31,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 // Write the rows with the provided values
                 writer.WriteLine($"{gameId};{timeStamp};{player};{positionX};{positionY}");
-            }
+            }*/
 
             // Confirm file update or creation
             //Console.WriteLine($"CSV file '{filePath}' has been updated or created.");
@@ -40,7 +40,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public static void CsvGeneratorStartGame(string gameId, string timeStamp)
         {
             // Define the file path
-            string filePath = "movement_data_" + gameId + ".csv";
+            /*string filePath = "movement_data_" + gameId + ".csv";
 
             // Write or append data to the CSV file
             using (StreamWriter writer = System.IO.File.Exists(filePath) ? System.IO.File.AppendText(filePath) : new StreamWriter(filePath))
@@ -57,13 +57,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
 
             // Confirm file update or creation
-            //Console.WriteLine($"CSV file '{filePath}' has been updated or created.");
+            //Console.WriteLine($"CSV file '{filePath}' has been updated or created.");*/
         }
 
         public static void CsvGeneratorEndGame(string gameId, string timeStamp)
         {
             // Define the file path
-            string filePath = "movement_data_" + gameId + ".csv";
+            /*string filePath = "movement_data_" + gameId + ".csv";
 
             // Write or append data to the CSV file
             using (StreamWriter writer = System.IO.File.Exists(filePath) ? System.IO.File.AppendText(filePath) : new StreamWriter(filePath))
@@ -80,7 +80,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
 
             // Confirm file update or creation
-            //Console.WriteLine($"CSV file '{filePath}' has been updated or created.");
+            //Console.WriteLine($"CSV file '{filePath}' has been updated or created.");*/
         }
     }
 }
