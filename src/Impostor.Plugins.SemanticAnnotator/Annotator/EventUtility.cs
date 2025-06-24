@@ -23,6 +23,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public DateTimeOffset CurrentTimestamp { get; private set; }
         public IGame Game { get; set; }
         public List<IEvent> Events;
+        public List<IEvent> EventsOnlyNotarized;
         public Dictionary<byte, PlayerStruct> PlayerStates;
         public string GameState;
 
@@ -36,6 +37,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             Game = game;
             Events = new List<IEvent>();
+            EventsOnlyNotarized = new List<IEvent>();
             PlayerStates = new Dictionary<byte, PlayerStruct>();
             GameState = "none";
             NumRestarts = numRestarts;
@@ -172,6 +174,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 //handle movement event
                 var movementStruct = new CustomPlayerMovementEvent(movEvent.Game, movEvent.ClientPlayer, movEvent.PlayerControl, CurrentTimestamp);
                 Events.Add(movementStruct);
+            }
+            else if(newEvent is IGameCreatedEvent || newEvent is IGameStartedEvent || newEvent is IGamePlayerLeftEvent || newEvent is IGamePlayerJoinedEvent || newEvent is IGameEndedEvent)
+            {
+                EventsOnlyNotarized.Add(newEvent);
             }
             else
             {

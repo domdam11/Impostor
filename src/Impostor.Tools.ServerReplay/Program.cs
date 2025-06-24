@@ -25,6 +25,7 @@ using Impostor.Hazel.Extensions;
 // Import namespaces for accessing the Semantic Annotator plugin
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Application;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Server;
@@ -152,6 +153,7 @@ namespace Impostor.Tools.ServerReplay
             // Log total processing time
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             Logger.Information($"Took {elapsedMilliseconds}ms.");
+
         }
 
         /// <summary>
@@ -172,6 +174,8 @@ namespace Impostor.Tools.ServerReplay
             {
                 IsReplay = true,
             });
+
+            services.AddSingleton<TaskQueue>();
 
             // Add a FakeDateTimeProvider to handle artificial time management
             services.AddSingleton<FakeDateTimeProvider>();
@@ -203,9 +207,6 @@ namespace Impostor.Tools.ServerReplay
             services.AddHazel();
             services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
             services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
-
-            // Add Coravel's scheduler services
-            services.AddScheduler();
 
             var serviceProvider = services.BuildServiceProvider();
             // Crea un'istanza di SemanticAnnotatorPluginStartup iniettando IConfiguration
@@ -285,7 +286,7 @@ namespace Impostor.Tools.ServerReplay
                     {
                         if (gameCacheManager.GetActiveSessions().Where(a => options.ValidGameCodes.Contains(a)).Any())
                         {
-                            //Thread.Sleep(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
+                            //await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
                         }
                     }
                     catch (Exception ex)
@@ -295,6 +296,10 @@ namespace Impostor.Tools.ServerReplay
 
                 }
             }
+            var taskQueue = _serviceProvider.GetRequiredService<TaskQueue>();
+            await taskQueue.WaitForCompletionAsync();
+
+            Logger.Information("All queued tasks completed.");
         }
 
         /// <summary>

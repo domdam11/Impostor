@@ -70,6 +70,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         {
             // Coravel
             services.AddScheduler();
+            services.AddQueue();
 
             services.AddSingleton(_configuration);
 

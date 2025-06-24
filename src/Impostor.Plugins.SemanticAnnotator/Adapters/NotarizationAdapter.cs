@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Games;
 using Impostor.Api.Innersloth;
+using Impostor.Api.Net;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Logging;
@@ -32,21 +33,13 @@ public class NotarizationAdapter : INotarizationService
         // Crea una nuova transazione per l'evento di annotazione
     }
 
-    public async Task<List<IEvent>> DispatchNotarizationTasksAsync(string gameCode)
+    public async Task<List<IEvent>> DispatchNotarizationTasksAsync(string gameCode, string assetKey, IEnumerable<IEvent> events, IEnumerable<IClientPlayer> players)
     /*elabora una serie di eventi di gioco attivi e li gestisce in base al tipo*/
     {
-        //var sessions = _eventCacheManager.GetActiveSessions();
-        //var semaphore = new SemaphoreSlim(5); // massimo 5 operazioni concorrenti
-      
         var processedEvents = new List<IEvent>();
-        //foreach (var gameCode in sessions)
         {
-            var events = _eventCacheManager.GetEventsByGameCodeAsync(gameCode);
-
             foreach (var ev in events)
             {
-                var assetKey = _eventCacheManager.GetGameSessionUniqueId(gameCode);
-
                 try
                 {
                     switch (ev)
@@ -60,7 +53,7 @@ public class NotarizationAdapter : INotarizationService
                         case IGameStartedEvent gameStartedEvent:
 
                             await _transactionManager.CreateGameSessionAsync(assetKey, "nuova sessione");
-                            var players = _eventCacheManager.GetPlayerList(gameCode);
+                            
                             foreach (var player in players)
                             {
                                 await _transactionManager.AddPlayerAsync(assetKey, player.Client.Name, "");

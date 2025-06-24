@@ -24,7 +24,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Adapters
             try
             {
                 var content = new StringContent(annotations, Encoding.UTF8);
-                var response = await _httpClient.PostAsync("update", content);
+                var response = await _httpClient.PostAsync("subgraph", content);
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadAsStringAsync();

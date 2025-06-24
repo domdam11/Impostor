@@ -48,6 +48,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 {
                     Game = game,
                     Events = new List<IEvent>(),
+                    EventsOnlyNotarized = new List<IEvent>(),
                     PlayerStates = new Dictionary<byte, PlayerStruct>(),
                     GameState = "none",
                     NumRestarts = 0,
@@ -112,6 +113,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             else return Enumerable.Empty<IEvent>();
         }
 
+        public IEnumerable<IEvent> GetEventsOnlyNotarizedByGameCodeAsync(string gameCode)
+        {
+            if (_gameCache.ContainsKey(gameCode))
+            {
+                return _gameCache[gameCode].EventsOnlyNotarized.ToList();
+
+            }
+            else return Enumerable.Empty<IEvent>();
+        }
+
         public bool IsInMatch(string gameCode)
         {
             if (_gameCache.ContainsKey(gameCode))
@@ -126,7 +137,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                return _gameCache[gameCode].Game.Players;
+
+                return _gameCache[gameCode].Game?.Players?.ToList();
 
             }
             else return new List<IClientPlayer>();
@@ -153,12 +165,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             else return null;
         }
 
-        internal void ClearEventsByGameCodeAsync(string gameCode)
+        internal void ClearEventsOnlyNotarizedByGameCodeAsync(string gameCode)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
-                _gameCache[gameCode].Events.Clear();
-
+                _gameCache[gameCode].EventsOnlyNotarized.Clear();
             }
       
         }

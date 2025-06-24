@@ -771,8 +771,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     var ExactFake = CowlWrapper.CreateCardTypeExactly(objPropFake, 0, instancesToRelease);
                     player.objCardRestrictionsPlayer.Add(ExactFake);
                 }
-                var dataQuantHasCoordinates = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim-1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
-                player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
+                //var dataQuantHasCoordinates = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasCoordinates", new[] { player.Movements[dim-1].Position.ToString() }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+                //player.dataQuantRestrictionsPlayer.Add(dataQuantHasCoordinates);
                 var objPropRestrictionNPlayers = CowlWrapper.CreateAllValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { playerClass }, instancesToRelease);
                 var propertyRestrictionNPlayers = CowlWrapper.CreateObjPropFromIri("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", instancesToRelease);
                 var ExactRestrictionNPlayers = CowlWrapper.CreateCardTypeExactly(propertyRestrictionNPlayers, numeroPlayerVivi, instancesToRelease);
@@ -851,7 +851,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             string absoluteHeaderDirectory = Path.Combine(folderPath, $"amongus{numAnnot}.owl");
             var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory);
             cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
-            cowl_manager.CowlManagerWritePath(manager, onto, string3);
+            //cowl_manager.CowlManagerWritePath(manager, onto, string3);
 
             // Write the ontology to a string
             UVec_char chars = uvec_builtin.UvecChar();

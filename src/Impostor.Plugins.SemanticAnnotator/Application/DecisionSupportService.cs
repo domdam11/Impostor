@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using Coravel.Queuing.Interfaces;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
@@ -50,10 +53,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             Meter.CreateObservableGauge("dss_total_duration_max_ms", () => _processMax);
         }
 
+        private TaskQueue _queue;
+
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
-                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager)
+                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, TaskQueue queue)
         {
             _annotator = annotator;
             _argumentation = argumentation;
@@ -62,6 +67,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             _notarizationEnabled = notarizationOptions.Value.Enabled;
             _argumentationEnabled = argumentationOptions.Value.Enabled;
             _cacheManager = cacheManager;
+            _queue = queue;
         }
 
         public async Task ProcessAsync(string gameCode)
@@ -70,29 +76,54 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             var swTotal = Stopwatch.StartNew();
             var annotationKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var isInMatch = _cacheManager.IsInMatch(gameCode);
+            var annotationEventId = _cacheManager.GetAnnotationEventId(gameCode);
             if (_notarizationEnabled)
             {
-                var swNot = Stopwatch.StartNew();
-
-                var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode);
-                swNot.Stop();
-                if (listEvents.Any())
+                var events = _cacheManager.GetEventsOnlyNotarizedByGameCodeAsync(gameCode);
+                _cacheManager.ClearEventsOnlyNotarizedByGameCodeAsync(gameCode);
+                var assetKey = _cacheManager.GetGameSessionUniqueId(gameCode);
+                var players = _cacheManager.GetPlayerList(gameCode);
+                if (events.Any())
                 {
-                    double notMs = swNot.Elapsed.TotalMilliseconds;
-                    NotarizationDuration.Record(notMs);
-                    _notarizationMin = Math.Min(_notarizationMin, notMs);
-                    _notarizationMax = Math.Max(_notarizationMax, notMs);
+                    await _queue.EnqueueAsync(async () =>
+                    {
+                        var swNot = Stopwatch.StartNew();
 
-                    _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                        try
+                        {
+
+                            var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode, assetKey, events, players);
+                            swNot.Stop();
+
+                            if (listEvents.Any())
+                            {
+                                var notMs = swNot.Elapsed.TotalMilliseconds;
+                                NotarizationDuration.Record(notMs);
+                                _notarizationMin = Math.Min(_notarizationMin, notMs);
+                                _notarizationMax = Math.Max(_notarizationMax, notMs);
+
+                                _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                            }
+                            else
+                            {
+                                _logger.LogDebug("[DSS::NOTARIZATION ONLY] {GameCode} - Nessun evento da processare", gameCode);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            swNot.Stop();
+                            _logger.LogError(ex, "[DSS::NOTARIZATION ONLY] Errore nella notarizzazione asincrona per {GameCode}", gameCode);
+                        }
+                    });
                 }
             }
             if (isInMatch)
             {
                 var swAnnot = Stopwatch.StartNew();
-                string owl = await _annotator.AnnotateAsync(gameCode);
+                var owl = await _annotator.AnnotateAsync(gameCode);
 
                 swAnnot.Stop();
-                double annotMs = swAnnot.Elapsed.TotalMilliseconds;
+                var annotMs = swAnnot.Elapsed.TotalMilliseconds;
                 AnnotationDuration.Record(annotMs);
                 _annotationMin = Math.Min(_annotationMin, annotMs);
                 _annotationMax = Math.Max(_annotationMax, annotMs);
@@ -107,22 +138,33 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                         var swArg = Stopwatch.StartNew();
                         result = await _argumentation.SendAnnotationsAsync(owl);
                         swArg.Stop();
-                        double argMs = swArg.Elapsed.TotalMilliseconds;
+                        var argMs = swArg.Elapsed.TotalMilliseconds;
                         ArgumentationDuration.Record(argMs);
                         _argumentationMin = Math.Min(_argumentationMin, argMs);
                         _argumentationMax = Math.Max(_argumentationMax, argMs);
                         _logger.LogInformation("[DSS::ARGUMENTATION] {GameCode} - Duration: {Duration}ms", annotationKey, argMs);
-
+       
                         if (_notarizationEnabled)
                         {
-                            var swNot = Stopwatch.StartNew();
-                            await _notarization.NotifyAsync(annotationKey, _cacheManager.GetAnnotationEventId(gameCode), owl, result);
-                            swNot.Stop();
-                            double notMs = swNot.Elapsed.TotalMilliseconds;
-                            NotarizationDuration.Record(notMs);
-                            _notarizationMin = Math.Min(_notarizationMin, notMs);
-                            _notarizationMax = Math.Max(_notarizationMax, notMs);
-                            _logger.LogInformation("[DSS::NOTARIZATION] {GameCode} - Duration: {Duration}ms", annotationKey, notMs);
+                            await _queue.EnqueueAsync(async () =>
+                            {
+                                var swNot = Stopwatch.StartNew();
+                                try
+                                {
+                                    await _notarization.NotifyAsync(annotationKey, annotationEventId, owl, result);
+                                    swNot.Stop();
+                                    var notMs = swNot.Elapsed.TotalMilliseconds;
+                                    NotarizationDuration.Record(notMs);
+                                    _notarizationMin = Math.Min(_notarizationMin, notMs);
+                                    _notarizationMax = Math.Max(_notarizationMax, notMs);
+                                    _logger.LogInformation("[DSS::NOTARIZATION] {GameCode} - Duration: {Duration}ms", annotationKey, notMs);
+                                }
+                                catch (Exception ex)
+                                {
+                                    swNot.Stop();
+                                    _logger.LogError(ex, "[DSS::NOTARIZATION] Errore durante NotifyAsync per {GameCode}", annotationKey);
+                                }
+                            });
                         }
                     }
                 }
@@ -131,18 +173,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                     _logger.LogWarning("[DSS::ANNOTATION] {GameCode} - Annotazione non generata", annotationKey);
                 }
                 swTotal.Stop();
-                double totalMs = swTotal.Elapsed.TotalMilliseconds;
+                var totalMs = swTotal.Elapsed.TotalMilliseconds;
                 ProcessDuration.Record(totalMs);
                 _processMin = Math.Min(_processMin, totalMs);
                 _processMax = Math.Max(_processMax, totalMs);
                 _logger.LogInformation("[DSS::TOTAL] {GameCode} - Total Duration: {Duration}ms", annotationKey, totalMs);
                 Console.WriteLine(result);
             }
-            else
-            {
-                _cacheManager.ClearEventsByGameCodeAsync(gameCode);
-            }
-
         }
 
         public async Task ProcessMultipleAsync(IEnumerable<string> gameCodes)
@@ -153,4 +190,50 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             }
         }
     }
+
+    public class TaskQueue
+    {
+        private readonly Channel<Func<Task>> _channel = Channel.CreateUnbounded<Func<Task>>();
+        private int _runningTasks = 0;
+
+        public TaskQueue()
+        {
+            Task.Run(ProcessQueueAsync);
+        }
+
+        public async Task EnqueueAsync(Func<Task> task)
+        {
+            await _channel.Writer.WriteAsync(task);
+        }
+
+        public void Complete() => _channel.Writer.Complete();
+
+        private async Task ProcessQueueAsync()
+        {
+            await foreach (var task in _channel.Reader.ReadAllAsync())
+            {
+                Interlocked.Increment(ref _runningTasks);
+                try
+                {
+                    await task();
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref _runningTasks);
+                }
+
+                // ⏱️ Attende 1 secondo prima di passare al task successivo
+                await Task.Delay(100);
+            }
+        }
+
+        public async Task WaitForCompletionAsync()
+        {
+            while (!_channel.Reader.Completion.IsCompleted || Volatile.Read(ref _runningTasks) > 0)
+            {
+                await Task.Delay(100);
+            }
+        }
+    }
+
 }
