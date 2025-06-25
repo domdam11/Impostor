@@ -27,22 +27,42 @@ namespace Impostor.Plugins.SemanticAnnotator
     public static class PrometheusExporterServer
     {
         private static bool _started;
+
         public static void Start()
         {
             if (!_started)
             {
                 var builder = WebApplication.CreateBuilder();
-                builder.Services.AddOpenTelemetry()
-                    .WithMetrics(metrics =>
-                    {
-                        metrics
-                            .AddMeter("SemanticAnnotator.DSS")
-                            .AddPrometheusExporter();
-                    });
+
+                builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
+                {
+                    var histogramBoundaries = new double[] { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
+                    var histogramBoundariesHigh = new double[] { 0, 500, 1000, 1500, 2000, 2500, 3000 };
+                    metrics
+                        .AddMeter("SemanticAnnotator.DSS")
+                        .AddView("dss_total_duration_ms", new ExplicitBucketHistogramConfiguration
+                        {
+                            Boundaries = histogramBoundaries
+                        })
+                        .AddView("dss_annotation_duration_ms", new ExplicitBucketHistogramConfiguration
+                        {
+                            Boundaries = histogramBoundaries
+                        })
+                        .AddView("dss_argumentation_duration_ms", new ExplicitBucketHistogramConfiguration
+                        {
+                            Boundaries = histogramBoundaries
+                        })
+                        .AddView("dss_notarization_duration_ms", new ExplicitBucketHistogramConfiguration
+                        {
+                            Boundaries = histogramBoundariesHigh
+                        })
+                        .AddPrometheusExporter();
+                });
+
 
                 var app = builder.Build();
-                app.MapPrometheusScrapingEndpoint(); // Espone /metrics
-                app.RunAsync(); // Non blocca il thread
+                app.MapPrometheusScrapingEndpoint(); // espone /metrics
+                app.RunAsync(); // non blocca il thread
                 _started = true;
             }
         }
@@ -68,9 +88,6 @@ namespace Impostor.Plugins.SemanticAnnotator
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Coravel
-            services.AddScheduler();
-            services.AddQueue();
 
             services.AddSingleton(_configuration);
 

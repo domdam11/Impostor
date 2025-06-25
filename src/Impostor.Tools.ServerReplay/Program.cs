@@ -145,7 +145,7 @@ namespace Impostor.Tools.ServerReplay
                 using (var reader = new BinaryReader(stream))
                 {
                     // Begin parsing the session
-                    await ParseSession(reader);
+                    await ParseSessionAsync(reader);
                 }
 
             }
@@ -153,7 +153,7 @@ namespace Impostor.Tools.ServerReplay
             // Log total processing time
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             Logger.Information($"Took {elapsedMilliseconds}ms.");
-
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Impostor.Tools.ServerReplay
                 IsReplay = true,
             });
 
-            services.AddSingleton<TaskQueue>();
+            services.AddSingleton<PerKeyTaskQueue>();
 
             // Add a FakeDateTimeProvider to handle artificial time management
             services.AddSingleton<FakeDateTimeProvider>();
@@ -225,7 +225,7 @@ namespace Impostor.Tools.ServerReplay
         /// <summary>
         /// Parses the entire session (.dat file)
         /// </summary>
-        private static async Task ParseSession(BinaryReader reader)
+        private static async Task ParseSessionAsync(BinaryReader reader)
         {
             var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
             // Read the version of the recording protocol
@@ -296,10 +296,13 @@ namespace Impostor.Tools.ServerReplay
 
                 }
             }
-            var taskQueue = _serviceProvider.GetRequiredService<TaskQueue>();
-            await taskQueue.WaitForCompletionAsync();
+
+            var queue = _serviceProvider.GetRequiredService<PerKeyTaskQueue>();
+            queue.MarkEnqueueDone();
+            await queue.WaitForCompletionAsync();
 
             Logger.Information("All queued tasks completed.");
+
         }
 
         /// <summary>

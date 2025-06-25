@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
@@ -53,12 +54,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             Meter.CreateObservableGauge("dss_total_duration_max_ms", () => _processMax);
         }
 
-        private TaskQueue _queue;
+        private readonly PerKeyTaskQueue _queue;
 
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
-                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, TaskQueue queue)
+                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, PerKeyTaskQueue queue)
         {
             _annotator = annotator;
             _argumentation = argumentation;
@@ -77,15 +78,16 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             var annotationKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var isInMatch = _cacheManager.IsInMatch(gameCode);
             var annotationEventId = _cacheManager.GetAnnotationEventId(gameCode);
+            var assetKey = _cacheManager.GetGameSessionUniqueId(gameCode);
+            var players = _cacheManager.GetPlayerList(gameCode);
             if (_notarizationEnabled)
             {
                 var events = _cacheManager.GetEventsOnlyNotarizedByGameCodeAsync(gameCode);
                 _cacheManager.ClearEventsOnlyNotarizedByGameCodeAsync(gameCode);
-                var assetKey = _cacheManager.GetGameSessionUniqueId(gameCode);
-                var players = _cacheManager.GetPlayerList(gameCode);
+
                 if (events.Any())
                 {
-                    await _queue.EnqueueAsync(async () =>
+                    await _queue.EnqueueAsync(assetKey, async () =>
                     {
                         var swNot = Stopwatch.StartNew();
 
@@ -146,7 +148,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
        
                         if (_notarizationEnabled)
                         {
-                            await _queue.EnqueueAsync(async () =>
+                            await _queue.EnqueueAsync(assetKey, async () =>
                             {
                                 var swNot = Stopwatch.StartNew();
                                 try
@@ -191,48 +193,57 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         }
     }
 
-    public class TaskQueue
+    public class PerKeyTaskQueue
     {
-        private readonly Channel<Func<Task>> _channel = Channel.CreateUnbounded<Func<Task>>();
-        private int _runningTasks = 0;
-
-        public TaskQueue()
+        private class TaskQueue
         {
-            Task.Run(ProcessQueueAsync);
-        }
+            private readonly Channel<Func<Task>> _channel;
+            public ChannelWriter<Func<Task>> Writer => _channel.Writer;
+            public Task ProcessingTask { get; }
 
-        public async Task EnqueueAsync(Func<Task> task)
-        {
-            await _channel.Writer.WriteAsync(task);
-        }
-
-        public void Complete() => _channel.Writer.Complete();
-
-        private async Task ProcessQueueAsync()
-        {
-            await foreach (var task in _channel.Reader.ReadAllAsync())
+            public TaskQueue()
             {
-                Interlocked.Increment(ref _runningTasks);
-                try
-                {
-                    await task();
-                }
-                finally
-                {
-                    Interlocked.Decrement(ref _runningTasks);
-                }
-
-                // ⏱️ Attende 1 secondo prima di passare al task successivo
-                await Task.Delay(100);
+                _channel = Channel.CreateUnbounded<Func<Task>>();
+                ProcessingTask = Task.Run(ProcessQueueAsync);
             }
+
+            private async Task ProcessQueueAsync()
+            {
+                await foreach (var task in _channel.Reader.ReadAllAsync())
+                {
+                    try
+                    {
+                        await task();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Error in queued task: {ex}");
+                    }
+
+                    await Task.Delay(1000); // ⏱️ Attesa di 1s tra task della stessa chiave
+                }
+            }
+
+            public void Complete() => _channel.Writer.Complete();
+        }
+
+        private readonly ConcurrentDictionary<string, TaskQueue> _queues = new();
+
+        public async Task EnqueueAsync(string assetKey, Func<Task> task)
+        {
+            var queue = _queues.GetOrAdd(assetKey, _ => new TaskQueue());
+            await queue.Writer.WriteAsync(task);
+        }
+
+        public void MarkEnqueueDone()
+        {
+            foreach (var queue in _queues.Values)
+                queue.Complete();
         }
 
         public async Task WaitForCompletionAsync()
         {
-            while (!_channel.Reader.Completion.IsCompleted || Volatile.Read(ref _runningTasks) > 0)
-            {
-                await Task.Delay(100);
-            }
+            await Task.WhenAll(_queues.Values.Select(q => q.ProcessingTask));
         }
     }
 
