@@ -299,9 +299,9 @@ namespace Impostor.Tools.ServerReplay
 
             var queue = _serviceProvider.GetRequiredService<PerKeyTaskQueue>();
             Logger.Information("Wait for queue drained");
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
-            await queue.WaitUntilQueueIsDrainedAsync("argumentation", cts.Token);
-            await queue.WaitForCompletionAsync();
+            await queue.WaitUntilAllQueuesAreDrainedAsync();
+            // clean queues
+            queue.CleanupDrainedQueues();
 
             Logger.Information("All queued tasks completed.");
 

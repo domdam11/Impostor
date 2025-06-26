@@ -208,25 +208,19 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             }
         }
     }
-
     public class PerKeyTaskQueue
     {
         private class TaskQueue
         {
             private readonly Channel<Func<Task>> _channel;
-            private int _pendingTasks = 0;
-
             public ChannelWriter<Func<Task>> Writer => _channel.Writer;
             public Task ProcessingTask { get; }
 
+            private int _pendingTasks = 0;
+
             public TaskQueue()
             {
-                _channel = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions
-                {
-                    SingleReader = true,
-                    SingleWriter = false
-                });
-
+                _channel = Channel.CreateUnbounded<Func<Task>>();
                 ProcessingTask = Task.Run(ProcessQueueAsync);
             }
 
@@ -248,32 +242,18 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                         Interlocked.Decrement(ref _pendingTasks);
                     }
 
-                    await Task.Delay(50); // Throttling tra task serializzati
+                    await Task.Delay(50); // attesa tra task
                 }
             }
 
-            public void Complete() => _channel.Writer.TryComplete();
-
-            public bool IsCompleted => _channel.Reader.Completion.IsCompleted;
-
             public async Task<bool> IsDrainedAsync(CancellationToken cancellationToken = default)
             {
-                if (_pendingTasks != 0)
-                    return false;
-
-                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                timeoutCts.CancelAfter(TimeSpan.FromMilliseconds(200)); // timeout interno
-
-                try
+                while (_pendingTasks > 0)
                 {
-                    var hasData = await _channel.Reader.WaitToReadAsync(timeoutCts.Token);
-                    return !hasData;
+                    await Task.Delay(25, cancellationToken);
                 }
-                catch (OperationCanceledException)
-                {
-                    // Timeout → consideriamo drenata
-                    return true;
-                }
+
+                return true;
             }
         }
 
@@ -282,49 +262,53 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         public async Task EnqueueAsync(string assetKey, Func<Task> task)
         {
             var queue = _queues.GetOrAdd(assetKey, _ => new TaskQueue());
-
-            if (!queue.Writer.TryWrite(task))
-            {
-                throw new InvalidOperationException($"Cannot enqueue task for key '{assetKey}': channel is closed.");
-            }
-
-            await Task.CompletedTask;
-        }
-
-        public void MarkEnqueueDone()
-        {
-            foreach (var queue in _queues.Values)
-            {
-                queue.Complete();
-            }
-        }
-
-        public async Task WaitForCompletionAsync()
-        {
-            await Task.WhenAll(_queues.Values.Select(q => q.ProcessingTask));
+            await queue.Writer.WriteAsync(task);
         }
 
         public async Task WaitUntilQueueIsDrainedAsync(string assetKey, CancellationToken cancellationToken = default)
         {
             if (_queues.TryGetValue(assetKey, out var queue))
             {
-                while (true)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        break;
-
-                    if (await queue.IsDrainedAsync(cancellationToken))
-                        break;
-
-                    await Task.Delay(50, cancellationToken);
-                }
+                await queue.IsDrainedAsync(cancellationToken);
             }
         }
 
-        public bool IsQueueCompleted(string assetKey)
+        public async Task WaitUntilAllQueuesAreDrainedAsync(CancellationToken cancellationToken = default)
         {
-            return _queues.TryGetValue(assetKey, out var queue) && queue.IsCompleted;
+            while (true)
+            {
+                bool allDrained = true;
+
+                foreach (var kvp in _queues)
+                {
+                    if (!await kvp.Value.IsDrainedAsync(cancellationToken))
+                    {
+                        allDrained = false;
+                        break;
+                    }
+                }
+
+                if (allDrained || cancellationToken.IsCancellationRequested)
+                    break;
+
+                await Task.Delay(50, cancellationToken);
+            }
+        }
+
+        public void CleanupDrainedQueues()
+        {
+            foreach (var kvp in _queues)
+            {
+                var key = kvp.Key;
+                var queue = kvp.Value;
+
+                if (queue.IsDrainedAsync().GetAwaiter().GetResult())
+                {
+                    _queues.TryRemove(key, out _);
+                }
+            }
         }
     }
+
 
 }
