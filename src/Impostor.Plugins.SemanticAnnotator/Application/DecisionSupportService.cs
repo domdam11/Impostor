@@ -137,37 +137,53 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 {
                     if (_argumentationEnabled)
                     {
-                        var swArg = Stopwatch.StartNew();
-                        result = await _argumentation.SendAnnotationsAsync(owl);
-                        swArg.Stop();
-                        var argMs = swArg.Elapsed.TotalMilliseconds;
-                        ArgumentationDuration.Record(argMs);
-                        _argumentationMin = Math.Min(_argumentationMin, argMs);
-                        _argumentationMax = Math.Max(_argumentationMax, argMs);
-                        _logger.LogInformation("[DSS::ARGUMENTATION] {GameCode} - Duration: {Duration}ms", annotationKey, argMs);
-       
-                        if (_notarizationEnabled)
+                        // Accoda argumentation
+                        await _queue.EnqueueAsync("argumentation", async () =>
                         {
-                            await _queue.EnqueueAsync(assetKey, async () =>
+                            var swArg = Stopwatch.StartNew();
+                            string result = null;
+
+                            try
                             {
-                                var swNot = Stopwatch.StartNew();
-                                try
+                                result = await _argumentation.SendAnnotationsAsync(owl);
+                                swArg.Stop();
+
+                                var argMs = swArg.Elapsed.TotalMilliseconds;
+                                ArgumentationDuration.Record(argMs);
+                                _argumentationMin = Math.Min(_argumentationMin, argMs);
+                                _argumentationMax = Math.Max(_argumentationMax, argMs);
+                                _logger.LogInformation("[DSS::ARGUMENTATION] {GameCode} - Duration: {Duration}ms", annotationKey, argMs);
+                            }
+                            catch (Exception ex)
+                            {
+                                swArg.Stop();
+                                _logger.LogError(ex, "[DSS::ARGUMENTATION] Errore per {GameCode}", annotationKey);
+                            }
+
+                            // 🔁 Avvia la notarizzazione come secondo task separato, accodato dopo
+                            if (_notarizationEnabled && !string.IsNullOrWhiteSpace(result))
+                            {
+                                await _queue.EnqueueAsync(assetKey, async () =>
                                 {
-                                    await _notarization.NotifyAsync(annotationKey, annotationEventId, owl, result);
-                                    swNot.Stop();
-                                    var notMs = swNot.Elapsed.TotalMilliseconds;
-                                    NotarizationDuration.Record(notMs);
-                                    _notarizationMin = Math.Min(_notarizationMin, notMs);
-                                    _notarizationMax = Math.Max(_notarizationMax, notMs);
-                                    _logger.LogInformation("[DSS::NOTARIZATION] {GameCode} - Duration: {Duration}ms", annotationKey, notMs);
-                                }
-                                catch (Exception ex)
-                                {
-                                    swNot.Stop();
-                                    _logger.LogError(ex, "[DSS::NOTARIZATION] Errore durante NotifyAsync per {GameCode}", annotationKey);
-                                }
-                            });
-                        }
+                                    var swNot = Stopwatch.StartNew();
+                                    try
+                                    {
+                                        await _notarization.NotifyAsync(annotationKey, annotationEventId, owl, result);
+                                        swNot.Stop();
+                                        var notMs = swNot.Elapsed.TotalMilliseconds;
+                                        NotarizationDuration.Record(notMs);
+                                        _notarizationMin = Math.Min(_notarizationMin, notMs);
+                                        _notarizationMax = Math.Max(_notarizationMax, notMs);
+                                        _logger.LogInformation("[DSS::NOTARIZATION] {GameCode} - Duration: {Duration}ms", annotationKey, notMs);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        swNot.Stop();
+                                        _logger.LogError(ex, "[DSS::NOTARIZATION] Errore durante NotifyAsync per {GameCode}", annotationKey);
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
                 else
@@ -198,12 +214,19 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         private class TaskQueue
         {
             private readonly Channel<Func<Task>> _channel;
+            private int _pendingTasks = 0;
+
             public ChannelWriter<Func<Task>> Writer => _channel.Writer;
             public Task ProcessingTask { get; }
 
             public TaskQueue()
             {
-                _channel = Channel.CreateUnbounded<Func<Task>>();
+                _channel = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions
+                {
+                    SingleReader = true,
+                    SingleWriter = false
+                });
+
                 ProcessingTask = Task.Run(ProcessQueueAsync);
             }
 
@@ -211,6 +234,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             {
                 await foreach (var task in _channel.Reader.ReadAllAsync())
                 {
+                    Interlocked.Increment(ref _pendingTasks);
                     try
                     {
                         await task();
@@ -219,12 +243,38 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                     {
                         Console.Error.WriteLine($"Error in queued task: {ex}");
                     }
+                    finally
+                    {
+                        Interlocked.Decrement(ref _pendingTasks);
+                    }
 
-                    await Task.Delay(1000); // ⏱️ Attesa di 1s tra task della stessa chiave
+                    await Task.Delay(50); // Throttling tra task serializzati
                 }
             }
 
-            public void Complete() => _channel.Writer.Complete();
+            public void Complete() => _channel.Writer.TryComplete();
+
+            public bool IsCompleted => _channel.Reader.Completion.IsCompleted;
+
+            public async Task<bool> IsDrainedAsync(CancellationToken cancellationToken = default)
+            {
+                if (_pendingTasks != 0)
+                    return false;
+
+                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                timeoutCts.CancelAfter(TimeSpan.FromMilliseconds(200)); // timeout interno
+
+                try
+                {
+                    var hasData = await _channel.Reader.WaitToReadAsync(timeoutCts.Token);
+                    return !hasData;
+                }
+                catch (OperationCanceledException)
+                {
+                    // Timeout → consideriamo drenata
+                    return true;
+                }
+            }
         }
 
         private readonly ConcurrentDictionary<string, TaskQueue> _queues = new();
@@ -232,18 +282,48 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
         public async Task EnqueueAsync(string assetKey, Func<Task> task)
         {
             var queue = _queues.GetOrAdd(assetKey, _ => new TaskQueue());
-            await queue.Writer.WriteAsync(task);
+
+            if (!queue.Writer.TryWrite(task))
+            {
+                throw new InvalidOperationException($"Cannot enqueue task for key '{assetKey}': channel is closed.");
+            }
+
+            await Task.CompletedTask;
         }
 
         public void MarkEnqueueDone()
         {
             foreach (var queue in _queues.Values)
+            {
                 queue.Complete();
+            }
         }
 
         public async Task WaitForCompletionAsync()
         {
             await Task.WhenAll(_queues.Values.Select(q => q.ProcessingTask));
+        }
+
+        public async Task WaitUntilQueueIsDrainedAsync(string assetKey, CancellationToken cancellationToken = default)
+        {
+            if (_queues.TryGetValue(assetKey, out var queue))
+            {
+                while (true)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
+                    if (await queue.IsDrainedAsync(cancellationToken))
+                        break;
+
+                    await Task.Delay(50, cancellationToken);
+                }
+            }
+        }
+
+        public bool IsQueueCompleted(string assetKey)
+        {
+            return _queues.TryGetValue(assetKey, out var queue) && queue.IsCompleted;
         }
     }
 
