@@ -108,12 +108,15 @@ namespace Impostor.Plugins.SemanticAnnotator
             services.AddSingleton<AnnotatorEngine>();
 
             // Modalità buffer: true -> uso di buffer + job Coravel
-            bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", false);
+            var useBuffer = _configuration.GetValue("SemanticPlugin:UseBufferMode", false);
             services.AddSingleton<IAnnotator, AnnotatorService>();
             services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
             services.AddSingleton<INotarizationService, NotarizationAdapter>();
             services.AddSingleton<ITransactionManager, TransactionManager>();
-   
+
+            services.Configure<SemanticPluginOptions>(_configuration.GetSection("SemanticPlugin"));
+            services.AddSingleton<KeyedTaskQueue>();
+
             services.Configure<ArgumentationServiceOptions>(_configuration.GetSection("ArgumentationService"));
 
             services.AddHttpClient<IArgumentationService, ArgumentationApiAdapter>((provider, client) =>

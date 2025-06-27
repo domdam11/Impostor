@@ -118,8 +118,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     }
                     // instantiate player: id, name, class, status, list of positions, lists of obj and data properties 
                     var spawnMov = new CustomMovement(p.Character.NetworkTransform.Position, timestamp);
-                    Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, playerStates[p.Character.PlayerId].SessionCls, playerStates[p.Character.PlayerId].Movements, spawnMov, playerStates[p.Character.PlayerId].State, playerStates[p.Character.PlayerId].VoteCount);
-                    players.Add(player);
+                    if (playerStates.ContainsKey(p.Character.PlayerId))
+                    {
+                        Player player = new Player(p.Character.PlayerId, p.Character.PlayerInfo.PlayerName.Replace(" ", ""), cls, playerStates[p.Character.PlayerId].SessionCls, playerStates[p.Character.PlayerId].Movements, spawnMov, playerStates[p.Character.PlayerId].State, playerStates[p.Character.PlayerId].VoteCount);
+                        players.Add(player);
+                    }
+                    else
+                    {
+                        throw new Exception($"Player with ID {p.Character.PlayerId} not found in player states dictionary.");
+                    }
                 }
             }
 
@@ -780,7 +787,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 player.objCardRestrictionsPlayer.Add(ExactRestrictionNPlayers);
 
             }
-            
             //Inserimento dei player all'interno dell'ontologia => post iterazione su tutti i player per memorizzare informazioni codipendenti tra di loro
             foreach (var player in playersInFOVImpostor)
             {
@@ -838,7 +844,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             //CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
 
             //write to file
-            string folderPath = $"gameSession{game.Code}";
+            /*string folderPath = $"gameSession{game.Code}";
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
@@ -849,7 +855,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 Directory.CreateDirectory(folderPath);
             }
             string absoluteHeaderDirectory = Path.Combine(folderPath, $"amongus{numAnnot}.owl");
+            
             var string3 = UString.UstringCopyBuf(absoluteHeaderDirectory);
+            */
             cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
             //cowl_manager.CowlManagerWritePath(manager, onto, string3);
 
@@ -859,7 +867,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             var sbyteArray = new sbyte[uvec_builtin.UvecCountChar(chars)];
             uvec_builtin.UvecCopyToArrayChar(chars, sbyteArray);
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
-            string result = System.Text.Encoding.UTF8.GetString(byteArray);
+            string result = playersInFOVImpostor.Any() ? System.Text.Encoding.UTF8.GetString(byteArray) : null;
 
             //Console.WriteLine(result2.Result);
 
@@ -881,7 +889,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 pStates.Add(p.Id, ps);
             }
-            Console.WriteLine(absoluteHeaderDirectory);
+            //Console.WriteLine(absoluteHeaderDirectory);
             return (pStates, gameState, result);
         }
 

@@ -8,6 +8,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Models;
+using IO.Swagger.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TransactionHandler.Tasks;
@@ -62,7 +63,7 @@ public class NotarizationAdapter : INotarizationService
                             break;
 
                         case IGameEndedEvent gameEndedEvent:
-                            await _transactionManager.ChangeStateAsync(assetKey, "chiusa");
+                            await _transactionManager.EndGameSessionAsync(assetKey);
                             processedEvents.Add(ev);
                             break;
 
@@ -74,6 +75,13 @@ public class NotarizationAdapter : INotarizationService
                         case IGameCreatedEvent gameCreatedEvent:
                         {
                             await _transactionManager.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
+                            processedEvents.Add(ev);
+                            break;
+                        }
+
+                        case IGameDestroyedEvent gameDestroyed:
+                        {
+                            await _transactionManager.EndGameSessionAsync(gameCode);
                             processedEvents.Add(ev);
                             break;
                         }

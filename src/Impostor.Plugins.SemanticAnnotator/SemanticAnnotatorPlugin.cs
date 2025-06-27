@@ -11,50 +11,46 @@ using Microsoft.Extensions.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
-    [ImpostorPlugin("gg.impostor.semanticannotator")]
+    [ImpostorPlugin("impostor.plugins.semanticannotator")]
     public class SemanticAnnotatorPlugin : PluginBase
     {
         private readonly ILogger<SemanticAnnotatorPlugin> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IConfiguration _configuration;
         private readonly bool _useBuffer;
-        private readonly int _annotationIntervalMilliseconds;
+        private readonly int _annotationIntervalMs;
 
-        public SemanticAnnotatorPlugin(ILogger<SemanticAnnotatorPlugin> logger, IServiceProvider serviceProvider, IConfiguration _configuration, IOptions<AnnotatorServiceOptions> options)
+        public SemanticAnnotatorPlugin(ILogger<SemanticAnnotatorPlugin> logger, IServiceProvider serviceProvider, IConfiguration _configuration, IOptions<SemanticPluginOptions> options)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _useBuffer = _configuration.GetValue<bool>("UseBufferMode", true);
-            _annotationIntervalMilliseconds = options.Value.AnnotationIntervalMilliseconds;
+            _useBuffer = options.Value.UseBuffer;
+            _annotationIntervalMs = options.Value.AnnotationIntervalMs;
         }
 
         public override ValueTask EnableAsync()
         {
             _logger.LogInformation("[SemanticAnnotatorPlugin] EnableAsync called.");
 
-        
-
             var scheduler = _serviceProvider.GetRequiredService<IScheduler>();
-            bool useBuffer = _configuration.GetValue<bool>("UseBufferMode", true);
 
-            if (useBuffer)
+            if (_useBuffer)
             {
                 scheduler.Schedule<AnnotationJob>()
-                .EverySeconds(_annotationIntervalMilliseconds)
+                .EverySeconds(_annotationIntervalMs)
                 .PreventOverlapping(nameof(AnnotationJob));
 
                 scheduler.Schedule<ArgumentationJob>()
-                    .EverySeconds(_annotationIntervalMilliseconds)
+                    .EverySeconds(_annotationIntervalMs)
                     .PreventOverlapping(nameof(ArgumentationJob));
 
                 scheduler.Schedule<GameNotarizationJob>()
-                    .EverySeconds(_annotationIntervalMilliseconds)
+                    .EverySeconds(_annotationIntervalMs)
                     .PreventOverlapping(nameof(GameNotarizationJob));
             }
             else
             {
                 scheduler.Schedule<DecisionSupportJob>()
-                    .EverySeconds(_annotationIntervalMilliseconds)
+                    .EverySeconds(_annotationIntervalMs)
                     .PreventOverlapping(nameof(DecisionSupportJob));
             }
 

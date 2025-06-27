@@ -32,7 +32,7 @@ namespace TransactionHandler.Tasks
                 // Create the Asset passing the AssetDTO, change the description and the state
                 var response1 = await _client.CreateAssetAsync(assetDto);
                 Console.WriteLine($"Game session created:\n {response1}");
-                var response2 = ChangeStateAsync(gameId, "in corso");
+                var response2 = await ChangeStateAsync(gameId, AssetDTO.StatoEnum.Incorso);
                 Console.WriteLine($"Game started:\n {response2}");
             }
             catch (Exception ex)
@@ -49,7 +49,7 @@ namespace TransactionHandler.Tasks
                 Console.WriteLine($"Closing game session {gameId}... ");
 
                 // Update description and state through the corresponding methods
-                var response = await ChangeStateAsync(gameId, "chiuso");
+                var response = await ChangeStateAsync(gameId, AssetDTO.StatoEnum.Chiuso);
                 Console.WriteLine($"Game session terminated. \n{response}");
             }
             catch (Exception ex)
@@ -66,7 +66,7 @@ namespace TransactionHandler.Tasks
                 Console.WriteLine($"Retrieving game details for game {gameId}...");
 
                 // Call the API
-                var response = await Task.Run(() => _client.ReadAsset(gameId));
+                var response = await _client.ReadAssetAsync(gameId);
                 Console.WriteLine($"Details retrieved succesfully. Response: {response}");
                 return response;
             }
@@ -92,7 +92,7 @@ namespace TransactionHandler.Tasks
                 };
 
                 // Call the API
-                await Task.Run(() => _client.CreateEvent(eventDto, gameId, eventId));
+                await _client.CreateEventAsync(eventDto, gameId, eventId);
                 Console.WriteLine($"Event created successfully.");
             }
             catch (Exception ex)
@@ -132,7 +132,7 @@ namespace TransactionHandler.Tasks
                 };
 
                 // Call the API
-                await Task.Run(() => _client.AddPlayer(playerDto, gameId));
+                await _client.AddPlayerAsync(playerDto, gameId);
                 Console.WriteLine($"Player added successfully.");
             }
             catch (Exception ex)
@@ -156,7 +156,7 @@ namespace TransactionHandler.Tasks
                 };
 
                 // Call the API
-                await Task.Run(() => _client.RemovePlayer(playerDto, gameId));
+                await _client.RemovePlayerAsync(playerDto, gameId);
                 Console.WriteLine($"Player removed successfully.");
             }
             catch (Exception ex)
@@ -191,7 +191,7 @@ namespace TransactionHandler.Tasks
         }
 
         // Change the state of a game
-        public async Task<string> ChangeStateAsync(string gameId, string state)
+        public async Task<string> ChangeStateAsync(string gameId, AssetDTO.StatoEnum state)
         {
             try
             {
@@ -200,18 +200,10 @@ namespace TransactionHandler.Tasks
                 // Build the AssetDTO object
                 var assetDto = new AssetDTO
                 {
-                    Id = gameId
+                    Id = gameId,
+                    Stato = state,
+                    Descrizione = ""
                 };
-
-                // Check the state and set it accordingly
-                if (state == "in corso")
-                {
-                    assetDto.Stato = AssetDTO.StatoEnum.Incorso;
-                }
-                else
-                {
-                    assetDto.Stato = AssetDTO.StatoEnum.Chiuso;
-                }
 
                 // Call the API
                 var response = await _client.ChangeStateAsync(assetDto, gameId);

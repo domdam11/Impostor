@@ -90,21 +90,47 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             GameStarted = true;
         }
 
-        // end game
-        public void EndGame(AnnotatorEngine annotatorEngine, Boolean destroyed = false)
+        /// <summary>
+        /// Ends the current game session and resets the game state.
+        /// </summary>
+        /// <remarks>This method clears all game events, resets player states, and marks the game as not
+        /// started.  If <paramref name="destroyed"/> is <see langword="true"/>, the game instance is set to <see
+        /// langword="null"/>  and the restart count is reset to zero. The method is intended to be called when a game
+        /// session ends,  either normally or due to an external interruption.</remarks>
+        /// <param name="annotatorEngine">The annotator engine used to process game events. This parameter is not used in this method but is included
+        /// for compatibility with related workflows.</param>
+        /// <param name="destroyed">A boolean value indicating whether the game is being destroyed.  <see langword="true"/> resets all
+        /// game-related data, including the game instance and restart count;  <see langword="false"/> retains certain
+        /// state information for potential reuse.</param>
+        public void CheckEndGame(IAnnotator annotatorEngine)
         {
-            GameEnded = true;
-            if (destroyed)
+            var gameEnded = EventsOnlyNotarized.Any(a => a is IGameEndedEvent);
+            var gameDestroyed = EventsOnlyNotarized.Any(a => a is IGameDestroyedEvent);
+            if (gameEnded || gameDestroyed)
             {
-                CallAnnotate(annotatorEngine, true);
+                GameEnded = true;
+                CallCount = 0;
+                Events.Clear();
+                // Reset player states to initial values
+                if (gameDestroyed)
+                {
+                    Game = null;
+                    GameEnded = false;
+                    NumRestarts = 0;
+                }
+                PlayerStates = null;
+                GameStarted = false;
+                LastAnnotTimestamp = CurrentTimestamp;
             }
-            else
-            {
-                CallAnnotate(annotatorEngine);
-            }
-        }
 
-        public string CallAnnotate(AnnotatorEngine annotatorEngine, Boolean destroyed = false)
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="annotatorEngine"></param>
+        /// <param name="destroyed"></param>
+        /// <returns></returns>
+        public string CallAnnotate(AnnotatorEngine annotatorEngine)
         {
             string owl = null;
             if (GameStarted && Game != null)
@@ -112,15 +138,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 //game started so annotating makes sense
                 if (Events.Count() != 0)
                 {
-                    if (GameEnded)
-                    {
-                        if (CallCount > 0)
-                        {
-                            //annotate cause game is ended
-                            annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
-                        }
-                    }
-                    else 
                     //something to annotate
                     //if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= totalSeconds)
                     {
@@ -137,21 +154,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     
                 }
             }
-            if (GameEnded)
-            {
-                // if game ended (or destroyed) without starting or with invalid game (null), reset and don't annotate
-                CallCount = 0;
-                Events.Clear();
-                if (destroyed)
-                {
-                    Game = null;
-                    GameEnded = false;
-                    NumRestarts = 0;
-                }
-                PlayerStates = null;
-                GameStarted = false;
-                LastAnnotTimestamp = CurrentTimestamp;
-            }
+            
             return owl;
         }
 
@@ -175,7 +178,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 var movementStruct = new CustomPlayerMovementEvent(movEvent.Game, movEvent.ClientPlayer, movEvent.PlayerControl, CurrentTimestamp);
                 Events.Add(movementStruct);
             }
-            else if(newEvent is IGameCreatedEvent || newEvent is IGameStartedEvent || newEvent is IGamePlayerLeftEvent || newEvent is IGamePlayerJoinedEvent || newEvent is IGameEndedEvent)
+            else if(newEvent is IGameCreatedEvent || 
+                newEvent is IGameStartedEvent || 
+                newEvent is IGamePlayerLeftEvent || 
+                newEvent is IGamePlayerJoinedEvent || 
+                newEvent is IGameEndedEvent ||
+                newEvent is IGameDestroyedEvent)
             {
                 EventsOnlyNotarized.Add(newEvent);
             }

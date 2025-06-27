@@ -8,6 +8,7 @@ using Impostor.Api.Innersloth;
 using Impostor.Api.Net;
 using Impostor.Api.Utils;
 using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Ports;
 
 namespace Impostor.Plugins.SemanticAnnotator.Annotator
 {
@@ -82,25 +83,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return new List<string>(_gameCache.Where(a=>a.Key != null).Select(a=>a.Key).ToList());
         }
 
-        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine, Boolean destroyed = false)
+        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
                 _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
-                return _gameCache[gameCode].CallAnnotate(annotatorEngine, destroyed);
-
+                return _gameCache[gameCode].CallAnnotate(annotatorEngine);                
             }
             return null;
-        }
-
-        public void EndGame(string gameCode, AnnotatorEngine annotatorEngine, Boolean destroyed = false)
-        {
-            if (_gameCache.ContainsKey(gameCode))
-            {
-                _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
-                _gameCache[gameCode].EndGame(annotatorEngine, destroyed);
-
-            }
         }
 
         public IEnumerable<IEvent> GetEventsByGameCodeAsync(string gameCode)
@@ -173,6 +163,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
       
         }
+
+        internal void CheckEndGame(IGame game, IAnnotator annotatorEngine)
+        {
+            if (_gameCache.ContainsKey(game.Code)) { 
+                _gameCache[game.Code].CheckEndGame(annotatorEngine);
+            }
+        }
+
+
     }
 
 

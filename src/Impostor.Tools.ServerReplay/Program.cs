@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using Coravel;
 using Impostor.Api.Config;
 using Impostor.Api.Events.Managers;
 using Impostor.Api.Games;
@@ -22,10 +20,9 @@ using Impostor.Api.Utils;
 using Impostor.Hazel;
 using Impostor.Hazel.Abstractions;
 using Impostor.Hazel.Extensions;
-// Import namespaces for accessing the Semantic Annotator plugin
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
-using Impostor.Plugins.SemanticAnnotator.Application;
+using Impostor.Plugins.SemanticAnnotator.Jobs;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Server;
@@ -80,14 +77,9 @@ namespace Impostor.Tools.ServerReplay
 
             // Measure execution time
             var stopwatch = Stopwatch.StartNew();
-
-            // Build our DI service provider
-            // _serviceProvider = BuildServices();
-
-            // var semanticAnnotatorPlugin = _serviceProvider.GetRequiredService<SemanticAnnotatorPlugin>();
-            //await semanticAnnotatorPlugin.EnableAsync(); // Schedules the periodic annotation task
+  
             bool Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
-            // Read all .dat files from the "sessions" directory
+
             string sessionDir = Path.Combine(AppContext.BaseDirectory, "sessions");
 
             // Se non esiste in Docker, prova a risalire fino al progetto locale
@@ -160,22 +152,17 @@ namespace Impostor.Tools.ServerReplay
         /// Sets up and configures required services, including:
         /// - Impostor core classes
         /// - Semantic Annotator plugin
-        /// - Coravel scheduling services
         /// </summary>
         private static ServiceProvider BuildServices()
         {
-           
 
             var services = new ServiceCollection();
 
-            
             // Set up a mock ServerEnvironment
             services.AddSingleton(new ServerEnvironment
             {
                 IsReplay = true,
             });
-
-            services.AddSingleton<PerKeyTaskQueue>();
 
             // Add a FakeDateTimeProvider to handle artificial time management
             services.AddSingleton<FakeDateTimeProvider>();
@@ -227,7 +214,7 @@ namespace Impostor.Tools.ServerReplay
         /// </summary>
         private static async Task ParseSessionAsync(BinaryReader reader)
         {
-            var options = _serviceProvider.GetRequiredService<IOptions<AnnotatorServiceOptions>>().Value;
+            var options = _serviceProvider.GetRequiredService<IOptions<SemanticPluginOptions>>().Value;
             // Read the version of the recording protocol
             var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
             if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
@@ -273,7 +260,7 @@ namespace Impostor.Tools.ServerReplay
                         continue;
                     }
                     var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
-                    if (totalTimeframe > options.AnnotationIntervalMilliseconds) {
+                    if (totalTimeframe > options.AnnotationIntervalMs) {
                        
                         var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
                         
@@ -297,9 +284,13 @@ namespace Impostor.Tools.ServerReplay
                 }
             }
 
-            var queue = _serviceProvider.GetRequiredService<PerKeyTaskQueue>();
-            Logger.Information("Wait for queue drained");
-            await queue.WaitUntilAllQueuesAreDrainedAsync();
+            var queue = _serviceProvider.GetRequiredService<KeyedTaskQueue>();
+
+            Logger.Information("Wait for argumentation queue drained");
+            await queue.WaitUntilQueueIsDrainedAsync("argumentation");
+            queue.MarkAllQueuesAsComplete();
+            Logger.Information("Wait for all queues drained");
+            await queue.WaitForAllQueuesCompletionAsync();
             // clean queues
             queue.CleanupDrainedQueues();
 

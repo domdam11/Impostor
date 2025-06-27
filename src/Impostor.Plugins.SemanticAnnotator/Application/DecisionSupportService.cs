@@ -8,7 +8,9 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Coravel.Queuing.Interfaces;
+using Impostor.Api.Events;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Jobs;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Microsoft.Extensions.Logging;
@@ -54,12 +56,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             Meter.CreateObservableGauge("dss_total_duration_max_ms", () => _processMax);
         }
 
-        private readonly PerKeyTaskQueue _queue;
+        private readonly KeyedTaskQueue _queue;
 
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
                                       INotarizationService notarization,
-                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, PerKeyTaskQueue queue)
+                                      ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, KeyedTaskQueue queue)
         {
             _annotator = annotator;
             _argumentation = argumentation;
@@ -78,59 +80,94 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             var annotationKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var isInMatch = _cacheManager.IsInMatch(gameCode);
             var annotationEventId = _cacheManager.GetAnnotationEventId(gameCode);
-            var assetKey = _cacheManager.GetGameSessionUniqueId(gameCode);
+            var globalAssetKey = _cacheManager.GetGameSessionUniqueId(gameCode);
             var players = _cacheManager.GetPlayerList(gameCode);
+            var events = _cacheManager.GetEventsOnlyNotarizedByGameCodeAsync(gameCode);
+
+            var eventsPerAssetKey = new Dictionary<string, List<IGameEvent>>();
+
+            foreach (var gameEvent in events)
+            {
+                if (gameEvent is IGameStartedEvent started)
+                {
+                    _cacheManager.StartGame(started.Game);
+
+                    var assetKey = _cacheManager.GetGameSessionUniqueId(started.Game.Code);
+                    if (!eventsPerAssetKey.TryGetValue(assetKey, out var list))
+                    {
+                        list = new List<IGameEvent>();
+                        eventsPerAssetKey[assetKey] = list;
+                    }
+                    list.Add(started);
+                }
+                else if (gameEvent is IGameEndedEvent ended)
+                {
+                    _cacheManager.CheckEndGame(ended.Game, _annotator);
+
+                    var assetKey = _cacheManager.GetGameSessionUniqueId(ended.Game.Code);
+                    if (!eventsPerAssetKey.TryGetValue(assetKey, out var list))
+                    {
+                        list = new List<IGameEvent>();
+                        eventsPerAssetKey[assetKey] = list;
+                    }
+                    list.Add(ended);
+                }
+            }
+            _cacheManager.ClearEventsOnlyNotarizedByGameCodeAsync(gameCode);
+
             if (_notarizationEnabled)
             {
-                var events = _cacheManager.GetEventsOnlyNotarizedByGameCodeAsync(gameCode);
-                _cacheManager.ClearEventsOnlyNotarizedByGameCodeAsync(gameCode);
-
                 if (events.Any())
                 {
-                    await _queue.EnqueueAsync(assetKey, async () =>
+                    foreach (var kvp in eventsPerAssetKey)
                     {
-                        var swNot = Stopwatch.StartNew();
+                        var assetKey = kvp.Key;
+                        var eventList = kvp.Value;
 
-                        try
+                        await _queue.EnqueueAsync(assetKey, async () =>
                         {
+                            var swNot = Stopwatch.StartNew();
 
-                            var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode, assetKey, events, players);
-                            swNot.Stop();
-
-                            if (listEvents.Any())
+                            try
                             {
-                                var notMs = swNot.Elapsed.TotalMilliseconds;
-                                NotarizationDuration.Record(notMs);
-                                _notarizationMin = Math.Min(_notarizationMin, notMs);
-                                _notarizationMax = Math.Max(_notarizationMax, notMs);
+                                var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode, assetKey, eventList, players);
+                                swNot.Stop();
 
-                                _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                                if (listEvents.Any())
+                                {
+                                    var notMs = swNot.Elapsed.TotalMilliseconds;
+                                    NotarizationDuration.Record(notMs);
+                                    _notarizationMin = Math.Min(_notarizationMin, notMs);
+                                    _notarizationMax = Math.Max(_notarizationMax, notMs);
+                                    _logger.LogInformation("[DSS::NOTARIZATION ONLY] {GameCode} - Duration: {Duration}ms", gameCode, notMs);
+                                }
+                                else
+                                {
+                                    _logger.LogDebug("[DSS::NOTARIZATION ONLY] {GameCode} - Nessun evento da processare", gameCode);
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                _logger.LogDebug("[DSS::NOTARIZATION ONLY] {GameCode} - Nessun evento da processare", gameCode);
+                                swNot.Stop();
+                                _logger.LogError(ex, "[DSS::NOTARIZATION ONLY] Errore nella notarizzazione asincrona per {GameCode}", gameCode);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            swNot.Stop();
-                            _logger.LogError(ex, "[DSS::NOTARIZATION ONLY] Errore nella notarizzazione asincrona per {GameCode}", gameCode);
-                        }
-                    });
+                        });
+                    }
                 }
             }
             if (isInMatch)
             {
                 var swAnnot = Stopwatch.StartNew();
-                var owl = await _annotator.AnnotateAsync(gameCode);
 
+                var owl = await _annotator.AnnotateAsync(gameCode);
+                
                 swAnnot.Stop();
                 var annotMs = swAnnot.Elapsed.TotalMilliseconds;
                 AnnotationDuration.Record(annotMs);
                 _annotationMin = Math.Min(_annotationMin, annotMs);
                 _annotationMax = Math.Max(_annotationMax, annotMs);
                 _logger.LogInformation("[DSS::ANNOTATION] {GameCode} - Duration: {Duration}ms", annotationKey, annotMs);
-
+                
                 string result = null;
 
                 if (!string.IsNullOrWhiteSpace(owl))
@@ -163,7 +200,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                             // 🔁 Avvia la notarizzazione come secondo task separato, accodato dopo
                             if (_notarizationEnabled && !string.IsNullOrWhiteSpace(result))
                             {
-                                await _queue.EnqueueAsync(assetKey, async () =>
+                                await _queue.EnqueueAsync(globalAssetKey, async () =>
                                 {
                                     var swNot = Stopwatch.StartNew();
                                     try
@@ -208,107 +245,4 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             }
         }
     }
-    public class PerKeyTaskQueue
-    {
-        private class TaskQueue
-        {
-            private readonly Channel<Func<Task>> _channel;
-            public ChannelWriter<Func<Task>> Writer => _channel.Writer;
-            public Task ProcessingTask { get; }
-
-            private int _pendingTasks = 0;
-
-            public TaskQueue()
-            {
-                _channel = Channel.CreateUnbounded<Func<Task>>();
-                ProcessingTask = Task.Run(ProcessQueueAsync);
-            }
-
-            private async Task ProcessQueueAsync()
-            {
-                await foreach (var task in _channel.Reader.ReadAllAsync())
-                {
-                    Interlocked.Increment(ref _pendingTasks);
-                    try
-                    {
-                        await task();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Error in queued task: {ex}");
-                    }
-                    finally
-                    {
-                        Interlocked.Decrement(ref _pendingTasks);
-                    }
-
-                    await Task.Delay(50); // attesa tra task
-                }
-            }
-
-            public async Task<bool> IsDrainedAsync(CancellationToken cancellationToken = default)
-            {
-                while (_pendingTasks > 0)
-                {
-                    await Task.Delay(25, cancellationToken);
-                }
-
-                return true;
-            }
-        }
-
-        private readonly ConcurrentDictionary<string, TaskQueue> _queues = new();
-
-        public async Task EnqueueAsync(string assetKey, Func<Task> task)
-        {
-            var queue = _queues.GetOrAdd(assetKey, _ => new TaskQueue());
-            await queue.Writer.WriteAsync(task);
-        }
-
-        public async Task WaitUntilQueueIsDrainedAsync(string assetKey, CancellationToken cancellationToken = default)
-        {
-            if (_queues.TryGetValue(assetKey, out var queue))
-            {
-                await queue.IsDrainedAsync(cancellationToken);
-            }
-        }
-
-        public async Task WaitUntilAllQueuesAreDrainedAsync(CancellationToken cancellationToken = default)
-        {
-            while (true)
-            {
-                bool allDrained = true;
-
-                foreach (var kvp in _queues)
-                {
-                    if (!await kvp.Value.IsDrainedAsync(cancellationToken))
-                    {
-                        allDrained = false;
-                        break;
-                    }
-                }
-
-                if (allDrained || cancellationToken.IsCancellationRequested)
-                    break;
-
-                await Task.Delay(50, cancellationToken);
-            }
-        }
-
-        public void CleanupDrainedQueues()
-        {
-            foreach (var kvp in _queues)
-            {
-                var key = kvp.Key;
-                var queue = kvp.Value;
-
-                if (queue.IsDrainedAsync().GetAwaiter().GetResult())
-                {
-                    _queues.TryRemove(key, out _);
-                }
-            }
-        }
-    }
-
-
 }

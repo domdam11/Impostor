@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
+using IO.Swagger.Model;
 
 namespace TransactionHandler.Tasks
 {
@@ -37,7 +38,7 @@ namespace TransactionHandler.Tasks
         /// <summary>
         /// Changes the state of a game session.
         /// </summary>
-        Task<string> ChangeStateAsync(string gameId, string state);
+        Task<string> ChangeStateAsync(string gameId, AssetDTO.StatoEnum state);
 
         /// <summary>
         /// Closes an active game session.

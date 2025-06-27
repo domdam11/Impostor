@@ -24,15 +24,7 @@ public class AnnotatorService : IAnnotator
         if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
             return string.Empty;
         var owl = _cacheManager.CallAnnotate(gameCode, _engine);
-        
-     
         _buffer?.Save(gameCode, owl); // save to buffer only if it's configured
-
-        //gameState.CallCount += 1;
-        //gameState.GameStateName = newGameStateName;
-        //await _cacheManager.UpdateGameStateAsync(gameCode, gameState);
-        //await _cacheManager.ClearGameEventsAsync(gameCode);
-
         return owl;
     }
 
