@@ -25,10 +25,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
             _logs.Add((assetKey, eventId, phase, durationMs, DateTime.UtcNow));
         }
 
-        public static async Task ExportToCsvAsync(string path, bool clearAfterExport = true)
+        public static async Task ExportToCsvAsync(string path, int testId, bool clearAfterExport = true)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("Timestamp,AssetKey,EventId,Phase,DurationMs");
+            sb.AppendLine("TestId,Timestamp,AssetKey,EventId,Phase,DurationMs");
 
             var orderedLogs = _logs
                 .OrderBy(l => l.assetKey)
@@ -45,7 +45,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
 
             foreach (var (assetKey, eventId, phase, durationMs, timestamp) in orderedLogs)
             {
-                sb.AppendLine($"{timestamp:o},{assetKey},{eventId},{phase},{durationMs.ToString(CultureInfo.InvariantCulture)}");
+                sb.AppendLine($"{testId},{timestamp:o},{assetKey},{eventId},{phase},{durationMs.ToString(CultureInfo.InvariantCulture)}");
             }
 
             using var writer = new StreamWriter(path, false, Encoding.UTF8);

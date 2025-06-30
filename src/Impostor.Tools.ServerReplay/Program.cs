@@ -296,11 +296,11 @@ namespace Impostor.Tools.ServerReplay
             queue.CleanupDrainedQueues();
             Logger.Information("All queued tasks completed.");
             var baseName = Path.GetFileNameWithoutExtension(fileName);
-            var csvFileName = $"temporal_trace_{baseName}_interval{options.AnnotationIntervalMs}.csv";
+            var csvFileName = $"temporal_trace_{baseName}_interval{options.AnnotationIntervalMs}_testId{options.TestId}.csv";
             var resultsDir = Path.Combine(sessionDir, "results");
             Directory.CreateDirectory(resultsDir); 
             var fullPath = Path.Combine(resultsDir, csvFileName);
-            await TemporalTraceCollector.ExportToCsvAsync(fullPath);
+            await TemporalTraceCollector.ExportToCsvAsync(fullPath, options.TestId);
         }
 
         /// <summary>
