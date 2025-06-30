@@ -1,7 +1,8 @@
-﻿/.vscode
+/.vscode
 /build
 /.vs
 /src/Impostor.Plugins.Debugger/Properties/launchSettings.json
 /tools
 
 .local/
+src/Impostor.Tools.ServerReplay/sessions/results/

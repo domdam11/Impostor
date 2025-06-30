@@ -137,7 +137,7 @@ namespace Impostor.Tools.ServerReplay
                 using (var reader = new BinaryReader(stream))
                 {
                     // Begin parsing the session
-                    await ParseSessionAsync(reader);
+                    await ParseSessionAsync(sessionDir, file, reader);
                 }
 
             }
@@ -146,6 +146,7 @@ namespace Impostor.Tools.ServerReplay
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             Logger.Information($"Took {elapsedMilliseconds}ms.");
             await Task.Delay(TimeSpan.FromSeconds(30));
+
         }
 
         /// <summary>
@@ -212,7 +213,7 @@ namespace Impostor.Tools.ServerReplay
         /// <summary>
         /// Parses the entire session (.dat file)
         /// </summary>
-        private static async Task ParseSessionAsync(BinaryReader reader)
+        private static async Task ParseSessionAsync(string sessionDir, string fileName, BinaryReader reader)
         {
             var options = _serviceProvider.GetRequiredService<IOptions<SemanticPluginOptions>>().Value;
             // Read the version of the recording protocol
@@ -293,9 +294,13 @@ namespace Impostor.Tools.ServerReplay
             await queue.WaitForAllQueuesCompletionAsync();
             // clean queues
             queue.CleanupDrainedQueues();
-
             Logger.Information("All queued tasks completed.");
-
+            var baseName = Path.GetFileNameWithoutExtension(fileName);
+            var csvFileName = $"temporal_trace_{baseName}_interval{options.AnnotationIntervalMs}.csv";
+            var resultsDir = Path.Combine(sessionDir, "results");
+            Directory.CreateDirectory(resultsDir); 
+            var fullPath = Path.Combine(resultsDir, csvFileName);
+            await TemporalTraceCollector.ExportToCsvAsync(fullPath);
         }
 
         /// <summary>

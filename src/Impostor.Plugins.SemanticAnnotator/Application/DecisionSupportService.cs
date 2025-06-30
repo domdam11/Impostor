@@ -136,6 +136,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                 if (listEvents.Any())
                                 {
                                     var notMs = swNot.Elapsed.TotalMilliseconds;
+                                    TemporalTraceCollector.Log(gameCode, assetKey, TracePhase.NotarizationOnly, notMs);
                                     NotarizationDuration.Record(notMs);
                                     _notarizationMin = Math.Min(_notarizationMin, notMs);
                                     _notarizationMax = Math.Max(_notarizationMax, notMs);
@@ -163,6 +164,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 
                 swAnnot.Stop();
                 var annotMs = swAnnot.Elapsed.TotalMilliseconds;
+                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Annotation, annotMs);
                 AnnotationDuration.Record(annotMs);
                 _annotationMin = Math.Min(_annotationMin, annotMs);
                 _annotationMax = Math.Max(_annotationMax, annotMs);
@@ -186,6 +188,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                 swArg.Stop();
 
                                 var argMs = swArg.Elapsed.TotalMilliseconds;
+                                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Argumentation, argMs);
                                 ArgumentationDuration.Record(argMs);
                                 _argumentationMin = Math.Min(_argumentationMin, argMs);
                                 _argumentationMax = Math.Max(_argumentationMax, argMs);
@@ -208,6 +211,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                         await _notarization.NotifyAsync(annotationKey, annotationEventId, owl, result);
                                         swNot.Stop();
                                         var notMs = swNot.Elapsed.TotalMilliseconds;
+                                        TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Notarization, notMs);
                                         NotarizationDuration.Record(notMs);
                                         _notarizationMin = Math.Min(_notarizationMin, notMs);
                                         _notarizationMax = Math.Max(_notarizationMax, notMs);
