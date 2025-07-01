@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Jobs
 {
@@ -18,17 +19,17 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
 
     public static class TemporalTraceCollector
     {
-        private static readonly ConcurrentBag<(string assetKey, string eventId, TracePhase phase, double durationMs, DateTime timestamp)> _logs = new();
+        private static readonly ConcurrentBag<(string assetKey, string eventId, TracePhase phase, double durationMs, AnnotationData, DateTime timestamp)> _logs = new();
 
-        public static void Log(string assetKey, string eventId, TracePhase phase, double durationMs)
+        public static void Log(string assetKey, string eventId, TracePhase phase, double durationMs, AnnotationData annotationData)
         {
-            _logs.Add((assetKey, eventId, phase, durationMs, DateTime.UtcNow));
+            _logs.Add((assetKey, eventId, phase, durationMs, annotationData, DateTime.UtcNow));
         }
 
         public static async Task ExportToCsvAsync(string path, int testId, bool clearAfterExport = true)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("TestId,Timestamp,AssetKey,EventId,Phase,DurationMs");
+            sb.AppendLine("TestId,Timestamp,AssetKey,EventId,Phase,DurationMs,NumIndividuals,NumEntities,Bytes");
 
             var orderedLogs = _logs
                 .OrderBy(l => l.assetKey)
@@ -43,9 +44,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
                 })
                 .ToList();
 
-            foreach (var (assetKey, eventId, phase, durationMs, timestamp) in orderedLogs)
+            foreach (var (assetKey, eventId, phase, durationMs, annotationData, timestamp) in orderedLogs)
             {
-                sb.AppendLine($"{testId},{timestamp:o},{assetKey},{eventId},{phase},{durationMs.ToString(CultureInfo.InvariantCulture)}");
+                sb.AppendLine($"{testId},{timestamp:o},{assetKey},{eventId},{phase},{durationMs.ToString(CultureInfo.InvariantCulture)},{annotationData?.NumIndividuals},{annotationData?.NumEntities},{annotationData?.SizeInBytes}");
             }
 
             using var writer = new StreamWriter(path, false, Encoding.UTF8);

@@ -130,9 +130,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         /// <param name="annotatorEngine"></param>
         /// <param name="destroyed"></param>
         /// <returns></returns>
-        public string CallAnnotate(AnnotatorEngine annotatorEngine)
+        public AnnotationData CallAnnotate(AnnotatorEngine annotatorEngine)
         {
-            string owl = null;
+            AnnotationData annotationData = new AnnotationData();
             if (GameStarted && Game != null)
             {
                 //game started so annotating makes sense
@@ -142,20 +142,20 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                     //if ((CurrentTimestamp - LastAnnotTimestamp).TotalSeconds >= totalSeconds)
                     {
                         //2s passed after last annotation  
-                        var (playerStates, gameState, owlOutput) = annotatorEngine.Annotate(Game, Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
+                        var (playerStates, gameState, data) = annotatorEngine.Annotate(Game, 
+                            Events, PlayerStates, GameState, CallCount, NumRestarts, CurrentTimestamp);
                         PlayerStates = playerStates;
                         GameState = gameState;
-                        owl = owlOutput;
+                        annotationData = data;
                         Events.Clear();
                         CallCount++;
                         LastAnnotTimestamp = CurrentTimestamp;
-                        return owl;
                     }
                     
                 }
             }
             
-            return owl;
+            return annotationData;
         }
 
   

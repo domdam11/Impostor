@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Ports
 {
     public interface IAnnotator
     {
-        Task<string> AnnotateAsync(string gameCode);
+        Task<AnnotationData> AnnotateAsync(string gameCode);
     }
 }

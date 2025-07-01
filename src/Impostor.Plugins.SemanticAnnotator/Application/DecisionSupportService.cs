@@ -136,7 +136,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                 if (listEvents.Any())
                                 {
                                     var notMs = swNot.Elapsed.TotalMilliseconds;
-                                    TemporalTraceCollector.Log(gameCode, assetKey, TracePhase.NotarizationOnly, notMs);
+                                    TemporalTraceCollector.Log(gameCode, assetKey, TracePhase.NotarizationOnly, notMs, null);
                                     NotarizationDuration.Record(notMs);
                                     _notarizationMin = Math.Min(_notarizationMin, notMs);
                                     _notarizationMax = Math.Max(_notarizationMax, notMs);
@@ -160,11 +160,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
             {
                 var swAnnot = Stopwatch.StartNew();
 
-                var owl = await _annotator.AnnotateAsync(gameCode);
+                var annotationData = await _annotator.AnnotateAsync(gameCode);
                 
                 swAnnot.Stop();
                 var annotMs = swAnnot.Elapsed.TotalMilliseconds;
-                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Annotation, annotMs);
+                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Annotation, annotMs, annotationData);
                 AnnotationDuration.Record(annotMs);
                 _annotationMin = Math.Min(_annotationMin, annotMs);
                 _annotationMax = Math.Max(_annotationMax, annotMs);
@@ -172,7 +172,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 
                 string result = null;
 
-                if (!string.IsNullOrWhiteSpace(owl))
+                if (!annotationData.IsEmpty())
                 {
                     if (_argumentationEnabled)
                     {
@@ -184,11 +184,11 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
                             try
                             {
-                                result = await _argumentation.SendAnnotationsAsync(owl);
+                                result = await _argumentation.SendAnnotationsAsync(annotationData.OwlDescription);
                                 swArg.Stop();
 
                                 var argMs = swArg.Elapsed.TotalMilliseconds;
-                                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Argumentation, argMs);
+                                TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Argumentation, argMs, annotationData);
                                 ArgumentationDuration.Record(argMs);
                                 _argumentationMin = Math.Min(_argumentationMin, argMs);
                                 _argumentationMax = Math.Max(_argumentationMax, argMs);
@@ -208,10 +208,10 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                     var swNot = Stopwatch.StartNew();
                                     try
                                     {
-                                        await _notarization.NotifyAsync(annotationKey, annotationEventId, owl, result);
+                                        await _notarization.NotifyAsync(annotationKey, annotationEventId, annotationData.OwlDescription, result);
                                         swNot.Stop();
                                         var notMs = swNot.Elapsed.TotalMilliseconds;
-                                        TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Notarization, notMs);
+                                        TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Notarization, notMs, annotationData);
                                         NotarizationDuration.Record(notMs);
                                         _notarizationMin = Math.Min(_notarizationMin, notMs);
                                         _notarizationMax = Math.Max(_notarizationMax, notMs);

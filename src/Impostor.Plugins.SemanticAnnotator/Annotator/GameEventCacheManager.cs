@@ -83,14 +83,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             return new List<string>(_gameCache.Where(a=>a.Key != null).Select(a=>a.Key).ToList());
         }
 
-        public string CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine)
+        public AnnotationData CallAnnotate(string gameCode, AnnotatorEngine annotatorEngine)
         {
             if (_gameCache.ContainsKey(gameCode))
             {
                 _gameCache[gameCode].SetCurrentTime(_dateTimeService.UtcNow);
                 return _gameCache[gameCode].CallAnnotate(annotatorEngine);                
             }
-            return null;
+            return new AnnotationData();
         }
 
         public IEnumerable<IEvent> GetEventsByGameCodeAsync(string gameCode)
@@ -139,7 +139,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             if (_gameCache.ContainsKey(gameCode))
             {
                 var gameSessionId = GetGameSessionUniqueId(gameCode);
-                return gameSessionId + "_" + _gameCache[gameCode].CallCount;
+                return gameSessionId + "_" + _gameCache[gameCode].CallCount.ToString("D3");
 
             }
             else return "";
@@ -149,7 +149,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         {
             if (_gameCache.ContainsKey(gameCode) && _gameCache[gameCode].Game != null)
             {
-                return _gameCache[gameCode].Game.Code+"_"+ _gameCache[gameCode].NumRestarts;
+                return _gameCache[gameCode].Game.Code+"_"+ _gameCache[gameCode].NumRestarts.ToString("D2");
 
             }
             else return null;

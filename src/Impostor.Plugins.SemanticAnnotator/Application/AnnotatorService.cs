@@ -19,13 +19,13 @@ public class AnnotatorService : IAnnotator
         _buffer = buffer;
     }
 
-    public async Task<string> AnnotateAsync(string gameCode)
+    public async Task<AnnotationData> AnnotateAsync(string gameCode)
     {
         if (string.IsNullOrWhiteSpace(gameCode) || gameCode == "unassigned")
-            return string.Empty;
-        var owl = _cacheManager.CallAnnotate(gameCode, _engine);
-        _buffer?.Save(gameCode, owl); // save to buffer only if it's configured
-        return owl;
+            return new AnnotationData();
+        var annotationData = _cacheManager.CallAnnotate(gameCode, _engine);
+        _buffer?.Save(gameCode, annotationData); // save to buffer only if it's configured
+        return annotationData;
     }
 
     

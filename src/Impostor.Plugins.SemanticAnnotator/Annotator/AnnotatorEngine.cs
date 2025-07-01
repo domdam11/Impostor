@@ -37,7 +37,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         /// </summary>
         /// <returns>The annotation.</returns>
 
-        public (Dictionary<byte, PlayerStruct>, string, string) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, PlayerStruct> playerStates, string gameState, int numAnnot, int numRestarts, DateTimeOffset timestamp)
+        public (Dictionary<byte, PlayerStruct>, string, AnnotationData) Annotate(IGame game, List<IEvent>? events, Dictionary<byte, PlayerStruct> playerStates, string gameState, int numAnnot, int numRestarts, DateTimeOffset timestamp)
         {
            // string filePath = "../../../../Impostor.Plugins.SemanticAnnotator/Annotator/properties.json";  // JSON file with thresholds
             string nameSpace = "http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/";
@@ -833,12 +833,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 confirmEjects = legacyGameOptionsData.ConfirmImpostor.ToString();
             }
 
-            var dataQuantRestrictionMap = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/UseMap", new[] { map }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
-            var dataQuantRestrictionAnonymVotes = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/AnonymousVotesEnabled", new[] { anonVotes }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
-            var dataQuantRestrictionVisualTasks = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/VisualTasksEnabled", new[] { visualTasks }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
-            var dataQuantRestrictionConfirmEjects = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ConfirmEjects", new[] { confirmEjects }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
-            var dataQuantRestrictionState = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CurrentState", new[] { gameState }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
-            var dataQuantRestrictionNPlayers = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { alive.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
+            //var dataQuantRestrictionMap = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/UseMap", new[] { map }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+            //var dataQuantRestrictionAnonymVotes = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/AnonymousVotesEnabled", new[] { anonVotes }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+            //var dataQuantRestrictionVisualTasks = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/VisualTasksEnabled", new[] { visualTasks }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+            //var dataQuantRestrictionConfirmEjects = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/ConfirmEjects", new[] { confirmEjects }, "http://www.w3.org/2001/XMLSchema#boolean", "", instancesToRelease);
+            //var dataQuantRestrictionState = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/CurrentState", new[] { gameState }, "http://www.w3.org/2001/XMLSchema#string", "", instancesToRelease);
+            //var dataQuantRestrictionNPlayers = CowlWrapper.CreateDataValuesRestriction("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/HasNAlivePlayers", new[] { alive.ToString() }, "http://www.w3.org/2001/XMLSchema#integer", "", instancesToRelease);
 
             //Individuo game può essere utile => metto solo 2 atomi per evitare sballamento punteggi in altre strategie
             //CowlWrapper.CreateIndividual(onto, $"http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/{game.Code.Code}", new[] { gameClass }, null, new[] { dataQuantRestrictionState, dataQuantRestrictionNPlayers, dataQuantRestrictionMap, dataQuantRestrictionAnonymVotes, dataQuantRestrictionVisualTasks, dataQuantRestrictionConfirmEjects }, instancesToRelease, false);
@@ -860,14 +860,14 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             */
             cowl_sym_table.CowlSymTableRegisterPrefixRaw(cowl_ontology.CowlOntologyGetSymTable(onto), UString.UstringCopyBuf(""), UString.UstringCopyBuf("http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/"), false);
             //cowl_manager.CowlManagerWritePath(manager, onto, string3);
-
+            
             // Write the ontology to a string
             UVec_char chars = uvec_builtin.UvecChar();
             cowl_manager.CowlManagerWriteStrbuf(manager, onto, chars);
             var sbyteArray = new sbyte[uvec_builtin.UvecCountChar(chars)];
             uvec_builtin.UvecCopyToArrayChar(chars, sbyteArray);
             byte[] byteArray = Array.ConvertAll(sbyteArray, b => (byte)b);
-            string result = playersInFOVImpostor.Any() ? System.Text.Encoding.UTF8.GetString(byteArray) : null;
+            string owlAnnotation = playersInFOVImpostor.Any() ? System.Text.Encoding.UTF8.GetString(byteArray) : null;
 
             //Console.WriteLine(result2.Result);
 
@@ -889,8 +889,15 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
 
                 pStates.Add(p.Id, ps);
             }
+            var annotationData = new AnnotationData
+            {
+                OwlDescription = owlAnnotation,
+                NumIndividuals = playersInFOVImpostor.Count,
+                NumEntities = instancesToRelease.Count,
+                SizeInBytes = byteArray.Length
+            };
             //Console.WriteLine(absoluteHeaderDirectory);
-            return (pStates, gameState, result);
+            return (pStates, gameState, annotationData);
         }
 
 

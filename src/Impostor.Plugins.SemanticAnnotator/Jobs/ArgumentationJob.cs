@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Coravel.Invocable;
 using Impostor.Plugins.SemanticAnnotator.Ports;
+using Impostor.Plugins.SemanticAnnotator.Models;
 
 namespace Impostor.Plugins.SemanticAnnotator.Jobs
 {
@@ -22,9 +23,9 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
 
         public async Task Invoke()
         {
-            while (_buffer.TryGetNext(out var gameCode, out var owl))
+            while (_buffer.TryGetNext(out var gameCode, out AnnotationData annotationData))
             {
-                var result = await _argumentation.SendAnnotationsAsync(owl);
+                var result = await _argumentation.SendAnnotationsAsync(annotationData.OwlDescription);
                 _resultBuffer.Save(gameCode, result);
                 _buffer.MarkAsProcessed(gameCode);
                 _logger.LogInformation($"[ArgumentationJob] Reasoning completato per {gameCode}");
