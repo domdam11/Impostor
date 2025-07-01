@@ -32,6 +32,13 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
         public Boolean GameStarted;
         public Boolean GameEnded;
 
+        public string? LastStrategy { get; private set; }
+
+        public void SetLastStrategy(string strategy)
+        {
+            LastStrategy = strategy;
+        }
+
         // define the game
         public void CreateGame(IGame game, int numRestarts = 0)
         {

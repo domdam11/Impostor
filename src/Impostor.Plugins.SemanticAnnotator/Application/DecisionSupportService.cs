@@ -20,6 +20,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 {
     public class DecisionSupportService : IDecisionSupportService
     {
+
         private readonly IAnnotator _annotator;
         private readonly IArgumentationService _argumentation;
         private readonly INotarizationService _notarization;
@@ -186,7 +187,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                             {
                                 result = await _argumentation.SendAnnotationsAsync(annotationData.OwlDescription);
                                 swArg.Stop();
-
+                                _cacheManager.SetLastStrategy(gameCode, result);
                                 var argMs = swArg.Elapsed.TotalMilliseconds;
                                 TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Argumentation, argMs, annotationData);
                                 ArgumentationDuration.Record(argMs);
@@ -248,5 +249,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                 await ProcessAsync(gameCode);
             }
         }
+
     }
 }

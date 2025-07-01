@@ -171,6 +171,23 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
             }
         }
 
+        public void SetLastStrategy(string gameCode, string strategy)
+        {
+            if (_gameCache.TryGetValue(gameCode, out var utility))
+            {
+                utility.SetLastStrategy(strategy);
+            }
+        }
+
+        public string? GetLastStrategy(string gameCode)
+        {
+            if (_gameCache.TryGetValue(gameCode, out var utility))
+            {
+                return utility.LastStrategy;
+            }
+            return null;
+        }
+
 
     }
 

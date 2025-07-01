@@ -23,7 +23,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _useBuffer = options.Value.UseBuffer;
+            _useBuffer = options.Value.UseBufferMode;
             _annotationIntervalMs = options.Value.AnnotationIntervalMs;
         }
 
@@ -50,7 +50,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             else
             {
                 scheduler.Schedule<DecisionSupportJob>()
-                    .EverySeconds(_annotationIntervalMs)
+                    .EverySeconds(_annotationIntervalMs / 1000)
                     .PreventOverlapping(nameof(DecisionSupportJob));
             }
 

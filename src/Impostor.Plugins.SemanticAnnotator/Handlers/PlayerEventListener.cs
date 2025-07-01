@@ -4,8 +4,11 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
+using Impostor.Api.Games;
+using Impostor.Api.Innersloth;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Microsoft.Extensions.Logging;
 
@@ -42,15 +45,35 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
 
                 while (clientPlayer.Client.Connection != null && clientPlayer.Client.Connection.IsConnected)
                 {
-                    // Modify player properties.
-                    await playerControl.SetColorAsync((ColorType)_random.Next(1, 9));
-                    // TODO Rewrite using cosmetics source generator
-                    // await playerControl.SetHatAsync((HatType)_random.Next(1, 9));
-                    // await playerControl.SetSkinAsync((SkinType)_random.Next(1, 9));
-                    // await playerControl.SetPetAsync((PetType)_random.Next(1, 9));
+                    if (playerControl.Game.GameState == Api.Innersloth.GameStates.Started
+                        && playerControl.PlayerInfo.IsImpostor)
+                    {
+                        var strategy = _eventCacheManager.GetLastStrategy(playerControl.Game.Code);
+                        if (!string.IsNullOrWhiteSpace(strategy))
+                        {
+                            try
+                            {
+                                // Imposta il nome del solo impostore con la strategia
+                                using var writer = playerControl.Game.StartRpc(playerControl.NetId, Api.Net.Inner.RpcCalls.SetName, clientPlayer.Client.Id);
+                                Rpc06SetName.Serialize(writer, $"Strategy: {strategy}");
+                                await playerControl.Game.FinishRpcAsync(writer);
 
-                    await Task.Delay(TimeSpan.FromMilliseconds(5000));
+                                
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Errore durante l'invio della strategia all'impostore");
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Nessuna strategia disponibile per impostore nella partita {GameCode}", playerControl.Game.Code);
+                        }
+                    }
+
+                    await Task.Delay(TimeSpan.FromMilliseconds(500));
                 }
+
 
                 _logger.LogDebug("Stopping player task");
             });

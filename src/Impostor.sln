@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CowlSharp", "CowlSharp\Cowl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionHandler", "TransactionHandler\src\IO.Swagger\TransactionHandler.csproj", "{C99EEA00-DE6B-485B-8D30-612FD7A86421}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiTestRunner", "TransactionHandler\ApiTestRunner\ApiTestRunner.csproj", "{960C14E0-CBD9-4D3E-9689-434A5ED91391}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,14 +157,6 @@ Global
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|x86.ActiveCfg = Release|Any CPU
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|x86.Build.0 = Release|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Debug|x86.Build.0 = Debug|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Release|Any CPU.Build.0 = Release|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Release|x86.ActiveCfg = Release|Any CPU
-		{960C14E0-CBD9-4D3E-9689-434A5ED91391}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

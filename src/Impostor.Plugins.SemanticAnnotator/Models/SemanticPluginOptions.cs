@@ -12,6 +12,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
         public int AnnotationIntervalMs { get; set; }
         public int TestId { get; set; }
         public List<string> ValidGameCodes { get; set; }
-        public bool UseBuffer { get; set; } = true;
+        public bool UseBufferMode { get; set; } = true;
     }
 }
