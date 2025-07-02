@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
@@ -53,12 +55,56 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                         {
                             try
                             {
-                                // Imposta il nome del solo impostore con la strategia
-                                using var writer = playerControl.Game.StartRpc(playerControl.NetId, Api.Net.Inner.RpcCalls.SetName, clientPlayer.Client.Id);
-                                Rpc06SetName.Serialize(writer, $"Strategy: {strategy}");
-                                await playerControl.Game.FinishRpcAsync(writer);
+                                var strategyDict = JsonSerializer.Deserialize<Dictionary<string, double>>(strategy);
 
-                                
+                                if (strategyDict != null && strategyDict.Count > 0)
+                                {
+                                    // Seleziona la strategia col valore più alto (positiva o meno negativa)
+                                    var selected = strategyDict.OrderByDescending(kvp => kvp.Value).First();
+
+                                    var strategyKey = selected.Key;
+                                    var score = selected.Value;
+
+                                    // Calcola percentuale da [-1,1] a [0,100]
+                                    int percentage = (int)Math.Round((score + 1) * 50);
+
+                                    // Mappa percentuale su colore
+                                    string color = percentage switch
+                                    {
+                                        <= 33 => "red",
+                                        <= 66 => "yellow",
+                                        _ => "green"
+                                    };
+
+                                    string pluginTitle = "🧩 SEAL-chain mode";
+                                    string strategyLabel = strategyKey switch
+                                    {
+                                        "UccidiESpegniLuci" => "😎 Kill & Lights",
+                                        "KillToSovrapposition" => "😎 Kill on Stacks",
+                                        "KillToWin" => "😎 Kill to Win",
+                                        "CanVent" => "😎 Vent Kill",
+                                        _ => "😐 Unknown"
+                                    };
+
+                                    string explanation = strategyKey switch
+                                    {
+                                        "UccidiESpegniLuci" => "😅 Sabotage lights before striking\n😁 Choose isolated targets\n😉 Escape quickly after kill",
+                                        "KillToSovrapposition" => "😅 Blend into groups\n😁 Kill during stack tasks\n😉 Avoid cameras and rush report",
+                                        "KillToWin" => "😅 Check win condition\n😁 Target key crewmates\n😉 Prevent emergency meetings",
+                                        "CanVent" => "😅 Wait near vent\n😁 Kill and vanish fast\n😉 Use sabotage to cover",
+                                        _ => "😐 Unknown\n😐 Unknown\n😐 Unknown"
+                                    };
+
+                                    using var writer = playerControl.Game.StartRpc(playerControl.NetId, Api.Net.Inner.RpcCalls.SetName, clientPlayer.Client.Id);
+                                    Rpc06SetName.Serialize(writer,
+                                        $"<align=left>" +
+                                        $"<color=yellow><size=130%>{pluginTitle}</size></color>\n" +
+                                        $"Strategy: {strategyLabel}\n" +
+                                        $"Explanation:\n" +
+                                        $"{explanation}\n\n" +
+                                        $"<color={color}><size=150%>😇 Risk Score: {percentage}%</size></color>");
+                                    await playerControl.Game.FinishRpcAsync(writer);
+                                }
                             }
                             catch (Exception ex)
                             {

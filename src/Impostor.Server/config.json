@@ -19,7 +19,7 @@
       "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\bin\\Debug\\net8.0"
     ],
     "LibraryPaths": [
-      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\libraries"
+      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\libraries\\cowl.dll"
 
     ]
   }
