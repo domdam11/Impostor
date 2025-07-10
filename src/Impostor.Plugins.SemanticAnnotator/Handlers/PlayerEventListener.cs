@@ -55,6 +55,41 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                         {
                             try
                             {
+                                /*
+ SPRITE INDEX ↔ EMOJI MAPPING (TextMeshPro Compatible)
+
+  ┌────────┬────────────┬───────────────────────────────────────────────┐
+  │ Index  │ Emoji      │ Description                                   │
+  ├────────┼────────────┼───────────────────────────────────────────────┤
+  │ 0      │ 😊         │ Friendly smile (calm)                         │
+  │ 1      │ 😋         │ Hungry face with tongue out                  │
+  │ 2      │ 😍         │ Heart eyes (love or perfect match)           │
+  │ 3      │ 😎         │ Cool face with sunglasses                    │
+  │ 4      │ 😀         │ Simple smile                                 │
+  │ 5      │ 😄         │ Wide smile with eyes                         │
+  │ 6      │ 😂         │ Tears of joy (classic)                       │
+  │ 7      │ 😃         │ Broad smile with big eyes                    │
+  │ 8      │ 😄         │ Joyful laugh without sweat                   │
+  │ 9      │ 😅         │ Nervous smile (sweat)                        │
+  │ 10     │ 😖         │ Frustrated/discomfort face                   │
+  │ 11     │ 😜         │ Tongue out with wink                         │
+  │ 12     │ ❓         │ Question mark (used for unknown strategies)  │
+  │ 13     │ 🤣         │ Rolling on the floor laughing (diagonal)     │
+  │ 14     │ 🙂         │ Neutral smile (gentle)                       │
+  │ 15     │ ☹️          │ Sad face (non-aggressive)                    │
+  └────────┴────────────┴───────────────────────────────────────────────┘
+
+*/
+                                var emojiByPurpose = new Dictionary<string, string>
+                                {
+                                    ["plugin"] = "<sprite=3>",   // 😎 Cool face for DSS Plugin
+                                    ["score"] = "<sprite=9>",    // 😅 Nervous/confident smile for score
+                                    ["UccidiESpegniLuci"] = "<sprite=10>",     // 😖 (tensione)
+                                    ["KillToSovrapposition"] = "<sprite=11>",  // 😜 (confusione/stacks)
+                                    ["KillToWin"] = "<sprite=2>",              // 😍 (focus obiettivo)
+                                    ["CanVent"] = "<sprite=1>",                // 😋 (fame di kill)
+                                    ["default"] = "<sprite=12>"                // ❓ (unknown strategy)
+                                };
                                 var strategyDict = JsonSerializer.Deserialize<Dictionary<string, double>>(strategy);
 
                                 if (strategyDict != null && strategyDict.Count > 0)
@@ -72,37 +107,39 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                                     string color = percentage switch
                                     {
                                         <= 33 => "red",
-                                        <= 66 => "yellow",
+                                        <= 50 => "orange",
+                                        <= 75 => "yellow",
                                         _ => "green"
                                     };
 
-                                    string pluginTitle = "🧩 SEAL-chain mode";
-                                    string strategyLabel = strategyKey switch
+                                    var emoji = emojiByPurpose.ContainsKey(strategyKey) ? emojiByPurpose[strategyKey] : emojiByPurpose["default"];
+                                    string pluginTitle = $"{emojiByPurpose["plugin"]} DSS Plugin";
+                                    string strategyLabel = $"{emoji} " + (strategyKey switch
                                     {
-                                        "UccidiESpegniLuci" => "😎 Kill & Lights",
-                                        "KillToSovrapposition" => "😎 Kill on Stacks",
-                                        "KillToWin" => "😎 Kill to Win",
-                                        "CanVent" => "😎 Vent Kill",
-                                        _ => "😐 Unknown"
-                                    };
+                                        "UccidiESpegniLuci" => "Kill & Lights",
+                                        "KillToSovrapposition" => "Kill on Stacks",
+                                        "KillToWin" => "Kill to Win",
+                                        "CanVent" => "Use Vent",
+                                        _ => "No Strategy"
+                                    });
 
                                     string explanation = strategyKey switch
                                     {
-                                        "UccidiESpegniLuci" => "😅 Sabotage lights before striking\n😁 Choose isolated targets\n😉 Escape quickly after kill",
-                                        "KillToSovrapposition" => "😅 Blend into groups\n😁 Kill during stack tasks\n😉 Avoid cameras and rush report",
-                                        "KillToWin" => "😅 Check win condition\n😁 Target key crewmates\n😉 Prevent emergency meetings",
-                                        "CanVent" => "😅 Wait near vent\n😁 Kill and vanish fast\n😉 Use sabotage to cover",
-                                        _ => "😐 Unknown\n😐 Unknown\n😐 Unknown"
+                                        "UccidiESpegniLuci" => "1. Sabotage lights before striking\n2. Choose isolated targets\n3. Escape quickly after kill",
+                                        "KillToSovrapposition" => "1. Blend into groups\n2. Kill during stack tasks\n3. Avoid cameras and rush report",
+                                        "KillToWin" => "1. Check win condition\n2. Target key crewmates\n3. Prevent emergency meetings",
+                                        "CanVent" => "1. Wait near vent\n2. Kill and vanish fast\n3. Use sabotage to cover",
+                                        _ => "Unknown\nUnknown\nUnknown"
                                     };
 
                                     using var writer = playerControl.Game.StartRpc(playerControl.NetId, Api.Net.Inner.RpcCalls.SetName, clientPlayer.Client.Id);
                                     Rpc06SetName.Serialize(writer,
                                         $"<align=left>" +
                                         $"<color=yellow><size=130%>{pluginTitle}</size></color>\n" +
-                                        $"Strategy: {strategyLabel}\n" +
-                                        $"Explanation:\n" +
-                                        $"{explanation}\n\n" +
-                                        $"<color={color}><size=150%>😇 Risk Score: {percentage}%</size></color>");
+                                        $"<color=orange><size=130%>Strategy: {strategyLabel}</size></color>\n" +
+                                        $"<color=orange><size=110%>Explanation:</size></color>\n" +
+                                        $"<color=orange><size=110%>{explanation}</size></color>\n" +
+                                        $"<color={color}><size=150%>{emojiByPurpose["score"]} Confidence: {percentage}%</size></color>\n\n\n\n\n\n\n\n");
                                     await playerControl.Game.FinishRpcAsync(writer);
                                 }
                             }
