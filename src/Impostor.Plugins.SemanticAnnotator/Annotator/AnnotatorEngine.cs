@@ -17,6 +17,7 @@ using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Innersloth.Maps;
 
 using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 using Microsoft.Extensions.Options;
 
 

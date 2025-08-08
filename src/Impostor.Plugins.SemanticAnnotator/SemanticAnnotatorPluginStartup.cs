@@ -6,19 +6,25 @@ using Impostor.Api.Plugins;
 using Impostor.Plugins.SemanticAnnotator.Adapters;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Application;
+using Impostor.Plugins.SemanticAnnotator.Controllers;
 using Impostor.Plugins.SemanticAnnotator.Handlers;
+using Impostor.Plugins.SemanticAnnotator.Infrastructure;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
-using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using IO.Swagger.Api;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using StackExchange.Redis;
 using TransactionHandler.Tasks;
 
 namespace Impostor.Plugins.SemanticAnnotator 
@@ -33,7 +39,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             if (!_started)
             {
                 var builder = WebApplication.CreateBuilder();
-
+                builder.WebHost.UseUrls("http://*:5001");
                 builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
                 {
                     var histogramBoundaries = new double[] { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
@@ -59,9 +65,28 @@ namespace Impostor.Plugins.SemanticAnnotator
                         .AddPrometheusExporter();
                 });
 
-
+                builder.Services.AddControllers().AddApplicationPart(typeof(StrategicPluginController).Assembly);
                 var app = builder.Build();
+                app.MapGet("/", async context =>
+                {
+                    var stream = typeof(PrometheusExporterServer).Assembly
+                        .GetManifestResourceStream("Impostor.Plugins.SemanticAnnotator.wwwroot.index.html");
+
+                    if (stream == null)
+                    {
+                        context.Response.StatusCode = 404;
+                        await context.Response.WriteAsync("index.html not found as EmbeddedResource.");
+                        return;
+                    }
+
+                    context.Response.ContentType = "text/html";
+                    await stream.CopyToAsync(context.Response.Body);
+                });
+                app.MapControllers();
                 app.MapPrometheusScrapingEndpoint(); // espone /metrics
+                                                     // Serve file statici da wwwroot/
+                
+
                 app.RunAsync(); // non blocca il thread
                 _started = true;
             }
@@ -96,7 +121,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             // Binding dei Thresholds
 
             services.Configure<AnnotatorServiceOptions>(_configuration.GetSection("AnnotatorService"));
-      
+            services.Configure<RedisStorageOptions>(_configuration.GetSection("RedisStorage"));
 
             // Event listeners
             services.AddSingleton<IEventListener, GameEventListener>();
@@ -113,8 +138,32 @@ namespace Impostor.Plugins.SemanticAnnotator
             var useBuffer = _configuration.GetValue("SemanticPlugin:UseBufferMode", false);
             services.AddSingleton<IAnnotator, AnnotatorService>();
             services.AddSingleton<IArgumentationService, ArgumentationApiAdapter>();
-            services.AddSingleton<INotarizationService, NotarizationAdapter>();
+            services.AddSingleton<IConnectionMultiplexer>(provider =>
+            {
+                var options = provider.GetRequiredService<IOptions<RedisStorageOptions>>().Value;
+
+
+                if (options?.Enabled == true)
+                {
+                    try
+                    {
+                        return ConnectionMultiplexer.Connect(options.ConnectionString);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Unable to connect to Redis at {options.ConnectionString}", ex);
+                    }
+                }
+                else {  return null;
+                }   
+            });
+
+
+            services.AddSingleton<IGameEventStorage, RedisGameEventStorage>();
             services.AddSingleton<ITransactionManager, TransactionManager>();
+
+            services.AddSingleton<ISemanticEventRecorder, SemanticEventRecorderService>();
 
             services.Configure<SemanticPluginOptions>(_configuration.GetSection("SemanticPlugin"));
             services.AddSingleton<KeyedTaskQueue>();

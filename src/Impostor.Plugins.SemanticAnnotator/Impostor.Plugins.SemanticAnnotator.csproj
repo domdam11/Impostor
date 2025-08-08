@@ -1,4 +1,4 @@
-
+﻿
 
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -25,6 +25,11 @@
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.12.0-beta.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.58" />
+  </ItemGroup>
+
+  <ItemGroup>
+  	<EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Impostor.Plugins.SemanticAnnotator.Models
+namespace Impostor.Plugins.SemanticAnnotator.Models.Options
 {
-    public class ArgumentationServiceOptions
+    public class NotarizationServiceOptions
     {
-        public string ArgumentationEndpointUrl { get; set; }
+        public string BlockchainEndpointUrl { get; set; }
         public bool Enabled { get; set; }
     }
 }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Coravel.Scheduling.Schedule.Interfaces;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
 using Microsoft.Extensions.Configuration;
-using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Options;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {

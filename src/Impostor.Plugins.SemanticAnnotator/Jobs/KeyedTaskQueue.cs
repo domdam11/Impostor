@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator.Jobs

@@ -11,7 +11,7 @@ using Coravel.Queuing.Interfaces;
 using Impostor.Api.Events;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
-using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,7 +23,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
         private readonly IAnnotator _annotator;
         private readonly IArgumentationService _argumentation;
-        private readonly INotarizationService _notarization;
+        private readonly ISemanticEventRecorder _notarization;
         private readonly ILogger<DecisionSupportService> _logger;
         private readonly bool _notarizationEnabled;
         private readonly bool _argumentationEnabled;
@@ -61,7 +61,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
         public DecisionSupportService(IAnnotator annotator,
                                       IArgumentationService argumentation,
-                                      INotarizationService notarization,
+                                      ISemanticEventRecorder notarization,
                                       ILogger<DecisionSupportService> logger, IOptions<ArgumentationServiceOptions> argumentationOptions, IOptions<NotarizationServiceOptions> notarizationOptions, GameEventCacheManager cacheManager, KeyedTaskQueue queue)
         {
             _annotator = annotator;
@@ -131,7 +131,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
                             try
                             {
-                                var listEvents = await _notarization.DispatchNotarizationTasksAsync(gameCode, assetKey, eventList, players);
+                                var listEvents = await _notarization.StoreGameEventsAsync(gameCode, assetKey, eventList, players);
                                 swNot.Stop();
 
                                 if (listEvents.Any())
@@ -209,7 +209,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
                                     var swNot = Stopwatch.StartNew();
                                     try
                                     {
-                                        await _notarization.NotifyAsync(annotationKey, annotationEventId, annotationData.OwlDescription, result);
+                                        await _notarization.StoreAnnotationAsync(annotationKey, annotationEventId, annotationData.OwlDescription, result);
                                         swNot.Stop();
                                         var notMs = swNot.Elapsed.TotalMilliseconds;
                                         TemporalTraceCollector.Log(annotationKey, annotationEventId, TracePhase.Notarization, notMs, annotationData);

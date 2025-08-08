@@ -23,7 +23,7 @@ using Impostor.Hazel.Extensions;
 using Impostor.Plugins.SemanticAnnotator;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
-using Impostor.Plugins.SemanticAnnotator.Models;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using Impostor.Server;
 using Impostor.Server.Events;

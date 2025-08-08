@@ -542,6 +542,14 @@
           "OpenTelemetry": "1.12.0"
         }
       },
+      "Pipelines.Sockets.Unofficial": {
+        "type": "Transitive",
+        "resolved": "2.2.8",
+        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        }
+      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
         "resolved": "4.3.2",
@@ -683,6 +691,15 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.0",
           "Microsoft.Extensions.DependencyModel": "8.0.0",
           "Serilog": "3.1.1"
+        }
+      },
+      "StackExchange.Redis": {
+        "type": "Transitive",
+        "resolved": "2.8.58",
+        "contentHash": "0XGRE2UoF/n2/qhCpcyBBZovpGhHu4hRtkdsx4fZFu1H5Q/Z8Q+U/z/nWwnosWDRJnEasntNatd9Mf+Isc8plg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
         }
       },
       "System.AppContext": {
@@ -1464,7 +1481,8 @@
           "Microsoft.Extensions.Http": "[9.0.6, )",
           "OpenTelemetry.Exporter.Prometheus.AspNetCore": "[1.12.0-beta.1, )",
           "OpenTelemetry.Extensions.Hosting": "[1.12.0, )",
-          "RestSharp": "[112.1.0, )"
+          "RestSharp": "[112.1.0, )",
+          "StackExchange.Redis": "[2.8.58, )"
         }
       },
       "impostor.server": {

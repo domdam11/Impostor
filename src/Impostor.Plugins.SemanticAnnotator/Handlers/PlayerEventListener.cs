@@ -12,6 +12,7 @@ using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Innersloth.GameOptions;
 using Impostor.Api.Net.Messages.Rpcs;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Impostor.Plugins.SemanticAnnotator.Handlers
@@ -87,18 +88,19 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                                     ["UccidiESpegniLuci"] = "<sprite=10>",     // 😖 (tensione)
                                     ["KillToSovrapposition"] = "<sprite=11>",  // 😜 (confusione/stacks)
                                     ["KillToWin"] = "<sprite=2>",              // 😍 (focus obiettivo)
-                                    ["CanVent"] = "<sprite=1>",                // 😋 (fame di kill)
+                                    ["CanVent"] = "<sprite=1>",                // 😋 ()
                                     ["default"] = "<sprite=12>"                // ❓ (unknown strategy)
                                 };
-                                var strategyDict = JsonSerializer.Deserialize<Dictionary<string, double>>(strategy);
-
-                                if (strategyDict != null && strategyDict.Count > 0)
+                                var strategyResponse = JsonSerializer.Deserialize<ArgumentationResponse>(strategy);
+                                //var strategyDict = JsonSerializer.Deserialize<Dictionary<string, double>>(strategy);
+                                var suggestedStrategies = strategyResponse.suggestedStrategies;
+                                if (suggestedStrategies != null && suggestedStrategies.Count > 0)
                                 {
                                     // Seleziona la strategia col valore più alto (positiva o meno negativa)
-                                    var selected = strategyDict.OrderByDescending(kvp => kvp.Value).First();
+                                    var selected = suggestedStrategies.Where(a=>a != null).OrderByDescending(kvp => kvp.score).First();
 
-                                    var strategyKey = selected.Key;
-                                    var score = selected.Value;
+                                    var strategyKey = selected.name;
+                                    var score = selected.score;
 
                                     // Calcola percentuale da [-1,1] a [0,100]
                                     int percentage = (int)Math.Round((score + 1) * 50);

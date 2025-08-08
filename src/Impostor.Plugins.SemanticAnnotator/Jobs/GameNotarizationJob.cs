@@ -11,12 +11,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
     public class GameNotarizationJob : IInvocable
     {
         private readonly IArgumentationResultBuffer _resultBuffer;
-        private readonly INotarizationService _notarizationService;
+        private readonly ISemanticEventRecorder _notarizationService;
         private readonly ILogger<GameNotarizationJob> _logger;
 
         public GameNotarizationJob(
             IArgumentationResultBuffer resultBuffer,
-            INotarizationService notarizationService,
+            ISemanticEventRecorder notarizationService,
             ILogger<GameNotarizationJob> logger)
         {
             _resultBuffer = resultBuffer;
@@ -29,12 +29,12 @@ namespace Impostor.Plugins.SemanticAnnotator.Jobs
             _logger.LogInformation("[GameNotarizationJob] Esecuzione avviata.");
 
             // 1. Notarizza gli eventi di gioco registrati nella cache
-            await _notarizationService.DispatchNotarizationTasksAsync("", "", new System.Collections.Generic.List<IEvent>(), new System.Collections.Generic.List<IClientPlayer>());
+            await _notarizationService.StoreGameEventsAsync("", "", new System.Collections.Generic.List<IEvent>(), new System.Collections.Generic.List<IClientPlayer>());
 
             // 2. Notarizza le annotazioni semantiche pronte
             while (_resultBuffer.TryGetNext(out var gameCode, out var result))
             {
-                await _notarizationService.NotifyAsync(gameCode,"", "", result);
+                await _notarizationService.StoreAnnotationAsync(gameCode,"", "", result);
                 _logger.LogInformation($"[GameNotarizationJob] Notarizzazione semantica completata per {gameCode}.");
                 _resultBuffer.MarkAsProcessed(gameCode);
             }
