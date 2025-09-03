@@ -29,7 +29,7 @@ using OpenTelemetry.Resources;
 using StackExchange.Redis;
 using TransactionHandler.Tasks;
 
-namespace Impostor.Plugins.SemanticAnnotator 
+namespace Impostor.Plugins.SemanticAnnotator
 
 {
     public class PrometheusExporterServer : IHostedService
@@ -48,23 +48,23 @@ namespace Impostor.Plugins.SemanticAnnotator
             builder.WebHost.UseUrls("http://*:5001");
 
             // ===== forward dal container principale =====
-            void Forward<TService>()
-            {
-                // se il servizio esiste nel root container, lo ripubblichiamo come singleton nella mini-app
-                using var scope = _root.CreateScope();
-                var maybe = scope.ServiceProvider.GetService(typeof(TService));
-                if (maybe != null)
-                {
-                    builder.Services.AddSingleton(typeof(TService), _ =>
-                        _root.GetRequiredService<TService>());
-                }
-            }
+            /* void Forward<TService>()
+             {
+                 // se il servizio esiste nel root container, lo ripubblichiamo come singleton nella mini-app
+                 using var scope = _root.CreateScope();
+                 var maybe = scope.ServiceProvider.GetService(typeof(TService));
+                 if (maybe != null)
+                 {
+                     builder.Services.AddSingleton(typeof(TService), _ =>
+                         _root.GetRequiredService<TService>());
+                 }
+             }*/
 
             // Minimo indispensabile per risolvere il controller
-            Forward<IGameEventStorage>();
+            //Forward<IGameEventStorage>();
 
             // Altri servizi spesso richiesti dai controller / pipeline
-            Forward<ISemanticEventRecorder>();
+            /*Forward<ISemanticEventRecorder>();
             Forward<IDecisionSupportService>();
             Forward<ITransactionManager>();
             Forward<IAnnotator>();
@@ -80,7 +80,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             Forward<IOptions<SemanticPluginOptions>>();
             Forward<IOptions<AnnotatorServiceOptions>>();
             Forward<IConfiguration>();
-
+            */
             // ===== metrics / prometheus =====
             builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
             {
@@ -94,13 +94,13 @@ namespace Impostor.Plugins.SemanticAnnotator
                     .AddView("dss_notarization_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundariesHigh })
                     .AddPrometheusExporter();
             });
-
+            /*
             // ===== controller del plugin =====
             builder.Services.AddControllers()
                    .AddApplicationPart(typeof(StrategicPluginController).Assembly);
-
+            */
             _app = builder.Build();
-
+            /*
             _app.MapGet("/", async context =>
             {
                 var stream = typeof(PrometheusExporterServer).Assembly
@@ -116,7 +116,7 @@ namespace Impostor.Plugins.SemanticAnnotator
                 context.Response.ContentType = "text/html";
                 await stream.CopyToAsync(context.Response.Body);
             });
-
+            */
             _app.MapControllers();
             _app.MapPrometheusScrapingEndpoint(); // /metrics
 
@@ -196,8 +196,10 @@ namespace Impostor.Plugins.SemanticAnnotator
                         throw new InvalidOperationException($"Unable to connect to Redis at {options.ConnectionString}", ex);
                     }
                 }
-                else {  return null;
-                }   
+                else
+                {
+                    return null;
+                }
             });
 
 
