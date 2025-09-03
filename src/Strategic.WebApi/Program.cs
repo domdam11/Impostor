@@ -205,7 +205,7 @@ if (app.Environment.IsDevelopment() /* || true per sempre */)
 
 app.UseCors();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
