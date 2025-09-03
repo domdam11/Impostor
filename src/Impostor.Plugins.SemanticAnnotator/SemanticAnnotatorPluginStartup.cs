@@ -34,7 +34,7 @@ namespace Impostor.Plugins.SemanticAnnotator
 {
     public class PrometheusExporterServer : IHostedService
     {
-        private readonly IServiceProvider _root; // provider del plugin
+        private readonly IServiceProvider _root;
         private WebApplication? _app;
 
         public PrometheusExporterServer(IServiceProvider root)
@@ -47,40 +47,6 @@ namespace Impostor.Plugins.SemanticAnnotator
             var builder = WebApplication.CreateBuilder();
             builder.WebHost.UseUrls("http://*:5001");
 
-            // ===== forward dal container principale =====
-            /* void Forward<TService>()
-             {
-                 // se il servizio esiste nel root container, lo ripubblichiamo come singleton nella mini-app
-                 using var scope = _root.CreateScope();
-                 var maybe = scope.ServiceProvider.GetService(typeof(TService));
-                 if (maybe != null)
-                 {
-                     builder.Services.AddSingleton(typeof(TService), _ =>
-                         _root.GetRequiredService<TService>());
-                 }
-             }*/
-
-            // Minimo indispensabile per risolvere il controller
-            //Forward<IGameEventStorage>();
-
-            // Altri servizi spesso richiesti dai controller / pipeline
-            /*Forward<ISemanticEventRecorder>();
-            Forward<IDecisionSupportService>();
-            Forward<ITransactionManager>();
-            Forward<IAnnotator>();
-            Forward<IArgumentationService>();
-            Forward<IConnectionMultiplexer>();
-            Forward<IBlockchainReSTAPIApi>();
-            Forward<GameEventCacheManager>();
-            Forward<AnnotatorEngine>();
-            Forward<KeyedTaskQueue>();
-            Forward<IOptions<RedisStorageOptions>>();
-            Forward<IOptions<ArgumentationServiceOptions>>();
-            Forward<IOptions<NotarizationServiceOptions>>();
-            Forward<IOptions<SemanticPluginOptions>>();
-            Forward<IOptions<AnnotatorServiceOptions>>();
-            Forward<IConfiguration>();
-            */
             // ===== metrics / prometheus =====
             builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
             {
@@ -94,31 +60,11 @@ namespace Impostor.Plugins.SemanticAnnotator
                     .AddView("dss_notarization_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundariesHigh })
                     .AddPrometheusExporter();
             });
-            /*
-            // ===== controller del plugin =====
-            builder.Services.AddControllers()
-                   .AddApplicationPart(typeof(StrategicPluginController).Assembly);
-            */
+
             _app = builder.Build();
-            /*
-            _app.MapGet("/", async context =>
-            {
-                var stream = typeof(PrometheusExporterServer).Assembly
-                    .GetManifestResourceStream("Impostor.Plugins.SemanticAnnotator.wwwroot.index.html");
 
-                if (stream == null)
-                {
-                    context.Response.StatusCode = 404;
-                    await context.Response.WriteAsync("index.html not found as EmbeddedResource.");
-                    return;
-                }
-
-                context.Response.ContentType = "text/html";
-                await stream.CopyToAsync(context.Response.Body);
-            });
-            */
-            _app.MapControllers();
-            _app.MapPrometheusScrapingEndpoint(); // /metrics
+            // Espone solo endpoint /metrics
+            _app.MapPrometheusScrapingEndpoint();
 
             _ = _app.RunAsync(cancellationToken);
             return Task.CompletedTask;
