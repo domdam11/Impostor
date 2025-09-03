@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Coravel;
 using Impostor.Api.Events;
 using Impostor.Api.Plugins;
@@ -30,65 +32,104 @@ using TransactionHandler.Tasks;
 namespace Impostor.Plugins.SemanticAnnotator 
 
 {
-    public static class PrometheusExporterServer
+    public class PrometheusExporterServer : IHostedService
     {
-        private static bool _started;
+        private readonly IServiceProvider _root; // provider del plugin
+        private WebApplication? _app;
 
-        public static void Start()
+        public PrometheusExporterServer(IServiceProvider root)
         {
-            if (!_started)
+            _root = root;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            var builder = WebApplication.CreateBuilder();
+            builder.WebHost.UseUrls("http://*:5001");
+
+            // ===== forward dal container principale =====
+            void Forward<TService>()
             {
-                var builder = WebApplication.CreateBuilder();
-                builder.WebHost.UseUrls("http://*:5001");
-                builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
+                // se il servizio esiste nel root container, lo ripubblichiamo come singleton nella mini-app
+                using var scope = _root.CreateScope();
+                var maybe = scope.ServiceProvider.GetService(typeof(TService));
+                if (maybe != null)
                 {
-                    var histogramBoundaries = new double[] { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
-                    var histogramBoundariesHigh = new double[] { 0, 500, 1000, 1500, 2000, 2500, 3000 };
-                    metrics
-                        .AddMeter("SemanticAnnotator.DSS")
-                        .AddView("dss_total_duration_ms", new ExplicitBucketHistogramConfiguration
-                        {
-                            Boundaries = histogramBoundaries
-                        })
-                        .AddView("dss_annotation_duration_ms", new ExplicitBucketHistogramConfiguration
-                        {
-                            Boundaries = histogramBoundaries
-                        })
-                        .AddView("dss_argumentation_duration_ms", new ExplicitBucketHistogramConfiguration
-                        {
-                            Boundaries = histogramBoundaries
-                        })
-                        .AddView("dss_notarization_duration_ms", new ExplicitBucketHistogramConfiguration
-                        {
-                            Boundaries = histogramBoundariesHigh
-                        })
-                        .AddPrometheusExporter();
-                });
+                    builder.Services.AddSingleton(typeof(TService), _ =>
+                        _root.GetRequiredService<TService>());
+                }
+            }
 
-                builder.Services.AddControllers().AddApplicationPart(typeof(StrategicPluginController).Assembly);
-                var app = builder.Build();
-                app.MapGet("/", async context =>
+            // Minimo indispensabile per risolvere il controller
+            Forward<IGameEventStorage>();
+
+            // Altri servizi spesso richiesti dai controller / pipeline
+            Forward<ISemanticEventRecorder>();
+            Forward<IDecisionSupportService>();
+            Forward<ITransactionManager>();
+            Forward<IAnnotator>();
+            Forward<IArgumentationService>();
+            Forward<IConnectionMultiplexer>();
+            Forward<IBlockchainReSTAPIApi>();
+            Forward<GameEventCacheManager>();
+            Forward<AnnotatorEngine>();
+            Forward<KeyedTaskQueue>();
+            Forward<IOptions<RedisStorageOptions>>();
+            Forward<IOptions<ArgumentationServiceOptions>>();
+            Forward<IOptions<NotarizationServiceOptions>>();
+            Forward<IOptions<SemanticPluginOptions>>();
+            Forward<IOptions<AnnotatorServiceOptions>>();
+            Forward<IConfiguration>();
+
+            // ===== metrics / prometheus =====
+            builder.Services.AddOpenTelemetry().WithMetrics(metrics =>
+            {
+                var histogramBoundaries = new double[] { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110 };
+                var histogramBoundariesHigh = new double[] { 0, 500, 1000, 1500, 2000, 2500, 3000 };
+                metrics
+                    .AddMeter("SemanticAnnotator.DSS")
+                    .AddView("dss_total_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundaries })
+                    .AddView("dss_annotation_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundaries })
+                    .AddView("dss_argumentation_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundaries })
+                    .AddView("dss_notarization_duration_ms", new ExplicitBucketHistogramConfiguration { Boundaries = histogramBoundariesHigh })
+                    .AddPrometheusExporter();
+            });
+
+            // ===== controller del plugin =====
+            builder.Services.AddControllers()
+                   .AddApplicationPart(typeof(StrategicPluginController).Assembly);
+
+            _app = builder.Build();
+
+            _app.MapGet("/", async context =>
+            {
+                var stream = typeof(PrometheusExporterServer).Assembly
+                    .GetManifestResourceStream("Impostor.Plugins.SemanticAnnotator.wwwroot.index.html");
+
+                if (stream == null)
                 {
-                    var stream = typeof(PrometheusExporterServer).Assembly
-                        .GetManifestResourceStream("Impostor.Plugins.SemanticAnnotator.wwwroot.index.html");
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("index.html not found as EmbeddedResource.");
+                    return;
+                }
 
-                    if (stream == null)
-                    {
-                        context.Response.StatusCode = 404;
-                        await context.Response.WriteAsync("index.html not found as EmbeddedResource.");
-                        return;
-                    }
+                context.Response.ContentType = "text/html";
+                await stream.CopyToAsync(context.Response.Body);
+            });
 
-                    context.Response.ContentType = "text/html";
-                    await stream.CopyToAsync(context.Response.Body);
-                });
-                app.MapControllers();
-                app.MapPrometheusScrapingEndpoint(); // espone /metrics
-                                                     // Serve file statici da wwwroot/
-                
+            _app.MapControllers();
+            _app.MapPrometheusScrapingEndpoint(); // /metrics
 
-                app.RunAsync(); // non blocca il thread
-                _started = true;
+            _ = _app.RunAsync(cancellationToken);
+            return Task.CompletedTask;
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (_app is not null)
+            {
+                await _app.StopAsync(cancellationToken);
+                _app = null;
             }
         }
     }
@@ -200,7 +241,7 @@ namespace Impostor.Plugins.SemanticAnnotator
                 services.AddSingleton<IDecisionSupportService, DecisionSupportService>();
 
             }
-            PrometheusExporterServer.Start();
+            services.AddHostedService<PrometheusExporterServer>();
         }
     }
 }

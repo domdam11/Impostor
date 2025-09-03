@@ -29,4 +29,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Models
         public string Timestamp { get; set; }
     }
 
+
+
 }

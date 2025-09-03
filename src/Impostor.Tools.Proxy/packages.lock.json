@@ -433,6 +433,14 @@
           "OpenTelemetry": "1.12.0"
         }
       },
+      "Pipelines.Sockets.Unofficial": {
+        "type": "Transitive",
+        "resolved": "2.2.8",
+        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        }
+      },
       "RestSharp": {
         "type": "Transitive",
         "resolved": "112.1.0",
@@ -480,6 +488,15 @@
         "contentHash": "6Jt8jl9y2ey8VV7nVEUAyjjyxjAQuvd5+qj4XYAT9CwcsvR70HHULGBeD+K2WCALFXf7CFsNQT4lON6qXcu2AA==",
         "dependencies": {
           "Serilog": "3.1.1"
+        }
+      },
+      "StackExchange.Redis": {
+        "type": "Transitive",
+        "resolved": "2.8.58",
+        "contentHash": "0XGRE2UoF/n2/qhCpcyBBZovpGhHu4hRtkdsx4fZFu1H5Q/Z8Q+U/z/nWwnosWDRJnEasntNatd9Mf+Isc8plg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
         }
       },
       "System.Diagnostics.DiagnosticSource": {
@@ -536,7 +553,8 @@
           "RestSharp": "[112.1.0, )",
           "Serilog.Extensions.Hosting": "[8.0.0, )",
           "Serilog.Settings.Configuration": "[8.0.0, )",
-          "Serilog.Sinks.Console": "[5.0.1, )"
+          "Serilog.Sinks.Console": "[5.0.1, )",
+          "StackExchange.Redis": "[2.8.58, )"
         }
       }
     }

@@ -37,6 +37,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CowlSharp", "CowlSharp\Cowl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransactionHandler", "TransactionHandler\src\IO.Swagger\TransactionHandler.csproj", "{C99EEA00-DE6B-485B-8D30-612FD7A86421}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strategic.WebApi", "Strategic.WebApi\Strategic.WebApi.csproj", "{269AD2CB-50E4-48D9-BBE0-08D535402633}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impostor.Plugins.SemanticAnnotator.Abstractions", "Impostor.Plugins.SemanticAnnotator.Abstractions\Impostor.Plugins.SemanticAnnotator.Abstractions.csproj", "{840A586B-237C-4F6B-9838-4FEE4FF96238}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +161,22 @@ Global
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|x86.ActiveCfg = Release|Any CPU
 		{C99EEA00-DE6B-485B-8D30-612FD7A86421}.Release|x86.Build.0 = Release|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Debug|x86.Build.0 = Debug|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Release|Any CPU.Build.0 = Release|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Release|x86.ActiveCfg = Release|Any CPU
+		{269AD2CB-50E4-48D9-BBE0-08D535402633}.Release|x86.Build.0 = Release|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Debug|x86.Build.0 = Debug|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Release|x86.ActiveCfg = Release|Any CPU
+		{840A586B-237C-4F6B-9838-4FEE4FF96238}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

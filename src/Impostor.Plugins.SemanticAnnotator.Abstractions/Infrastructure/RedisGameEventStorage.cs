@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Impostor.Plugins.SemanticAnnotator.Models;
 using Impostor.Plugins.SemanticAnnotator.Ports;
 using StackExchange.Redis;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Impostor.Plugins.SemanticAnnotator.Infrastructure
 {
@@ -17,7 +20,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Infrastructure
         {
             _db = connectionMultiplexer?.GetDatabase();
         }
-
 
         public async Task CreateGameSessionAsync(string sessionId, string description)
         {
@@ -48,7 +50,8 @@ namespace Impostor.Plugins.SemanticAnnotator.Infrastructure
             {
                 Id = eventId,
                 Annotation = annotatedReasoning,
-                Metadata = argumentation
+                Metadata = argumentation,
+                Timestamp = DateTime.UtcNow.ToString("o")
             };
 
             // Salva i dettagli in Redis
@@ -70,17 +73,19 @@ namespace Impostor.Plugins.SemanticAnnotator.Infrastructure
                 if (!json.HasValue) continue;
 
                 var details = JsonSerializer.Deserialize<StrategicEventDetails>(json);
-                var bestStrategy = details?.Metadata?.suggestedStrategies?
+                var bestStrategy = details?.Metadata?.suggestedStrategies?.Where(a => a != null)
                     .OrderByDescending(s => s.score)
                     .FirstOrDefault();
-
-                result.Add(new StrategicEventSummary
+                if (bestStrategy.name != "OtherStrategy" && bestStrategy?.name != null)
                 {
-                    Id = int.TryParse(eventId, out var num) ? num : 0,
-                    Timestamp = details?.Metadata?.graph?.nodes?.FirstOrDefault()?.data?.label ?? "",
-                    Strategy = bestStrategy?.name ?? "Unknown",
-                    Score = bestStrategy?.score ?? 0
-                });
+                    result.Add(new StrategicEventSummary
+                    {
+                        Id = eventId,
+                        Timestamp = details.Timestamp,
+                        Strategy = bestStrategy?.name ?? "Unknown",
+                        Score = (int)Math.Round((bestStrategy.score + 1) * 50)
+                    });
+                }
             }
 
             return result;
@@ -112,4 +117,6 @@ namespace Impostor.Plugins.SemanticAnnotator.Infrastructure
             return result;
         }
     }
+    
+
 }
