@@ -49,6 +49,7 @@ namespace Impostor.Plugins.SemanticAnnotator
             }
             else
             {
+                _logger.LogInformation("No buffer mode.");
                 scheduler.Schedule<DecisionSupportJob>()
                     .EverySeconds(_annotationIntervalMs / 1000)
                     .PreventOverlapping(nameof(DecisionSupportJob));

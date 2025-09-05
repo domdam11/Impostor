@@ -118,6 +118,7 @@ namespace Impostor.Server.Plugins
 
                 foreach (var plugin in orderedPlugins)
                 {
+                    Logger.Warning("ConfigureServices ({0}).", plugin.Name);
                     plugin.Startup?.ConfigureServices(services);
                 }
             });
@@ -183,6 +184,7 @@ namespace Impostor.Server.Plugins
 
             foreach (var plugin in checkedPlugins)
             {
+                Logger.Warning("Check plugin ({0}).", pluginDictionary[plugin].Name);
                 foreach (var dependency in pluginDictionary[plugin].Dependencies.Where(d => checkedPlugins.Contains(d.Id)))
                 {
                     if (dependency.DependencyType == DependencyType.LoadBefore)
