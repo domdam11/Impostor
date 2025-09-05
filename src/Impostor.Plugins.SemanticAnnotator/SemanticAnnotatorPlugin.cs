@@ -1,13 +1,16 @@
-using Impostor.Api.Plugins;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Coravel.Scheduling.Schedule.Interfaces;
+using Impostor.Api.Plugins;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Application;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Impostor.Plugins.SemanticAnnotator.Models.Options;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Impostor.Plugins.SemanticAnnotator
 {
@@ -31,11 +34,11 @@ namespace Impostor.Plugins.SemanticAnnotator
         {
             _logger.LogInformation("[SemanticAnnotatorPlugin] EnableAsync called.");
 
-            var scheduler = _serviceProvider.GetRequiredService<IScheduler>();
+            //var scheduler = _serviceProvider.GetRequiredService<IScheduler>();
 
             if (_useBuffer)
             {
-                scheduler.Schedule<AnnotationJob>()
+               /* scheduler.Schedule<AnnotationJob>()
                 .EverySeconds(_annotationIntervalMs)
                 .PreventOverlapping(nameof(AnnotationJob));
 
@@ -45,14 +48,15 @@ namespace Impostor.Plugins.SemanticAnnotator
 
                 scheduler.Schedule<GameNotarizationJob>()
                     .EverySeconds(_annotationIntervalMs)
-                    .PreventOverlapping(nameof(GameNotarizationJob));
+                    .PreventOverlapping(nameof(GameNotarizationJob));*/
             }
             else
             {
                 _logger.LogInformation("No buffer mode.");
-                scheduler.Schedule<DecisionSupportJob>()
+                /*scheduler.Schedule<DecisionSupportJob>()
                     .EverySeconds(_annotationIntervalMs / 1000)
-                    .PreventOverlapping(nameof(DecisionSupportJob));
+                    .PreventOverlapping(nameof(DecisionSupportJob));*/
+                
             }
 
 

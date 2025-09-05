@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Coravel.Queuing.Interfaces;
 using Impostor.Api.Events;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
 using Impostor.Plugins.SemanticAnnotator.Jobs;
@@ -244,6 +243,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Application
 
         public async Task ProcessMultipleAsync(IEnumerable<string> gameCodes)
         {
+            _logger.LogInformation("Invoked Decision Support: active gamecodes ({0})", gameCodes.FirstOrDefault());
             foreach (var gameCode in gameCodes)
             {
                 await ProcessAsync(gameCode);
