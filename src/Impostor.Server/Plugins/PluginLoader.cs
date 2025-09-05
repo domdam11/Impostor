@@ -103,7 +103,7 @@ namespace Impostor.Server.Plugins
                         .FirstOrDefault(),
                     plugin.Single()));
             }
-
+            Logger.Warning("LoadOrderPlugins ({0}).", plugins.Count);
             var orderedPlugins = LoadOrderPlugins(plugins);
 
             foreach (var plugin in orderedPlugins)
@@ -176,12 +176,12 @@ namespace Impostor.Server.Plugins
             }
 
             var presentPlugins = pluginDictionary.Keys.ToList();
-
+            Logger.Warning("Check Hard Dependencies plugin ({0}).", presentPlugins.Count);
             // Check whether the Hard Dependencies are present and remove those without.
             var checkedPlugins = CheckHardDependencies(presentPlugins, hardDependencies);
 
             var dependencyGraph = checkedPlugins.ToDictionary(p => p, _ => new List<string>());
-
+            Logger.Warning("CheckedPlugins iterator for ({0}).", checkedPlugins.Count);
             foreach (var plugin in checkedPlugins)
             {
                 Logger.Warning("Check plugin ({0}).", pluginDictionary[plugin].Name);
