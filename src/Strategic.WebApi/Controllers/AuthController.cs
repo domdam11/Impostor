@@ -112,7 +112,7 @@ namespace Strategic.WebApi.Controllers
             ValidateLifetime = !ignoreLifetime,        // <— ignore lifetime for refresh
             ClockSkew = TimeSpan.Zero
         };
-
+        [Authorize]
         [HttpPost("auth/refresh")]
         public async Task<IActionResult> RefreshAsync()
         {

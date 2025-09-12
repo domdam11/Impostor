@@ -137,7 +137,7 @@ public sealed class RedisAuthStore : IAuthStore
 
     private static string GenerateSessionKey()
     {
-        Span<byte> buf = stackalloc byte[24];
+        Span<byte> buf = stackalloc byte[10];
         RandomNumberGenerator.Fill(buf);
         var b64 = Convert.ToBase64String(buf)
             .TrimEnd('=')

@@ -52,6 +52,11 @@
           "Microsoft.IdentityModel.Tokens": "8.14.0"
         }
       },
+      "CppSharp.Runtime": {
+        "type": "Transitive",
+        "resolved": "1.1.5.3168",
+        "contentHash": "57twYtZo0D0uWByv6fW128A7WwbLgdNCSe8BAzcUMr+MUNMfisjLmas4JOwCfd2mWyZyGvtOCYHwoCSuvWTdzw=="
+      },
       "Microsoft.Extensions.ApiDescription.Server": {
         "type": "Transitive",
         "resolved": "8.0.0",
@@ -156,6 +161,12 @@
         "type": "Transitive",
         "resolved": "5.0.1",
         "contentHash": "qEePWsaq9LoEEIqhbGe6D5J8c9IqQOUuTzzV6wn1POlfdLkJliZY3OlB0j0f17uMWlqZYjH7txj+2YbyrIA8Yg=="
+      },
+      "cowlsharp": {
+        "type": "Project",
+        "dependencies": {
+          "CppSharp.Runtime": "[1.1.5.3168, )"
+        }
       },
       "impostor.plugins.semanticannotator.abstractions": {
         "type": "Project",

@@ -3,8 +3,9 @@ using cowl;
 
 namespace CowlSharp.Wrapper
 {
-    public static class CowlWrapper
+    public class CowlWrapper
     {
+
         /// <summary>
         /// Creates an individual in the ontology.
         /// </summary>
@@ -289,9 +290,58 @@ namespace CowlSharp.Wrapper
                 return data_quant;
             }
         }
+        private List<string> individuals = new List<string>();
+        public List<string> ReadIndividuals(string ontology)
+        {
+            try
+            {
+                // Initialize the Cowl library
+                cowl_config.CowlInit();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            var instancesToRelease = new List<nint>();
+            // Instantiate a manager and deserialize an ontology from file
+            CowlManager manager = cowl_manager.CowlManager();
+
+            var ontologyUString = UString.UstringCopyBuf(ontology);
+            var onto = cowl_manager.CowlManagerReadString(manager, ontologyUString);
+            individuals = new List<string>();
+            // Run the query.
+            CowlIterator iter = new CowlIterator()
+            {
+                ForEach = ForEachClassMethod
+            };
+            cowl_ontology.CowlOntologyIterateAxiomsOfType(onto, CowlAxiomType.COWL_AT_CLASS_ASSERT, iter, false);
+            // Release the instances
+            foreach (var instance in instancesToRelease)
+            {
+                cowl_object.CowlRelease(instance);
+            }
+            cowl_object.CowlRelease(onto.__Instance);
+            cowl_object.CowlRelease(manager.__Instance);
+            return individuals;
+        }
+
+        private bool ForEachClassMethod(nint ctx, nint axiom)
+        {
+           
+            CowlIndividual individual = cowl_cls_assert_axiom.CowlClsAssertAxiomGetInd(CowlClsAssertAxiom.__CreateInstance(axiom));
+            var cowlString = cowl_object.CowlGetRem(cowl_object.CowlGetIri(individual.__Instance).__Instance);
+            var cowlUString = cowl_object.CowlToUstring(cowlString.__Instance);
+            // Write the ontology to a string
+
+            var indName = cowl_string.CowlStringGetCstring(cowlString);
+            individuals.Add(indName);
+            return true;
+        }
 
 
-        
+
+
 
     }
 }

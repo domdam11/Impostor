@@ -1187,7 +1187,7 @@ namespace cowl
             var ___ret = new global::cowl.UString.__Internal();
             __Internal.UstringAssignBuf(ustringBuffer.__Instance, buf);
             var result = Marshal.PtrToStringUTF8(ustringBuffer.__Instance);
-            Console.WriteLine("string" + result);
+            //Console.WriteLine("string" + result);
             return global::cowl.UString.__CreateInstance(___ret);
         }
 
@@ -17973,7 +17973,7 @@ namespace cowl
     {
         public partial struct __Internal
         {
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_axiom_get_type@@YA?AW4CowlAxiomType@@PEAX@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_axiom_get_type", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.CowlAxiomType CowlAxiomGetType(__IntPtr axiom);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_axiom_get_annot@@YAPEAUCowlVector@@PEAX@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -19911,7 +19911,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_cls_assert_axiom_get_cls_exp@@YAPEAUCowlClsExp@@PEAUCowlClsAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlClsAssertAxiomGetClsExp(__IntPtr axiom);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_cls_assert_axiom_get_ind@@YAPEAUCowlIndividual@@PEAUCowlClsAssertAxiom@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_cls_assert_axiom_get_ind", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern __IntPtr CowlClsAssertAxiomGetInd(__IntPtr axiom);
         }
 
@@ -22135,7 +22135,7 @@ namespace cowl
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_write_error", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.UstreamRet CowlWriteError(__IntPtr stream, __IntPtr error);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_write_ustring@@YA?AW4ustream_ret@@PEAUUOStream@@PEBUUString@@@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_write_ustring", CallingConvention = __CallingConvention.Cdecl)]
             internal static extern global::cowl.UstreamRet CowlWriteUstring(__IntPtr stream, __IntPtr @string);
 
             [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_write_cstring@@YA?AW4ustream_ret@@PEAUUOStream@@PEBD@Z", CallingConvention = __CallingConvention.Cdecl)]
@@ -28768,23 +28768,23 @@ namespace cowl
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateRelated(__IntPtr onto, __IntPtr primitive, global::cowl.CowlAxiomType type, byte position, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_sub_classes@@YA_NPEAUCowlOntology@@PEAUCowlClass@@PEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_sub_classes", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateSubClasses(__IntPtr onto, __IntPtr owl_class, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_super_classes@@YA_NPEAUCowlOntology@@PEAUCowlClass@@PEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_super_classes", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateSuperClasses(__IntPtr onto, __IntPtr owl_class, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_eq_classes@@YA_NPEAUCowlOntology@@PEAUCowlClass@@PEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_eq_classes", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateEqClasses(__IntPtr onto, __IntPtr owl_class, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_disjoint_classes@@YA_NPEAUCowlOntology@@PEAUCowlClass@@PEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_disjoint_classes", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateDisjointClasses(__IntPtr onto, __IntPtr owl_class, __IntPtr iter, bool imports);
 
-            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "?cowl_ontology_iterate_types@@YA_NPEAUCowlOntology@@PEAXPEAUCowlIterator@@_N@Z", CallingConvention = __CallingConvention.Cdecl)]
+            [SuppressUnmanagedCodeSecurity, DllImport("cowl", EntryPoint = "cowl_ontology_iterate_types", CallingConvention = __CallingConvention.Cdecl)]
             [return: MarshalAs(UnmanagedType.I1)]
             internal static extern bool CowlOntologyIterateTypes(__IntPtr onto, __IntPtr ind, __IntPtr iter, bool imports);
         }
