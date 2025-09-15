@@ -40,7 +40,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Controllers
             return v is null ? NotFound() : Ok(v);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [HttpPost("upload")]
         [SwaggerOperation(Summary = "Carica una nuova ontologia OWL da file e aggiorna le strategie")]
         [ProducesResponseType(typeof(object), 201)]
@@ -69,7 +69,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         [SwaggerOperation(Summary = "Cancella una versione specifica")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Coravel.Scheduling.Schedule;
 using Coravel.Scheduling.Schedule.Interfaces;
 using Impostor.Api.Plugins;
 using Impostor.Plugins.SemanticAnnotator.Annotator;
@@ -17,17 +18,18 @@ namespace Impostor.Plugins.SemanticAnnotator
     [ImpostorPlugin("impostor.plugins.semanticannotator")]
     public class SemanticAnnotatorPlugin : PluginBase
     {
+        private readonly DecisionSupportScheduler _scheduler;
         private readonly ILogger<SemanticAnnotatorPlugin> _logger;
-        private readonly IServiceProvider _serviceProvider;
         private readonly bool _useBuffer;
-        private readonly int _annotationIntervalMs;
+        //private readonly int _annotationIntervalMs;
 
-        public SemanticAnnotatorPlugin(ILogger<SemanticAnnotatorPlugin> logger, IServiceProvider serviceProvider, IConfiguration _configuration, IOptions<SemanticPluginOptions> options)
+        public SemanticAnnotatorPlugin(ILogger<SemanticAnnotatorPlugin> logger, IServiceProvider serviceProvider, IConfiguration _configuration, IOptions<SemanticPluginOptions> options, DecisionSupportScheduler scheduler)
         {
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            //_serviceProvider = serviceProvider;
             _useBuffer = options.Value.UseBufferMode;
-            _annotationIntervalMs = options.Value.AnnotationIntervalMs;
+            //_annotationIntervalMs = options.Value.AnnotationIntervalMs;
+            _scheduler = scheduler;
         }
 
         public override ValueTask EnableAsync()
@@ -53,10 +55,11 @@ namespace Impostor.Plugins.SemanticAnnotator
             else
             {
                 _logger.LogInformation("No buffer mode.");
+                _scheduler.Start();
                 /*scheduler.Schedule<DecisionSupportJob>()
                     .EverySeconds(_annotationIntervalMs / 1000)
                     .PreventOverlapping(nameof(DecisionSupportJob));*/
-                
+
             }
 
 
@@ -66,6 +69,7 @@ namespace Impostor.Plugins.SemanticAnnotator
         public override ValueTask DisableAsync()
         {
             _logger.LogInformation("[SemanticAnnotatorPlugin] DisableAsync called.");
+            _scheduler.Stop();
             return default;
         }
     }

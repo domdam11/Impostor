@@ -104,10 +104,10 @@ namespace Impostor.Plugins.SemanticAnnotator
 
             services.AddSingleton(_configuration);
             //services.AddScheduler(); // Coravel scheduler
-            services.AddHostedService<DecisionSupportScheduler>();
-            services.AddScoped<IDecisionSupportService, DecisionSupportService>();
-          
+            services.AddSingleton<DecisionSupportScheduler>();
             services.AddTransient<DecisionSupportJob>();
+            services.AddScoped<IDecisionSupportService, DecisionSupportService>();
+      
 
             // Binding dei Thresholds
 
