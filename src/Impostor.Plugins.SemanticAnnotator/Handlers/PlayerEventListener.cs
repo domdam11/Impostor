@@ -122,7 +122,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Handlers
                                         "KillToSovrapposition" => "Kill on Stacks",
                                         "KillToWin" => "Kill to Win",
                                         "CanVent" => "Use Vent",
-                                        _ => "No Strategy"
+                                        _ => strategyKey
                                     });
 
                                     string explanation = strategyKey switch
