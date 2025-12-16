@@ -30,7 +30,7 @@ public class SemanticEventRecorderService : ISemanticEventRecorder
 
     public async Task StoreAnnotationAsync(string gameSessionId, string eventId, string annotatedReasoning, string metadata)
     {
-        //await _notarizer.CreateEventAsync(gameSessionId, eventId, annotatedReasoning, metadata);
+        await _notarizer.CreateEventAsync(gameSessionId, eventId, annotatedReasoning, metadata);
         await _storage.CreateEventAsync(gameSessionId, eventId, annotatedReasoning, metadata);
     }
 
@@ -45,13 +45,13 @@ public class SemanticEventRecorderService : ISemanticEventRecorder
                 switch (ev)
                 {
                     case IGamePlayerLeftEvent gamePlayerLeftEvent:
-                        //await _notarizer.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
+                        await _notarizer.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
                         //await _storage.RemovePlayerAsync(gameCode, gamePlayerLeftEvent.Player.Client.Name, "");
                         processedEvents.Add(ev);
                         break;
 
                     case IGameStartedEvent gameStartedEvent:
-                        //await _notarizer.CreateGameSessionAsync(assetKey, "nuova sessione");
+                        await _notarizer.CreateGameSessionAsync(assetKey, "nuova sessione");
                         await _storage.CreateGameSessionAsync(assetKey, "nuova sessione");
 
                         foreach (var player in players)
@@ -63,25 +63,25 @@ public class SemanticEventRecorderService : ISemanticEventRecorder
                         break;
 
                     case IGameEndedEvent gameEndedEvent:
-                        //await _notarizer.EndGameSessionAsync(assetKey);
+                        await _notarizer.EndGameSessionAsync(assetKey);
                         //await _storage.EndGameSessionAsync(assetKey);
                         processedEvents.Add(ev);
                         break;
 
                     case IGamePlayerJoinedEvent gamePlayerJoinedEvent:
-                        //await _notarizer.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
+                        await _notarizer.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
                         await _storage.AddPlayerAsync(gameCode, gamePlayerJoinedEvent.Player.Client.Name, "");
                         processedEvents.Add(ev);
                         break;
 
                     case IGameCreatedEvent gameCreatedEvent:
-                        //await _notarizer.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
+                        await _notarizer.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
                         await _storage.CreateGameSessionAsync(gameCode, gameCreatedEvent.Game.GameState.ToString());
                         processedEvents.Add(ev);
                         break;
 
                     case IGameDestroyedEvent gameDestroyed:
-                        //await _notarizer.EndGameSessionAsync(gameCode);
+                        await _notarizer.EndGameSessionAsync(gameCode);
                         //await _storage.EndGameSessionAsync(gameCode);
                         processedEvents.Add(ev);
                         break;
