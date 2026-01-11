@@ -1,0 +1,404 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Impostor.Api.Config;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
+using Impostor.Api.Net.Manager;
+using Impostor.Api.Net.Messages;
+using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Utils;
+using Impostor.Hazel;
+using Impostor.Hazel.Abstractions;
+using Impostor.Hazel.Extensions;
+using Impostor.Plugins.SemanticAnnotator;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Impostor.Plugins.SemanticAnnotator.Jobs;
+using Impostor.Plugins.SemanticAnnotator.Models.Options;
+using Impostor.Plugins.SemanticAnnotator.Ports;
+using Impostor.Server;
+using Impostor.Server.Events;
+using Impostor.Server.Net;
+using Impostor.Server.Net.Custom;
+using Impostor.Server.Net.Factories;
+using Impostor.Server.Net.Manager;
+using Impostor.Server.Recorder;
+using Impostor.Server.Utils;
+using Impostor.Tools.ServerReplay.Mocks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
+using Serilog;
+using ILogger = Serilog.ILogger;
+
+namespace Impostor.Tools.ServerReplay
+{
+    internal static class Program
+    {
+        // Serilog logger for logging application activity
+        private static readonly ILogger Logger = Log.ForContext(typeof(Program));
+
+        // Dictionaries mapping client IDs to necessary session objects
+        private static readonly Dictionary<int, IHazelConnection> Connections = new Dictionary<int, IHazelConnection>();
+        private static readonly Dictionary<int, IGameOptions> GameOptions = new Dictionary<int, IGameOptions>();
+
+        // Dependency Injection ServiceProvider
+        private static ServiceProvider _serviceProvider;
+
+        // Other required objects for handling messages
+        private static ObjectPool<MessageReader> _readerPool;
+        private static MockGameCodeFactory _gameCodeFactory;
+        private static ClientManager _clientManager;
+        private static GameManager _gameManager;
+
+        // Fake DateTimeProvider to simulate time progression in recorded sessions
+        public static FakeDateTimeProvider _fakeDateTimeProvider;
+
+        /// <summary>
+        /// Entry point of the application that processes and replays .dat session files.
+        /// </summary>
+        private static async Task Main(string[] args)
+        {
+            // Configure Serilog for logging
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            // Measure execution time
+            var stopwatch = Stopwatch.StartNew();
+  
+            bool Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
+
+            string sessionDir = Path.Combine(AppContext.BaseDirectory, "sessions");
+
+            // Se non esiste in Docker, prova a risalire fino al progetto locale
+            if (!Directory.Exists(sessionDir))
+            {
+                try
+                {
+                    // Risale a partire da bin/Debug/net8.0 verso la cartella progetto
+                    string? projectRoot = Directory.GetParent(AppContext.BaseDirectory)?
+                                                         .Parent?.Parent?.Parent?.FullName;
+
+                    if (projectRoot != null)
+                    {
+                        string fallback = Path.Combine(projectRoot, "sessions");
+                        if (Directory.Exists(fallback))
+                        {
+                            sessionDir = fallback;
+                        }
+                        else
+                        {
+                            throw new DirectoryNotFoundException($"sessions folder not found at fallback path: {fallback}");
+                        }
+                    }
+                    else
+                    {
+                        throw new DirectoryNotFoundException("Could not determine project root from BaseDirectory.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error locating sessions folder: {ex.Message}");
+                    throw;
+                }
+            }
+
+            Console.WriteLine($"Using session directory: {sessionDir}");
+            foreach (var file in Directory.GetFiles(sessionDir, "*.dat"))
+            {
+                // Clear dictionaries at the start of each session
+                Connections.Clear();
+                GameOptions.Clear();
+
+                // Create a new ServiceProvider (DI) for each session file
+                _serviceProvider = BuildServices();
+
+                // Retrieve shared services
+                _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
+                _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
+                _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
+                _gameManager = _serviceProvider.GetRequiredService<GameManager>();
+                _fakeDateTimeProvider = _serviceProvider.GetRequiredService<FakeDateTimeProvider>();
+
+                // Open the file and start reading
+                await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new BinaryReader(stream))
+                {
+                    // Begin parsing the session
+                    await ParseSessionAsync(sessionDir, file, reader);
+                }
+
+            }
+
+            // Log total processing time
+            var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            Logger.Information($"Took {elapsedMilliseconds}ms.");
+            await Task.Delay(TimeSpan.FromSeconds(30));
+
+        }
+
+        /// <summary>
+        /// Sets up and configures required services, including:
+        /// - Impostor core classes
+        /// - Semantic Annotator plugin
+        /// </summary>
+        private static ServiceProvider BuildServices()
+        {
+
+            var services = new ServiceCollection();
+
+            // Set up a mock ServerEnvironment
+            services.AddSingleton(new ServerEnvironment
+            {
+                IsReplay = true,
+            });
+
+            // Add a FakeDateTimeProvider to handle artificial time management
+            services.AddSingleton<FakeDateTimeProvider>();
+            services.AddSingleton<IDateTimeProvider>(p => p.GetRequiredService<FakeDateTimeProvider>());
+
+            // Configure logging
+            services.AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddSerilog();
+            });
+
+            // Register necessary Impostor services
+            services.AddSingleton<GameManager>();
+            services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
+            services.AddSingleton<MockGameCodeFactory>();
+            services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
+            services.Configure<CompatibilityConfig>(config =>
+            {
+                config.AllowFutureGameVersions = true;
+            });
+            services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
+            services.AddSingleton<ClientManager>();
+            services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+            services.AddSingleton<IEventManager, EventManager>();
+
+            // Register custom message managers
+            services.AddEventPools();
+            services.AddHazel();
+            services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
+            services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            // Crea un'istanza di SemanticAnnotatorPluginStartup iniettando IConfiguration
+            var semanticAnnotatorPluginStartup = ActivatorUtilities.CreateInstance<SemanticAnnotatorPluginStartup>(serviceProvider);
+
+            // Configura i servizi
+            semanticAnnotatorPluginStartup.ConfigureServices(services);
+
+            // Registrazioni aggiuntive (se serve)
+            services.AddSingleton<SemanticAnnotatorPlugin>();
+
+            // Build and return the service provider
+            return services.BuildServiceProvider();
+        }
+
+        /// <summary>
+        /// Parses the entire session (.dat file)
+        /// </summary>
+        private static async Task ParseSessionAsync(string sessionDir, string fileName, BinaryReader reader)
+        {
+            var options = _serviceProvider.GetRequiredService<IOptions<SemanticPluginOptions>>().Value;
+            // Read the version of the recording protocol
+            var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
+            if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
+            {
+                throw new NotSupportedException("Session's protocol version is unsupported");
+            }
+
+            // Retrieve the initial timestamp of the session
+            var startTime = _fakeDateTimeProvider.UtcNow = DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64());
+
+            // Read the server version
+            var serverVersion = reader.ReadString();
+            Logger.Information("Loaded session (server: {ServerVersion}, recorded at {StartTime})", serverVersion, startTime);
+            double totalTimeframe = 0;
+            // Read all packets in the session
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
+            {
+                var dataLength = reader.ReadInt32();
+                var data = reader.ReadBytes(dataLength - 4);
+
+                await using (var stream = new MemoryStream(data))
+                using (var readerInner = new BinaryReader(stream))
+                {
+                    var nextTimeFrame = TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
+                    
+                    // Update the simulated time for each block
+                    var previous = _fakeDateTimeProvider.UtcNow;
+                    _fakeDateTimeProvider.UtcNow = startTime + nextTimeFrame;
+                    totalTimeframe += _fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
+                    var milliseconds = (int)_fakeDateTimeProvider.UtcNow.Subtract(previous).TotalMilliseconds;
+                    if(milliseconds < 0)
+                    {
+                        milliseconds = 0;
+                        totalTimeframe = 0;
+                    }
+                    // Interpret the individual packet
+                    try
+                    {
+                        await ParsePacket(readerInner);
+                    }
+                    catch (Exception ex)
+                    {
+                        continue;
+                    }
+                    var gameCacheManager = _serviceProvider.GetRequiredService<GameEventCacheManager>();
+                    if (totalTimeframe > options.AnnotationIntervalMs) {
+                       
+                        var decisionSupport = _serviceProvider.GetRequiredService<IDecisionSupportService>();
+                        
+                        await decisionSupport.ProcessMultipleAsync(gameCacheManager.GetActiveSessions().Where(a=>options.ValidGameCodes.Contains(a)));
+
+                        totalTimeframe = 0;
+                        
+                    }
+                    try
+                    {
+                        if (gameCacheManager.GetActiveSessions().Where(a => options.ValidGameCodes.Contains(a)).Any())
+                        {
+                            //await Task.Delay(Math.Min(milliseconds, options.ReplayMinWaitMilliseconds));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        totalTimeframe = 0;
+                    }
+
+                }
+            }
+
+            var queue = _serviceProvider.GetRequiredService<KeyedTaskQueue>();
+
+            Logger.Information("Wait for argumentation queue drained");
+            await queue.WaitUntilQueueIsDrainedAsync("argumentation");
+            queue.MarkAllQueuesAsComplete();
+            Logger.Information("Wait for all queues drained");
+            await queue.WaitForAllQueuesCompletionAsync();
+            // clean queues
+            queue.CleanupDrainedQueues();
+            Logger.Information("All queued tasks completed.");
+            var baseName = Path.GetFileNameWithoutExtension(fileName);
+            var csvFileName = $"temporal_trace_{baseName}_interval{options.AnnotationIntervalMs}_testId{options.TestId}.csv";
+            var resultsDir = Path.Combine(sessionDir, "results");
+            Directory.CreateDirectory(resultsDir); 
+            var fullPath = Path.Combine(resultsDir, csvFileName);
+            await TemporalTraceCollector.ExportToCsvAsync(fullPath, options.TestId);
+        }
+
+        /// <summary>
+        /// Decodes and processes a single packet.
+        /// </summary>
+        private static async Task ParsePacket(BinaryReader reader)
+        {
+            var dataType = (RecordedPacketType)reader.ReadByte();
+            // The client ID is used as a key in the dictionary
+            var clientId = reader.ReadInt32();
+
+            switch (dataType)
+            {
+                case RecordedPacketType.Connect:
+                {
+                    // Read connection data
+                    var addressLength = reader.ReadByte();
+                    var addressBytes = reader.ReadBytes(addressLength);
+                    var addressPort = reader.ReadUInt16();
+                    var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
+                    var name = reader.ReadString();
+                    var gameVersion = new GameVersion(reader.ReadInt32());
+
+                    // Create a mock connection and register the client
+                    var connection = new MockHazelConnection(address);
+                    await _clientManager.RegisterConnectionAsync(
+                        connection,
+                        name,
+                        gameVersion,
+                        Language.English,
+                        QuickChatModes.FreeChatOrQuickChat,
+                        new PlatformSpecificData(Platforms.Unknown, "ServerReplay")
+                    );
+
+                    // 3. Store the connection in the dictionary
+                    Connections.Add(clientId, connection);
+                    
+                    break;
+                }
+                case RecordedPacketType.Disconnect:
+                {
+                    // If the packet contains a disconnection reason, read it
+                    string reason = null;
+                    if (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        reason = reader.ReadString();
+                    }
+
+                    // Send the disconnection signal to the client (and to Impostor)
+                    await Connections[clientId].Client!.HandleDisconnectAsync(reason);
+                    Connections.Remove(clientId);
+                    break;
+                }
+                case RecordedPacketType.Message:
+                {
+                    // 1. Retrieve message type and length
+                    var messageType = (MessageType)reader.ReadByte();
+                    var tag = reader.ReadByte();
+                    var length = reader.ReadInt32();
+                    var buffer = reader.ReadBytes(length);
+
+                    // 2. Retrieve a MessageReader object from the pool
+                    using var message = _readerPool.Get();
+                    message.Update(buffer, tag: tag);
+
+                    // 3. If this is a HostGame request, store the game options
+                    if (tag == MessageFlags.HostGame)
+                    {
+                        Message00HostGameC2S.Deserialize(message, out var gameOptions, out _, out _);
+                        GameOptions.Add(clientId, gameOptions);
+                    }
+                    else if (Connections.TryGetValue(clientId, out var client))
+                    {
+                        // Route the message to the Impostor Client
+                        await client.Client!.HandleMessageAsync(message, messageType);
+                    }
+                    break;
+                }
+                case RecordedPacketType.GameCreated:
+                {
+                    // 1. Read the game code
+                    _gameCodeFactory.Result = GameCode.From(reader.ReadString());
+
+                    // 2. Create the game
+                    await _gameManager.CreateAsync(
+                        Connections[clientId].Client,
+                        GameOptions[clientId],
+                        GameFilterOptions.CreateDefault()
+                    );
+
+                    // 3. Remove the used game options from the dictionary
+                    GameOptions.Remove(clientId);
+
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+}

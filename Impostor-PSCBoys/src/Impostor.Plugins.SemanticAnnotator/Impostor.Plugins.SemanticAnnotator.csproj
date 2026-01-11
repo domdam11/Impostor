@@ -1,0 +1,56 @@
+﻿
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+
+    <Version>1.0.0</Version>
+    <AssemblyTitle>SemanticAnnotator</AssemblyTitle>
+    <Authors>AeonLucid</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CowlWrapper\**" />
+    <EmbeddedResource Remove="CowlWrapper\**" />
+    <None Remove="CowlWrapper\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Coravel" Version="6.0.2" />
+    <PackageReference Include="CppSharp" Version="1.1.5.3168" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.12.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.58" />
+  </ItemGroup>
+
+  <ItemGroup>
+  	<EmbeddedResource Include="Resources\**\*.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CowlSharp\CowlSharp.csproj" />
+    <ProjectReference Include="..\Impostor.Api\Impostor.Api.csproj" />
+    <ProjectReference Include="..\TransactionHandler\src\IO.Swagger\TransactionHandler.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="amongus.owl">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="cowl.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="libraries\cowl.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

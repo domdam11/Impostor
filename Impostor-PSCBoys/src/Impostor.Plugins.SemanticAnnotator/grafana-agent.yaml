@@ -1,0 +1,15 @@
+metrics:
+  global:
+    scrape_interval: 1s
+
+  configs:
+    - name: default
+      scrape_configs:
+        - job_name: 'semantic-annotator'
+          static_configs:
+            - targets: ['host.docker.internal:5000']
+      remote_write:
+        - url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
+          basic_auth:
+             username: 2491325
+             password: glc_eyJvIjoiMTQ1MzQ2MSIsIm4iOiJzdGFjay0xMjgzNTQ1LWFsbG95LXNlbWFudGljLWFubm90YXRvciIsImsiOiJFNFdJNDdKQnlDTjlmaDY3UVZFNEc5NDIiLCJtIjp7InIiOiJwcm9kLWV1LXdlc3QtMiJ9fQ==

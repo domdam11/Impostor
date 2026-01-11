@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0": {
+      "CppSharp.Runtime": {
+        "type": "Direct",
+        "requested": "[1.1.5.3168, )",
+        "resolved": "1.1.5.3168",
+        "contentHash": "57twYtZo0D0uWByv6fW128A7WwbLgdNCSe8BAzcUMr+MUNMfisjLmas4JOwCfd2mWyZyGvtOCYHwoCSuvWTdzw=="
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "Server": {
+    "PublicIp": "127.0.0.1",
+    "PublicPort": 22023,
+    "ListenIp": "0.0.0.0",
+    "ListenPort": 22023
+  },
+  "HttpServer": {
+    "Enabled": true,
+    "ListenIp": "0.0.0.0",
+    "ListenPort": 22023
+  },
+  "AntiCheat": {
+    "Enabled": false,
+    "BanIpFromGame": false
+  },
+  "PluginLoader": {
+    "Paths": [
+      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\bin\\Debug\\net8.0"
+    ],
+    "LibraryPaths": [
+      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\libraries\\cowl.dll"
+
+    ]
+  }
+
+}

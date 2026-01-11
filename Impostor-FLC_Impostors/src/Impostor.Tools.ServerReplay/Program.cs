@@ -1,0 +1,286 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+using Impostor.Api.Events.Managers;
+using Impostor.Api.Games;
+using Impostor.Api.Games.Managers;
+using Impostor.Api.Innersloth;
+using Impostor.Api.Innersloth.GameOptions;
+using Impostor.Api.Net;
+using Impostor.Api.Net.Custom;
+using Impostor.Api.Net.Messages;
+using Impostor.Hazel.Abstractions;
+using Impostor.Api.Net.Messages.C2S;
+using Impostor.Api.Utils;
+using Impostor.Hazel;
+using Impostor.Hazel.Extensions;
+using Impostor.Server;
+using Impostor.Server.Events;
+using Impostor.Server.Net;
+using Impostor.Server.Net.Custom;
+using Impostor.Server.Net.Factories;
+using Impostor.Server.Net.Manager;
+using Impostor.Server.Recorder;
+using Impostor.Server.Utils;
+using Impostor.Tools.ServerReplay.Mocks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
+using Serilog;
+using ILogger = Serilog.ILogger;
+using Impostor.Api.Net.Manager;
+using Impostor.Api.Events;
+using Impostor.Plugins.Example.Handlers;
+using Impostor.Plugins.Example;
+using Impostor.Plugins.SemanticAnnotator.Annotator;
+using Serilog.Events;
+using Serilog.Sinks.File;
+using System.Text;
+
+namespace Impostor.Tools.ServerReplay
+{
+    internal static class Program
+    {
+        private static readonly ILogger Logger = Log.ForContext(typeof(Program));
+        private static readonly Dictionary<int, IHazelConnection> Connections = new Dictionary<int, IHazelConnection>();
+        private static readonly Dictionary<int, IGameOptions> GameOptions = new Dictionary<int, IGameOptions>();
+
+        private static ServiceProvider _serviceProvider;
+
+        private static ObjectPool<MessageReader> _readerPool;
+        private static MockGameCodeFactory _gameCodeFactory;
+        private static ClientManager _clientManager;
+        private static GameManager _gameManager;
+        public static FakeDateTimeProvider _fakeDateTimeProvider;
+
+        private static async Task Main(string[] args)
+        {
+            var fileWriter = new StreamWriter("output.txt", append: true) { AutoFlush = true };
+            var dualWriter = new DualWriter(Console.Out, fileWriter);
+
+            Console.SetOut(dualWriter);
+            Console.SetError(dualWriter);
+
+            // Serilog: log su console + filecos
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            var stopwatch = Stopwatch.StartNew();
+         
+            foreach (var file in Directory.GetFiles("..\\..\\..\\sessions\\", "*.dat"))
+            {
+                // Clear.
+                Connections.Clear();
+                GameOptions.Clear();
+
+                // Create service provider.
+                _serviceProvider = BuildServices();
+
+                // Create required instances.
+                _readerPool = _serviceProvider.GetRequiredService<ObjectPool<MessageReader>>();
+                _gameCodeFactory = _serviceProvider.GetRequiredService<MockGameCodeFactory>();
+                _clientManager = _serviceProvider.GetRequiredService<ClientManager>();
+                _gameManager = _serviceProvider.GetRequiredService<GameManager>();
+                _fakeDateTimeProvider = _serviceProvider.GetRequiredService<FakeDateTimeProvider>();
+
+                await using (var stream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new BinaryReader(stream))
+                {
+                    await ParseSession(reader);
+                }
+            }
+
+            var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            string resultMessage = $"Took {elapsedMilliseconds}ms.";
+
+            
+
+            Console.WriteLine("L'esecuzione del replay è terminata. Premi un tasto per chiudere la finestra.");
+            Console.ReadKey();
+        }
+        
+
+    public class DualWriter : TextWriter
+        {
+            private readonly TextWriter _console;
+            private readonly TextWriter _file;
+
+            public DualWriter(TextWriter console, TextWriter file)
+            {
+                _console = console;
+                _file = file;
+            }
+
+            public override Encoding Encoding => _console.Encoding;
+
+            public override void Write(char value)
+            {
+                _console.Write(value);
+                _file.Write(value);
+            }
+
+            public override void WriteLine(string value)
+            {
+                _console.WriteLine(value);
+                _file.WriteLine(value);
+            }
+
+            public override void Flush()
+            {
+                _console.Flush();
+                _file.Flush();
+            }
+    }
+
+
+        private static ServiceProvider BuildServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton(new ServerEnvironment
+            {
+                IsReplay = true,
+            });
+
+            services.AddSingleton<FakeDateTimeProvider>();
+            services.AddSingleton<IDateTimeProvider>(p => p.GetRequiredService<FakeDateTimeProvider>());
+
+            services.AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddSerilog();
+            });
+
+            services.AddSingleton<GameManager>();
+            services.AddSingleton<IGameManager>(p => p.GetRequiredService<GameManager>());
+
+            services.AddSingleton<MockGameCodeFactory>();
+            services.AddSingleton<IGameCodeFactory>(p => p.GetRequiredService<MockGameCodeFactory>());
+            services.AddSingleton<ICompatibilityManager, CompatibilityManager>();
+            services.AddSingleton<ClientManager>();
+            
+            services.AddSingleton<IClientFactory, ClientFactory<Client>>();
+            services.AddSingleton<IEventManager, EventManager>();
+
+            services.AddEventPools();
+            services.AddHazel();
+            services.AddSingleton<ICustomMessageManager<ICustomRootMessage>, CustomMessageManager<ICustomRootMessage>>();
+            services.AddSingleton<ICustomMessageManager<ICustomRpc>, CustomMessageManager<ICustomRpc>>();
+            //Manually invoke the ConfigureServices method of the SemanticAnnotatorPluginStartup class
+            var semanticAnnotatorPluginStartup = new SemanticAnnotatorPluginStartup();
+            semanticAnnotatorPluginStartup.ConfigureServices(services);
+
+            return services.BuildServiceProvider();
+        }
+
+        private static async Task ParseSession(BinaryReader reader)
+        {
+            var protocolVersion = (ServerReplayVersion)reader.ReadUInt32();
+            if (protocolVersion < ServerReplayVersion.Initial || protocolVersion > ServerReplayVersion.Latest)
+            {
+                throw new NotSupportedException("Session's protocol version is unsupported");
+            }
+
+            var startTime = _fakeDateTimeProvider.UtcNow = DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64());
+            var serverVersion = reader.ReadString();
+
+            Logger.Information("Loaded session (server: {ServerVersion}, recorded at {StartTime})", serverVersion, startTime);
+
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
+            {
+                var dataLength = reader.ReadInt32();
+                var data = reader.ReadBytes(dataLength - 4);
+
+                await using (var stream = new MemoryStream(data))
+                using (var readerInner = new BinaryReader(stream))
+                {
+                    _fakeDateTimeProvider.UtcNow = startTime + TimeSpan.FromMilliseconds(readerInner.ReadUInt32());
+                    CsvUtility.TimeStamp = _fakeDateTimeProvider.UtcNow;
+                    //Console.WriteLine(_fakeDateTimeProvider.UtcNow);
+                    await ParsePacket(readerInner);
+                }
+            }
+        }
+
+        private static async Task ParsePacket(BinaryReader reader)
+        {
+            var dataType = (RecordedPacketType)reader.ReadByte();
+
+            // Read client id.
+            var clientId = reader.ReadInt32();
+
+            switch (dataType)
+            {
+                case RecordedPacketType.Connect:
+                    // Read data.
+                    var addressLength = reader.ReadByte();
+                    var addressBytes = reader.ReadBytes(addressLength);
+                    var addressPort = reader.ReadUInt16();
+                    var address = new IPEndPoint(new IPAddress(addressBytes), addressPort);
+                    var name = reader.ReadString();
+                    var gameVersion = new GameVersion(reader.ReadInt32());
+
+                    // Create and register connection.
+                    var connection = new MockHazelConnection(address);
+
+                    await _clientManager.RegisterConnectionAsync(connection, name, gameVersion, Language.English, QuickChatModes.FreeChatOrQuickChat, new PlatformSpecificData(Platforms.Unknown, "ServerReplay"));
+
+                    // Store reference for ourselfs.
+                    Connections.Add(clientId, connection);
+                    break;
+
+                case RecordedPacketType.Disconnect:
+                    string reason = null;
+
+                    if (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        reason = reader.ReadString();
+                    }
+
+                    await Connections[clientId].Client!.HandleDisconnectAsync(reason);
+                    Connections.Remove(clientId);
+                    break;
+
+                case RecordedPacketType.Message:
+                {
+                    var messageType = (MessageType)reader.ReadByte();
+                    var tag = reader.ReadByte();
+                    var length = reader.ReadInt32();
+                    var buffer = reader.ReadBytes(length);
+                    using var message = _readerPool.Get();
+
+                    message.Update(buffer, tag: tag);
+
+                    if (tag == MessageFlags.HostGame)
+                    {
+                        Message00HostGameC2S.Deserialize(message, out var gameOptions, out _, out _);
+                        GameOptions.Add(clientId, gameOptions);
+                    }
+                    else if (Connections.TryGetValue(clientId, out var client))
+                    {
+                        await client.Client!.HandleMessageAsync(message, messageType);
+                    }
+
+                    break;
+                }
+
+                case RecordedPacketType.GameCreated:
+                    _gameCodeFactory.Result = GameCode.From(reader.ReadString());
+
+                    await _gameManager.CreateAsync(Connections[clientId].Client, GameOptions[clientId], GameFilterOptions.CreateDefault());
+
+                    GameOptions.Remove(clientId);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+}

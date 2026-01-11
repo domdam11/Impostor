@@ -1,0 +1,75 @@
+# ---- Build stage ----
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG TARGETARCH
+ARG VERSIONSUFFIX="docker"
+WORKDIR /source
+
+# Copy csproj files first (restore step)
+COPY src/Impostor.Server/Impostor.Server.csproj ./src/Impostor.Server/
+COPY src/Impostor.Api.Innersloth.Generator/Impostor.Api.Innersloth.Generator.csproj ./src/Impostor.Api.Innersloth.Generator/
+COPY src/Impostor.Api/Impostor.Api.csproj ./src/Impostor.Api/
+COPY src/Impostor.Plugins.SemanticAnnotator/Impostor.Plugins.SemanticAnnotator.csproj ./src/Impostor.Plugins.SemanticAnnotator/
+COPY src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj ./src/Impostor.Tools.ServerReplay/
+COPY src/CowlSharp/CowlSharp.csproj ./src/CowlSharp/
+COPY src/TransactionHandler/src/IO.Swagger/TransactionHandler.csproj ./src/TransactionHandler/src/IO.Swagger/
+COPY src/Directory.Build.props ./src/
+
+# Restore dependencies
+RUN case "$TARGETARCH" in \
+    amd64) NETCORE_PLATFORM='linux-x64';; \
+    arm64) NETCORE_PLATFORM='linux-arm64';; \
+    arm) NETCORE_PLATFORM='linux-arm';; \
+    *) echo "unsupported architecture"; exit 1 ;; \
+    esac && \
+    dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Server/Impostor.Server.csproj && \
+    dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api.Innersloth.Generator/Impostor.Api.Innersloth.Generator.csproj && \
+    dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Api/Impostor.Api.csproj && \
+    dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Plugins.SemanticAnnotator/Impostor.Plugins.SemanticAnnotator.csproj && \
+    dotnet restore -r "$NETCORE_PLATFORM" ./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj
+
+# Copy sources
+COPY src/. ./src/
+
+# Publish servers and build plugin
+RUN case "$TARGETARCH" in \
+    amd64) NETCORE_PLATFORM='linux-x64';; \
+    arm64) NETCORE_PLATFORM='linux-arm64';; \
+    arm) NETCORE_PLATFORM='linux-arm';; \
+    *) echo "unsupported architecture"; exit 1 ;; \
+    esac && \
+    EXTRA_SUFFIX="" && \
+    if [ "$VERSIONSUFFIX" != "none" ]; then EXTRA_SUFFIX="-p:VersionSuffix=$VERSIONSUFFIX"; fi && \
+    dotnet publish -c Release -o /out/Impostor.Server -r "$NETCORE_PLATFORM" $EXTRA_SUFFIX --no-restore ./src/Impostor.Server/Impostor.Server.csproj && \
+    dotnet publish -c Release -o /out/Impostor.Tools.ServerReplay -r "$NETCORE_PLATFORM" $EXTRA_SUFFIX --no-restore ./src/Impostor.Tools.ServerReplay/Impostor.Tools.ServerReplay.csproj /p:CopyToPublishDirectory=Never && \
+    dotnet publish -c Release -o /out/plugins -r "$NETCORE_PLATFORM" $EXTRA_SUFFIX --no-restore ./src/Impostor.Plugins.SemanticAnnotator/Impostor.Plugins.SemanticAnnotator.csproj && \
+    echo "=== CONTENUTO /out DOPO BUILD/PUBLISH ===" && ls -R /out
+
+
+# ---- Artifacts stage ----
+#FROM alpine:3.20 AS artifacts
+#WORKDIR /export
+#COPY --from=build /out ./
+
+
+# ---- Runtime stage ----
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+
+# Copy published outputs
+COPY --from=build /out/Impostor.Server ./Impostor.Server
+COPY --from=build /out/plugins ./plugins
+COPY --from=build /out/Impostor.Tools.ServerReplay ./Impostor.Tools.ServerReplay
+
+# Copy native library
+COPY ./src/Impostor.Plugins.SemanticAnnotator/libcowl.so /usr/lib/
+RUN ldconfig
+
+# Override ASPNETCORE_URLS to stop warning
+ENV ASPNETCORE_URLS=
+
+# Ports
+EXPOSE 22023/tcp
+EXPOSE 22023/udp
+
+# Start Impostor.Server by default
+ENTRYPOINT ["./Impostor.Server/Impostor.Server"]

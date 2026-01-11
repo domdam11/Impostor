@@ -1,0 +1,874 @@
+Prefix(:=<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs/>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs>
+Annotation(rdfs:comment "Ontologia sulle strategie in Among Us per vincere come impostore")
+
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>))
+Declaration(Class(:Admin))
+Declaration(Class(:AdminFixWiring))
+Declaration(Class(:AdminOxygenDepleted))
+Declaration(Class(:AdminTask))
+Declaration(Class(:AdminVent))
+Declaration(Class(:Admin_Sabotage))
+Declaration(Class(:AliveCrewmateMessage))
+Declaration(Class(:Cafeteria))
+Declaration(Class(:CafeteriaDownloadData))
+Declaration(Class(:CafeteriaEmptyGarbage))
+Declaration(Class(:CafeteriaFixWiring))
+Declaration(Class(:CafeteriaTask))
+Declaration(Class(:CafeteriaVent))
+Declaration(Class(:CalibrateDistributor))
+Declaration(Class(:ChartCourse))
+Declaration(Class(:CleanO2Filter))
+Declaration(Class(:ClearAsteroids))
+Declaration(Class(:CommsSabotaged))
+Declaration(Class(:Communications))
+Declaration(Class(:CommunicationsAcceptDivertedPower))
+Declaration(Class(:CommunicationsDownloadData))
+Declaration(Class(:CommunicationsTask))
+Declaration(Class(:Communications_Sabotage))
+Declaration(Class(:CrewMateAlive))
+Declaration(Class(:CrewMateDead))
+Declaration(Class(:Crewmate))
+Declaration(Class(:DeadCrewmateMessage))
+Declaration(Class(:DivertPower))
+Declaration(Class(:Electrical))
+Declaration(Class(:ElectricalDownloadData))
+Declaration(Class(:ElectricalFixWiring))
+Declaration(Class(:ElectricalTask))
+Declaration(Class(:ElectricalVent))
+Declaration(Class(:Electrical_Sabotage))
+Declaration(Class(:EmergencyCall))
+Declaration(Class(:FixLight))
+Declaration(Class(:Impostor))
+Declaration(Class(:ImpostorMessage))
+Declaration(Class(:InspectSample))
+Declaration(Class(:LowerEngine))
+Declaration(Class(:LowerEngineAcceptDivertedPower))
+Declaration(Class(:LowerEngineAlignEngineOutput))
+Declaration(Class(:LowerEngineFuelEngines))
+Declaration(Class(:LowerEngineTask))
+Declaration(Class(:LowerEngineVent))
+Declaration(Class(:LowerNavigationVent))
+Declaration(Class(:LowerReactorVent))
+Declaration(Class(:MedBay))
+Declaration(Class(:MedBayVent))
+Declaration(Class(:MedBaytask))
+Declaration(Class(:Message))
+Declaration(Class(:Navigation))
+Declaration(Class(:NavigationAcceptDivertedPower))
+Declaration(Class(:NavigationDownloadData))
+Declaration(Class(:NavigationFixWiring))
+Declaration(Class(:NavigationTask))
+Declaration(Class(:NavigationVent))
+Declaration(Class(:O2))
+Declaration(Class(:O2AcceptDivertedPower))
+Declaration(Class(:O2EmptyChute))
+Declaration(Class(:O2Oxygendepleted))
+Declaration(Class(:O2Task))
+Declaration(Class(:O2_Sabotage))
+Declaration(Class(:Player))
+Declaration(Class(:PrimeShields))
+Declaration(Class(:Reactor))
+Declaration(Class(:ReactorMeltdown))
+Declaration(Class(:ReactorTask))
+Declaration(Class(:ReactorVent))
+Declaration(Class(:Reactor_Sabotage))
+Declaration(Class(:Room))
+Declaration(Class(:Sabotage))
+Declaration(Class(:SabotageCommsSabotaged))
+Declaration(Class(:SabotageDoorSabotage))
+Declaration(Class(:SabotageFixLights))
+Declaration(Class(:SabotageOxygenDepleted))
+Declaration(Class(:SabotageReactorMeltdown))
+Declaration(Class(:Sabotage_Task))
+Declaration(Class(:Security))
+Declaration(Class(:SecurityAcceptDivertedPower))
+Declaration(Class(:SecurityFixWiring))
+Declaration(Class(:SecurityTask))
+Declaration(Class(:SecurityVent))
+Declaration(Class(:Shields))
+Declaration(Class(:ShieldsAcceeptDivertedPower))
+Declaration(Class(:ShieldsTask))
+Declaration(Class(:ShieldsVent))
+Declaration(Class(:Skeld))
+Declaration(Class(:StabilizeSteering))
+Declaration(Class(:StartReactor))
+Declaration(Class(:Storage))
+Declaration(Class(:StorageEmptyChute))
+Declaration(Class(:StorageEmptyGarbage))
+Declaration(Class(:StorageFixWiring))
+Declaration(Class(:StorageFuelEngines))
+Declaration(Class(:StorageTask))
+Declaration(Class(:SubmitScan))
+Declaration(Class(:SwipeCARD))
+Declaration(Class(:Task))
+Declaration(Class(:UnlockManifolds))
+Declaration(Class(:UploadData))
+Declaration(Class(:UpperEngine))
+Declaration(Class(:UpperEngineAcceptDivertedPower))
+Declaration(Class(:UpperEngineAlignEngineOutput))
+Declaration(Class(:UpperEngineFuelEngines))
+Declaration(Class(:UpperEngineTask))
+Declaration(Class(:UpperEngineVent))
+Declaration(Class(:UpperNavigationVent))
+Declaration(Class(:UpperReactorVent))
+Declaration(Class(:Vent))
+Declaration(Class(:WeaponDownloadData))
+Declaration(Class(:WeaponTask))
+Declaration(Class(:Weapons))
+Declaration(Class(:WeaponsAcceptDivertedPower))
+Declaration(Class(:WeaponsVent))
+Declaration(ObjectProperty(:Calls))
+Declaration(ObjectProperty(:Does))
+Declaration(ObjectProperty(:Kills))
+Declaration(ObjectProperty(:Reads))
+Declaration(ObjectProperty(:Reports))
+Declaration(ObjectProperty(:Sabotages))
+Declaration(ObjectProperty(:Writes))
+Declaration(ObjectProperty(:ventLeadsToRoom))
+Declaration(DataProperty(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp>))
+Declaration(DataProperty(:CrewmateName))
+Declaration(DataProperty(:ImpostorName))
+Declaration(DataProperty(:IsTaskDone))
+Declaration(DataProperty(:TimeStamp))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageCommsSabotaged>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageDoorSabotage>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageFixLights>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageOxygenDepleted>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageReactorMeltdown>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>))
+Declaration(NamedIndividual(:RoomAdmin))
+Declaration(NamedIndividual(:RoomCafeteria))
+Declaration(NamedIndividual(:RoomElectrical))
+Declaration(NamedIndividual(:RoomLowerEngine))
+Declaration(NamedIndividual(:RoomMeedbay))
+Declaration(NamedIndividual(:RoomNavigation))
+Declaration(NamedIndividual(:RoomReactor))
+Declaration(NamedIndividual(:RoomSecurity))
+Declaration(NamedIndividual(:RoomShields))
+Declaration(NamedIndividual(:RoomUpperEngine))
+Declaration(NamedIndividual(:RoomWeapon))
+Declaration(NamedIndividual(:VentAdmin))
+Declaration(NamedIndividual(:VentCafeteria))
+Declaration(NamedIndividual(:VentElectrical))
+Declaration(NamedIndividual(:VentLowerEngine))
+Declaration(NamedIndividual(:VentMedbay))
+Declaration(NamedIndividual(:VentNavigation))
+Declaration(NamedIndividual(:VentReactor))
+Declaration(NamedIndividual(:VentSecurity))
+Declaration(NamedIndividual(:VentShield))
+Declaration(NamedIndividual(:VentUpperEngine))
+Declaration(NamedIndividual(:VentWeapon))
+
+############################
+#   Object Properties
+############################
+
+# Object Property: :Calls (:Calls)
+
+AnnotationAssertion(rdfs:comment :Calls "Crewmate or Impostor calls the emergency call")
+ObjectPropertyDomain(:Calls :CrewMateAlive)
+ObjectPropertyDomain(:Calls :Impostor)
+ObjectPropertyRange(:Calls :EmergencyCall)
+
+# Object Property: :Does (:Does)
+
+AnnotationAssertion(rdfs:comment :Does "Crewmate does the tasks")
+ObjectPropertyDomain(:Does :Crewmate)
+ObjectPropertyRange(:Does :Sabotage)
+ObjectPropertyRange(:Does :Sabotage_Task)
+
+# Object Property: :Kills (:Kills)
+
+AnnotationAssertion(rdfs:comment :Kills "Impostor kills the crewmate")
+ObjectPropertyDomain(:Kills :Impostor)
+ObjectPropertyRange(:Kills :CrewMateAlive)
+
+# Object Property: :Reads (:Reads)
+
+ObjectPropertyDomain(:Reads :Crewmate)
+ObjectPropertyDomain(:Reads :Impostor)
+ObjectPropertyRange(:Reads :AliveCrewmateMessage)
+ObjectPropertyRange(:Reads :DeadCrewmateMessage)
+
+# Object Property: :Reports (:Reports)
+
+SubObjectPropertyOf(:Reports owl:topObjectProperty)
+ObjectPropertyDomain(:Reports :CrewMateAlive)
+ObjectPropertyDomain(:Reports :Impostor)
+ObjectPropertyRange(:Reports :CrewMateDead)
+
+# Object Property: :Sabotages (:Sabotages)
+
+AnnotationAssertion(rdfs:comment :Sabotages "Impostor sabotages something in the skeld map")
+ObjectPropertyDomain(:Sabotages :Impostor)
+ObjectPropertyRange(:Sabotages :Sabotage)
+
+# Object Property: :Writes (:Writes)
+
+ObjectPropertyDomain(:Writes :Player)
+ObjectPropertyRange(:Writes :Message)
+
+# Object Property: :ventLeadsToRoom (:ventLeadsToRoom)
+
+SubObjectPropertyOf(:ventLeadsToRoom owl:topObjectProperty)
+ObjectPropertyDomain(:ventLeadsToRoom :AdminVent)
+ObjectPropertyDomain(:ventLeadsToRoom :CafeteriaVent)
+ObjectPropertyDomain(:ventLeadsToRoom :ElectricalVent)
+ObjectPropertyDomain(:ventLeadsToRoom :LowerEngineVent)
+ObjectPropertyDomain(:ventLeadsToRoom :MedBayVent)
+ObjectPropertyDomain(:ventLeadsToRoom :NavigationVent)
+ObjectPropertyDomain(:ventLeadsToRoom :ReactorVent)
+ObjectPropertyDomain(:ventLeadsToRoom :SecurityVent)
+ObjectPropertyDomain(:ventLeadsToRoom :ShieldsVent)
+ObjectPropertyDomain(:ventLeadsToRoom :UpperEngineVent)
+ObjectPropertyDomain(:ventLeadsToRoom :WeaponsVent)
+ObjectPropertyRange(:ventLeadsToRoom :Admin)
+ObjectPropertyRange(:ventLeadsToRoom :Cafeteria)
+ObjectPropertyRange(:ventLeadsToRoom :Electrical)
+ObjectPropertyRange(:ventLeadsToRoom :MedBay)
+ObjectPropertyRange(:ventLeadsToRoom :Navigation)
+ObjectPropertyRange(:ventLeadsToRoom :Reactor)
+ObjectPropertyRange(:ventLeadsToRoom :Security)
+ObjectPropertyRange(:ventLeadsToRoom :Shields)
+ObjectPropertyRange(:ventLeadsToRoom :Weapons)
+
+
+############################
+#   Data Properties
+############################
+
+# Data Property: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp>)
+
+SubDataPropertyOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp> owl:topDataProperty)
+DataPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>)
+DataPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp> :Sabotage)
+DataPropertyRange(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#TimeStamp> xsd:dateTime)
+
+# Data Property: :CrewmateName (:CrewmateName)
+
+SubDataPropertyOf(:CrewmateName owl:topDataProperty)
+DataPropertyDomain(:CrewmateName :Crewmate)
+DataPropertyRange(:CrewmateName xsd:string)
+
+# Data Property: :ImpostorName (:ImpostorName)
+
+SubDataPropertyOf(:ImpostorName owl:topDataProperty)
+DataPropertyDomain(:ImpostorName :Impostor)
+
+
+
+############################
+#   Classes
+############################
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill> :Skeld)
+
+# Class: :Admin (:Admin)
+
+SubClassOf(:Admin :Room)
+
+# Class: :AdminFixWiring (:AdminFixWiring)
+
+SubClassOf(:AdminFixWiring :AdminTask)
+
+# Class: :AdminOxygenDepleted (:AdminOxygenDepleted)
+
+SubClassOf(:AdminOxygenDepleted :Admin_Sabotage)
+
+# Class: :AdminTask (:AdminTask)
+
+SubClassOf(:AdminTask :Task)
+
+# Class: :AdminVent (:AdminVent)
+
+SubClassOf(:AdminVent :Vent)
+
+# Class: :Admin_Sabotage (:Admin_Sabotage)
+
+SubClassOf(:Admin_Sabotage :Sabotage_Task)
+
+# Class: :AliveCrewmateMessage (:AliveCrewmateMessage)
+
+SubClassOf(:AliveCrewmateMessage :Message)
+
+# Class: :Cafeteria (:Cafeteria)
+
+SubClassOf(:Cafeteria :Room)
+
+# Class: :CafeteriaDownloadData (:CafeteriaDownloadData)
+
+SubClassOf(:CafeteriaDownloadData :CafeteriaTask)
+
+# Class: :CafeteriaEmptyGarbage (:CafeteriaEmptyGarbage)
+
+SubClassOf(:CafeteriaEmptyGarbage :CafeteriaTask)
+
+# Class: :CafeteriaFixWiring (:CafeteriaFixWiring)
+
+SubClassOf(:CafeteriaFixWiring :CafeteriaTask)
+
+# Class: :CafeteriaTask (:CafeteriaTask)
+
+SubClassOf(:CafeteriaTask :Task)
+
+# Class: :CafeteriaVent (:CafeteriaVent)
+
+SubClassOf(:CafeteriaVent :Vent)
+
+# Class: :CalibrateDistributor (:CalibrateDistributor)
+
+SubClassOf(:CalibrateDistributor :ElectricalTask)
+
+# Class: :ChartCourse (:ChartCourse)
+
+SubClassOf(:ChartCourse :NavigationTask)
+
+# Class: :CleanO2Filter (:CleanO2Filter)
+
+SubClassOf(:CleanO2Filter :O2Task)
+
+# Class: :ClearAsteroids (:ClearAsteroids)
+
+SubClassOf(:ClearAsteroids :WeaponTask)
+
+# Class: :CommsSabotaged (:CommsSabotaged)
+
+SubClassOf(:CommsSabotaged :Communications_Sabotage)
+
+# Class: :Communications (:Communications)
+
+SubClassOf(:Communications :Room)
+
+# Class: :CommunicationsAcceptDivertedPower (:CommunicationsAcceptDivertedPower)
+
+SubClassOf(:CommunicationsAcceptDivertedPower :CommunicationsTask)
+
+# Class: :CommunicationsDownloadData (:CommunicationsDownloadData)
+
+SubClassOf(:CommunicationsDownloadData :CommunicationsTask)
+
+# Class: :CommunicationsTask (:CommunicationsTask)
+
+SubClassOf(:CommunicationsTask :Task)
+
+# Class: :Communications_Sabotage (:Communications_Sabotage)
+
+SubClassOf(:Communications_Sabotage :Sabotage_Task)
+
+# Class: :CrewMateAlive (:CrewMateAlive)
+
+SubClassOf(:CrewMateAlive :Crewmate)
+
+# Class: :CrewMateDead (:CrewMateDead)
+
+SubClassOf(:CrewMateDead :Crewmate)
+
+# Class: :Crewmate (:Crewmate)
+
+SubClassOf(:Crewmate :Player)
+
+# Class: :DeadCrewmateMessage (:DeadCrewmateMessage)
+
+SubClassOf(:DeadCrewmateMessage :Message)
+
+# Class: :DivertPower (:DivertPower)
+
+SubClassOf(:DivertPower :ElectricalTask)
+
+# Class: :Electrical (:Electrical)
+
+SubClassOf(:Electrical :Room)
+
+# Class: :ElectricalDownloadData (:ElectricalDownloadData)
+
+SubClassOf(:ElectricalDownloadData :ElectricalTask)
+
+# Class: :ElectricalFixWiring (:ElectricalFixWiring)
+
+SubClassOf(:ElectricalFixWiring :ElectricalTask)
+
+# Class: :ElectricalTask (:ElectricalTask)
+
+SubClassOf(:ElectricalTask :Task)
+
+# Class: :ElectricalVent (:ElectricalVent)
+
+SubClassOf(:ElectricalVent :Vent)
+
+# Class: :Electrical_Sabotage (:Electrical_Sabotage)
+
+SubClassOf(:Electrical_Sabotage :Sabotage_Task)
+
+# Class: :EmergencyCall (:EmergencyCall)
+
+SubClassOf(:EmergencyCall :Skeld)
+
+# Class: :FixLight (:FixLight)
+
+SubClassOf(:FixLight :Electrical_Sabotage)
+
+# Class: :Impostor (:Impostor)
+
+SubClassOf(:Impostor :Player)
+
+# Class: :ImpostorMessage (:ImpostorMessage)
+
+SubClassOf(:ImpostorMessage :Message)
+
+# Class: :InspectSample (:InspectSample)
+
+SubClassOf(:InspectSample :MedBaytask)
+
+# Class: :LowerEngine (:LowerEngine)
+
+SubClassOf(:LowerEngine :Room)
+
+# Class: :LowerEngineAcceptDivertedPower (:LowerEngineAcceptDivertedPower)
+
+SubClassOf(:LowerEngineAcceptDivertedPower :LowerEngineTask)
+
+# Class: :LowerEngineAlignEngineOutput (:LowerEngineAlignEngineOutput)
+
+SubClassOf(:LowerEngineAlignEngineOutput :LowerEngineTask)
+
+# Class: :LowerEngineFuelEngines (:LowerEngineFuelEngines)
+
+SubClassOf(:LowerEngineFuelEngines :LowerEngineTask)
+
+# Class: :LowerEngineTask (:LowerEngineTask)
+
+SubClassOf(:LowerEngineTask :Task)
+
+# Class: :LowerEngineVent (:LowerEngineVent)
+
+SubClassOf(:LowerEngineVent :Vent)
+
+# Class: :LowerNavigationVent (:LowerNavigationVent)
+
+SubClassOf(:LowerNavigationVent :NavigationVent)
+
+# Class: :LowerReactorVent (:LowerReactorVent)
+
+SubClassOf(:LowerReactorVent :ReactorVent)
+
+# Class: :MedBay (:MedBay)
+
+SubClassOf(:MedBay :Room)
+
+# Class: :MedBayVent (:MedBayVent)
+
+SubClassOf(:MedBayVent :Vent)
+
+# Class: :MedBaytask (:MedBaytask)
+
+SubClassOf(:MedBaytask :Task)
+
+# Class: :Message (:Message)
+
+SubClassOf(:Message :Skeld)
+
+# Class: :Navigation (:Navigation)
+
+SubClassOf(:Navigation :Room)
+
+# Class: :NavigationAcceptDivertedPower (:NavigationAcceptDivertedPower)
+
+SubClassOf(:NavigationAcceptDivertedPower :NavigationTask)
+
+# Class: :NavigationDownloadData (:NavigationDownloadData)
+
+SubClassOf(:NavigationDownloadData :NavigationTask)
+
+# Class: :NavigationFixWiring (:NavigationFixWiring)
+
+SubClassOf(:NavigationFixWiring :NavigationTask)
+
+# Class: :NavigationTask (:NavigationTask)
+
+SubClassOf(:NavigationTask :Task)
+
+# Class: :NavigationVent (:NavigationVent)
+
+SubClassOf(:NavigationVent :Vent)
+
+# Class: :O2 (:O2)
+
+SubClassOf(:O2 :Room)
+
+# Class: :O2AcceptDivertedPower (:O2AcceptDivertedPower)
+
+SubClassOf(:O2AcceptDivertedPower :O2Task)
+
+# Class: :O2EmptyChute (:O2EmptyChute)
+
+SubClassOf(:O2EmptyChute :O2Task)
+
+# Class: :O2Oxygendepleted (:O2Oxygendepleted)
+
+SubClassOf(:O2Oxygendepleted :O2_Sabotage)
+
+# Class: :O2Task (:O2Task)
+
+SubClassOf(:O2Task :Task)
+
+# Class: :O2_Sabotage (:O2_Sabotage)
+
+SubClassOf(:O2_Sabotage :Sabotage_Task)
+
+# Class: :Player (:Player)
+
+SubClassOf(:Player :Skeld)
+
+# Class: :PrimeShields (:PrimeShields)
+
+SubClassOf(:PrimeShields :ShieldsTask)
+
+# Class: :Reactor (:Reactor)
+
+SubClassOf(:Reactor :Room)
+
+# Class: :ReactorMeltdown (:ReactorMeltdown)
+
+SubClassOf(:ReactorMeltdown :Reactor_Sabotage)
+
+# Class: :ReactorTask (:ReactorTask)
+
+SubClassOf(:ReactorTask :Task)
+
+# Class: :ReactorVent (:ReactorVent)
+
+SubClassOf(:ReactorVent :Vent)
+
+# Class: :Reactor_Sabotage (:Reactor_Sabotage)
+
+SubClassOf(:Reactor_Sabotage :Sabotage_Task)
+
+# Class: :Room (:Room)
+
+SubClassOf(:Room :Skeld)
+
+# Class: :Sabotage (:Sabotage)
+
+SubClassOf(:Sabotage :Skeld)
+
+# Class: :SabotageCommsSabotaged (:SabotageCommsSabotaged)
+
+SubClassOf(:SabotageCommsSabotaged :Sabotage)
+
+# Class: :SabotageDoorSabotage (:SabotageDoorSabotage)
+
+SubClassOf(:SabotageDoorSabotage :Sabotage)
+
+# Class: :SabotageFixLights (:SabotageFixLights)
+
+SubClassOf(:SabotageFixLights :Sabotage)
+
+# Class: :SabotageOxygenDepleted (:SabotageOxygenDepleted)
+
+SubClassOf(:SabotageOxygenDepleted :Sabotage)
+
+# Class: :SabotageReactorMeltdown (:SabotageReactorMeltdown)
+
+SubClassOf(:SabotageReactorMeltdown :Sabotage)
+
+# Class: :Sabotage_Task (:Sabotage_Task)
+
+SubClassOf(:Sabotage_Task :Skeld)
+
+# Class: :Security (:Security)
+
+SubClassOf(:Security :Room)
+
+# Class: :SecurityAcceptDivertedPower (:SecurityAcceptDivertedPower)
+
+SubClassOf(:SecurityAcceptDivertedPower :SecurityTask)
+
+# Class: :SecurityFixWiring (:SecurityFixWiring)
+
+SubClassOf(:SecurityFixWiring :SecurityTask)
+
+# Class: :SecurityTask (:SecurityTask)
+
+SubClassOf(:SecurityTask :Task)
+
+# Class: :SecurityVent (:SecurityVent)
+
+SubClassOf(:SecurityVent :Vent)
+
+# Class: :Shields (:Shields)
+
+SubClassOf(:Shields :Room)
+
+# Class: :ShieldsAcceeptDivertedPower (:ShieldsAcceeptDivertedPower)
+
+SubClassOf(:ShieldsAcceeptDivertedPower :ShieldsTask)
+
+# Class: :ShieldsTask (:ShieldsTask)
+
+SubClassOf(:ShieldsTask :Task)
+
+# Class: :ShieldsVent (:ShieldsVent)
+
+SubClassOf(:ShieldsVent :Vent)
+
+# Class: :StabilizeSteering (:StabilizeSteering)
+
+SubClassOf(:StabilizeSteering :NavigationTask)
+
+# Class: :StartReactor (:StartReactor)
+
+SubClassOf(:StartReactor :ReactorTask)
+
+# Class: :Storage (:Storage)
+
+SubClassOf(:Storage :Room)
+
+# Class: :StorageEmptyChute (:StorageEmptyChute)
+
+SubClassOf(:StorageEmptyChute :StorageTask)
+
+# Class: :StorageEmptyGarbage (:StorageEmptyGarbage)
+
+SubClassOf(:StorageEmptyGarbage :StorageTask)
+
+# Class: :StorageFixWiring (:StorageFixWiring)
+
+SubClassOf(:StorageFixWiring :StorageTask)
+
+# Class: :StorageFuelEngines (:StorageFuelEngines)
+
+SubClassOf(:StorageFuelEngines :StorageTask)
+
+# Class: :StorageTask (:StorageTask)
+
+SubClassOf(:StorageTask :Task)
+
+# Class: :SubmitScan (:SubmitScan)
+
+SubClassOf(:SubmitScan :MedBaytask)
+
+# Class: :SwipeCARD (:SwipeCARD)
+
+SubClassOf(:SwipeCARD :AdminTask)
+
+# Class: :Task (:Task)
+
+SubClassOf(:Task :Skeld)
+
+# Class: :UnlockManifolds (:UnlockManifolds)
+
+SubClassOf(:UnlockManifolds :ReactorTask)
+
+# Class: :UploadData (:UploadData)
+
+SubClassOf(:UploadData :AdminTask)
+
+# Class: :UpperEngine (:UpperEngine)
+
+SubClassOf(:UpperEngine :Room)
+
+# Class: :UpperEngineAcceptDivertedPower (:UpperEngineAcceptDivertedPower)
+
+SubClassOf(:UpperEngineAcceptDivertedPower :UpperEngineTask)
+
+# Class: :UpperEngineAlignEngineOutput (:UpperEngineAlignEngineOutput)
+
+SubClassOf(:UpperEngineAlignEngineOutput :UpperEngineTask)
+
+# Class: :UpperEngineFuelEngines (:UpperEngineFuelEngines)
+
+SubClassOf(:UpperEngineFuelEngines :UpperEngineTask)
+
+# Class: :UpperEngineTask (:UpperEngineTask)
+
+SubClassOf(:UpperEngineTask :Task)
+
+# Class: :UpperEngineVent (:UpperEngineVent)
+
+SubClassOf(:UpperEngineVent :Vent)
+
+# Class: :UpperNavigationVent (:UpperNavigationVent)
+
+SubClassOf(:UpperNavigationVent :NavigationVent)
+
+# Class: :UpperReactorVent (:UpperReactorVent)
+
+SubClassOf(:UpperReactorVent :ReactorVent)
+
+# Class: :Vent (:Vent)
+
+SubClassOf(:Vent :Skeld)
+
+# Class: :WeaponDownloadData (:WeaponDownloadData)
+
+SubClassOf(:WeaponDownloadData :WeaponTask)
+
+# Class: :WeaponTask (:WeaponTask)
+
+SubClassOf(:WeaponTask :Task)
+
+# Class: :Weapons (:Weapons)
+
+SubClassOf(:Weapons :Room)
+
+# Class: :WeaponsAcceptDivertedPower (:WeaponsAcceptDivertedPower)
+
+SubClassOf(:WeaponsAcceptDivertedPower :WeaponTask)
+
+# Class: :WeaponsVent (:WeaponsVent)
+
+SubClassOf(:WeaponsVent :Vent)
+
+
+############################
+#   Named Individuals
+############################
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageCommsSabotaged> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageCommsSabotaged>)
+
+ClassAssertion(:SabotageCommsSabotaged <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageCommsSabotaged>)
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageDoorSabotage> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageDoorSabotage>)
+
+ClassAssertion(:SabotageDoorSabotage <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageDoorSabotage>)
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageFixLights> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageFixLights>)
+
+ClassAssertion(:SabotageFixLights <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageFixLights>)
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageOxygenDepleted> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageOxygenDepleted>)
+
+ClassAssertion(:SabotageOxygenDepleted <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageOxygenDepleted>)
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageReactorMeltdown> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageReactorMeltdown>)
+
+ClassAssertion(:SabotageReactorMeltdown <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SabotageReactorMeltdown>)
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>)
+
+ClassAssertion(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#kill>)
+
+# Individual: :RoomAdmin (:RoomAdmin)
+
+ClassAssertion(:Admin :RoomAdmin)
+
+# Individual: :RoomCafeteria (:RoomCafeteria)
+
+ClassAssertion(:Cafeteria :RoomCafeteria)
+
+# Individual: :RoomElectrical (:RoomElectrical)
+
+ClassAssertion(:Electrical :RoomElectrical)
+
+# Individual: :RoomLowerEngine (:RoomLowerEngine)
+
+ClassAssertion(:LowerEngine :RoomLowerEngine)
+
+# Individual: :RoomMeedbay (:RoomMeedbay)
+
+ClassAssertion(:MedBay :RoomMeedbay)
+
+# Individual: :RoomNavigation (:RoomNavigation)
+
+ClassAssertion(:Navigation :RoomNavigation)
+
+# Individual: :RoomReactor (:RoomReactor)
+
+ClassAssertion(:Reactor :RoomReactor)
+
+# Individual: :RoomSecurity (:RoomSecurity)
+
+ClassAssertion(:Security :RoomSecurity)
+
+# Individual: :RoomShields (:RoomShields)
+
+ClassAssertion(:Shields :RoomShields)
+
+# Individual: :RoomUpperEngine (:RoomUpperEngine)
+
+ClassAssertion(:UpperEngine :RoomUpperEngine)
+
+# Individual: :RoomWeapon (:RoomWeapon)
+
+ClassAssertion(:Weapons :RoomWeapon)
+
+# Individual: :VentAdmin (:VentAdmin)
+
+ClassAssertion(:AdminVent :VentAdmin)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentAdmin :RoomCafeteria)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentAdmin :RoomNavigation)
+
+# Individual: :VentCafeteria (:VentCafeteria)
+
+ClassAssertion(:CafeteriaVent :VentCafeteria)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentCafeteria :RoomAdmin)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentCafeteria :RoomNavigation)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentCafeteria :RoomWeapon)
+
+# Individual: :VentElectrical (:VentElectrical)
+
+ClassAssertion(:ElectricalVent :VentElectrical)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentElectrical :RoomMeedbay)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentElectrical :RoomSecurity)
+
+# Individual: :VentLowerEngine (:VentLowerEngine)
+
+ClassAssertion(:LowerEngineVent :VentLowerEngine)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentLowerEngine :RoomReactor)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentLowerEngine :RoomUpperEngine)
+
+# Individual: :VentMedbay (:VentMedbay)
+
+ClassAssertion(:MedBayVent :VentMedbay)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentMedbay :RoomElectrical)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentMedbay :RoomSecurity)
+
+# Individual: :VentNavigation (:VentNavigation)
+
+ClassAssertion(:NavigationVent :VentNavigation)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentNavigation :RoomAdmin)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentNavigation :RoomCafeteria)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentNavigation :RoomShields)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentNavigation :RoomWeapon)
+
+# Individual: :VentReactor (:VentReactor)
+
+ClassAssertion(:ReactorVent :VentReactor)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentReactor :RoomLowerEngine)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentReactor :RoomUpperEngine)
+
+# Individual: :VentSecurity (:VentSecurity)
+
+ClassAssertion(:SecurityVent :VentSecurity)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentSecurity :RoomElectrical)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentSecurity :RoomMeedbay)
+
+# Individual: :VentShield (:VentShield)
+
+ClassAssertion(:ShieldsVent :VentShield)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentShield :RoomNavigation)
+
+# Individual: :VentUpperEngine (:VentUpperEngine)
+
+ClassAssertion(:UpperEngineVent :VentUpperEngine)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentUpperEngine :RoomLowerEngine)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentUpperEngine :RoomReactor)
+
+# Individual: :VentWeapon (:VentWeapon)
+
+ClassAssertion(:WeaponsVent :VentWeapon)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentWeapon :RoomCafeteria)
+ObjectPropertyAssertion(:ventLeadsToRoom :VentWeapon :RoomNavigation)
+
+
+)
