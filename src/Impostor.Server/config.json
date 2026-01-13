@@ -16,12 +16,14 @@
   },
   "PluginLoader": {
     "Paths": [
-      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\bin\\Debug\\net8.0"
+      "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\bin\\Debug\\net8.0" //-> su windows, cambiare il path in base al sistema operativo locale
+      //"/home/ubuntu/Impostor/src/Impostor.Plugins.SemanticAnnotator/bin/Debug/net8.0" -> su docker
     ],
     "LibraryPaths": [
       "C:\\Users\\Saverio\\Documents\\SourceTree\\Impostor\\src\\Impostor.Plugins.SemanticAnnotator\\libraries\\cowl.dll"
 
     ]
   }
+  
 
 }
