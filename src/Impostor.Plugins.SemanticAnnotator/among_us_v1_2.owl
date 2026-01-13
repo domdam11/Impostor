@@ -10,9 +10,11 @@ Ontology(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs>
 Annotation(rdfs:comment "Ontologia sulle strategie in Among Us per vincere come
 impostore")
 
-Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3>))
 Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>))
-Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAA>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAC>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyBB>))
 Declaration(Class(:Action))
 Declaration(Class(:Admin))
 Declaration(Class(:AdminFixWiring))
@@ -20,6 +22,7 @@ Declaration(Class(:AdminOxygenDepleted))
 Declaration(Class(:AdminTask))
 Declaration(Class(:AdminVent))
 Declaration(Class(:Admin_Sabotage))
+Declaration(Class(:AlignEngineOutput))
 Declaration(Class(:AliveCrewmateMessage))
 Declaration(Class(:AliveImpostorMessage))
 Declaration(Class(:BigYVent))
@@ -63,6 +66,7 @@ Declaration(Class(:EngineVent))
 Declaration(Class(:Engineer))
 Declaration(Class(:ExiledImpostorMessage))
 Declaration(Class(:FixLight))
+Declaration(Class(:FixWiring))
 Declaration(Class(:Game))
 Declaration(Class(:GuardianAngel))
 Declaration(Class(:Impostor))
@@ -99,6 +103,7 @@ Declaration(Class(:Phantom))
 Declaration(Class(:Player))
 Declaration(Class(:Player1))
 Declaration(Class(:Player2))
+Declaration(Class(:Player3))
 Declaration(Class(:Player4))
 Declaration(Class(:Player5))
 Declaration(Class(:Player6))
@@ -143,9 +148,10 @@ Declaration(Class(:StorageTask))
 Declaration(Class(:Strategy))
 Declaration(Class(:StrategyA))
 Declaration(Class(:StrategyB))
+Declaration(Class(:StrategyBA))
 Declaration(Class(:StrategyC))
 Declaration(Class(:SubmitScan))
-Declaration(Class(:SwipeCARD))
+Declaration(Class(:SwipeCard))
 Declaration(Class(:Task))
 Declaration(Class(:Test))
 Declaration(Class(:Tracker))
@@ -158,6 +164,8 @@ Declaration(Class(:UpperEngineFuelEngines))
 Declaration(Class(:UpperEngineTask))
 Declaration(Class(:UpperReactorVent))
 Declaration(Class(:Vent))
+Declaration(Class(:VentCleaning))
+Declaration(Class(:VentTask))
 Declaration(Class(:WeaponDownloadData))
 Declaration(Class(:WeaponTask))
 Declaration(Class(:Weapons))
@@ -190,6 +198,7 @@ Declaration(ObjectProperty(:Reads))
 Declaration(ObjectProperty(:Repairs))
 Declaration(ObjectProperty(:Reports))
 Declaration(ObjectProperty(:Sabotages))
+Declaration(ObjectProperty(:SeeCamera))
 Declaration(ObjectProperty(:SuggestedAction1))
 Declaration(ObjectProperty(:SuggestedAction2))
 Declaration(ObjectProperty(:SuggestedAction3))
@@ -217,11 +226,14 @@ Declaration(DataProperty(:IsTaskVisual))
 Declaration(DataProperty(:PlayerName))
 Declaration(DataProperty(:UseMap))
 Declaration(DataProperty(:VisualTasksEnabled))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#KillWhenCaughtVenting>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NotSeeSomeOne>))
 Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy>))
-Declaration(NamedIndividual(:CantEnterVent))
-Declaration(NamedIndividual(:CantExitVent))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SeeSomeOne>))
+Declaration(NamedIndividual(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SelfReportIfSeen>))
+Declaration(NamedIndividual(:AldoMoro))
+Declaration(NamedIndividual(:CanVent))
 Declaration(NamedIndividual(:KillToSovrapposition))
-Declaration(NamedIndividual(:KillToWin))
 Declaration(NamedIndividual(:PassTheBlame))
 Declaration(NamedIndividual(:SabotaggioPostKill3Vivi))
 Declaration(NamedIndividual(:UccidiESpegniLuci))
@@ -361,6 +373,10 @@ AnnotationAssertion(rdfs:comment :Sabotages "Impostor sabotages something in
 the skeld map")
 ObjectPropertyDomain(:Sabotages :ImpostorAlive)
 ObjectPropertyRange(:Sabotages :Sabotage)
+
+# Object Property: :SeeCamera (:SeeCamera)
+
+AnnotationAssertion(rdfs:comment :SeeCamera "Si attiva solo nel momento in cui c'è almeno un giocatore non impostore a guardare la video camera e tu impostore sei nel raggio visivo della videocamera")
 
 # Object Property: :SuggestedAction1 (:SuggestedAction1)
 
@@ -518,19 +534,27 @@ DataPropertyRange(:VisualTasksEnabled xsd:boolean)
 #   Classes
 ############################
 
-# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3>)
-
-SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#Player3> :Player)
-
 # Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>)
 
 SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :Player)
 DisjointClasses(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :CrewMateDead)
 DisjointClasses(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> :ImpostorExiled)
 
-# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC>)
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAA> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAA>)
 
-SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyCC> :StrategyC)
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAA> :StrategyA)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB> :StrategyA)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAC> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAC>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAC> :StrategyA)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyBB> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyBB>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyBB> :StrategyB)
 
 # Class: :Action (:Action)
 
@@ -554,12 +578,15 @@ SubClassOf(:AdminTask :Task)
 
 # Class: :AdminVent (:AdminVent)
 
-EquivalentClasses(:AdminVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToCorridor :CorridorWONS) ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation)))
 SubClassOf(:AdminVent :Vent)
 
 # Class: :Admin_Sabotage (:Admin_Sabotage)
 
 SubClassOf(:Admin_Sabotage :Sabotage_Task)
+
+# Class: :AlignEngineOutput (:AlignEngineOutput)
+
+SubClassOf(:AlignEngineOutput :Task)
 
 # Class: :AliveCrewmateMessage (:AliveCrewmateMessage)
 
@@ -571,29 +598,15 @@ SubClassOf(:AliveImpostorMessage :Message)
 
 # Class: :BigYVent (:BigYVent)
 
-EquivalentClasses(:BigYVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Admin) ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria)))
 SubClassOf(:BigYVent :Vent)
 
 # Class: :CafeVent (:CafeVent)
 
-EquivalentClasses(:CafeVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToCorridor :CorridorWONS) ObjectAllValuesFrom(:VentLeadsToRoom :Admin) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation) ObjectAllValuesFrom(:VentLeadsToRoom :Weapons)))
 SubClassOf(:CafeVent :Vent)
 
 # Class: :Cafeteria (:Cafeteria)
 
-EquivalentClasses(:Cafeteria ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCAS) ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :Admin) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :Storage) ObjectAllValuesFrom(:IsNearR :Weapons)))
 SubClassOf(:Cafeteria :Room)
-DisjointClasses(:Cafeteria :Communications)
-DisjointClasses(:Cafeteria :Electrical)
-DisjointClasses(:Cafeteria :LowerEngine)
-DisjointClasses(:Cafeteria :MedBay)
-DisjointClasses(:Cafeteria :Navigation)
-DisjointClasses(:Cafeteria :Reactor)
-DisjointClasses(:Cafeteria :Security)
-DisjointClasses(:Cafeteria :Shields)
-DisjointClasses(:Cafeteria :Storage)
-DisjointClasses(:Cafeteria :UpperEngine)
-DisjointClasses(:Cafeteria :Weapons)
 
 # Class: :CafeteriaDownloadData (:CafeteriaDownloadData)
 
@@ -633,18 +646,7 @@ SubClassOf(:CommsSabotaged :Communications_Sabotage)
 
 # Class: :Communications (:Communications)
 
-EquivalentClasses(:Communications ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
 SubClassOf(:Communications :Room)
-DisjointClasses(:Communications :Electrical)
-DisjointClasses(:Communications :LowerEngine)
-DisjointClasses(:Communications :MedBay)
-DisjointClasses(:Communications :Navigation)
-DisjointClasses(:Communications :Reactor)
-DisjointClasses(:Communications :Security)
-DisjointClasses(:Communications :Shields)
-DisjointClasses(:Communications :Storage)
-DisjointClasses(:Communications :UpperEngine)
-DisjointClasses(:Communications :Weapons)
 
 # Class: :CommunicationsAcceptDivertedPower (:CommunicationsAcceptDivertedPower)
 
@@ -664,9 +666,9 @@ SubClassOf(:Communications_Sabotage :Sabotage_Task)
 
 # Class: :Corridor (:Corridor)
 
+AnnotationAssertion(rdfs:comment :Corridor "Vedere poi di creare un legame room vent - o di sussunzione o di collegamento tramite proprietà => capire cosa è più utile nelle strategie")
 SubClassOf(:Corridor :Skeld)
 DisjointClasses(:Corridor :Vent)
-DisjointClasses(:Corridor :Weapons)
 
 # Class: :CorridorCAS (:CorridorCAS)
 
@@ -674,47 +676,26 @@ SubClassOf(:CorridorCAS :Corridor)
 
 # Class: :CorridorCW (:CorridorCW)
 
-EquivalentClasses(:CorridorCW ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Weapons)))
 SubClassOf(:CorridorCW :Corridor)
-DisjointClasses(:CorridorCW :CorridorLSRU)
-DisjointClasses(:CorridorCW :CorridorSCS)
-DisjointClasses(:CorridorCW :CorridorSEL)
-DisjointClasses(:CorridorCW :CorridorUMC)
-DisjointClasses(:CorridorCW :CorridorWONS)
 
 # Class: :CorridorLSRU (:CorridorLSRU)
 
-EquivalentClasses(:CorridorLSRU ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:CorridorLSRU :Corridor)
-DisjointClasses(:CorridorLSRU :CorridorSCS)
-DisjointClasses(:CorridorLSRU :CorridorSEL)
-DisjointClasses(:CorridorLSRU :CorridorUMC)
-DisjointClasses(:CorridorLSRU :CorridorWONS)
 
 # Class: :CorridorSCS (:CorridorSCS)
 
-EquivalentClasses(:CorridorSCS ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
 SubClassOf(:CorridorSCS :Corridor)
-DisjointClasses(:CorridorSCS :CorridorSEL)
-DisjointClasses(:CorridorSCS :CorridorUMC)
-DisjointClasses(:CorridorSCS :CorridorWONS)
 
 # Class: :CorridorSEL (:CorridorSEL)
 
-EquivalentClasses(:CorridorSEL ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Storage)))
 SubClassOf(:CorridorSEL :Corridor)
-DisjointClasses(:CorridorSEL :CorridorUMC)
-DisjointClasses(:CorridorSEL :CorridorWONS)
 
 # Class: :CorridorUMC (:CorridorUMC)
 
-EquivalentClasses(:CorridorUMC ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:CorridorUMC :Corridor)
-DisjointClasses(:CorridorUMC :CorridorWONS)
 
 # Class: :CorridorWONS (:CorridorWONS)
 
-EquivalentClasses(:CorridorWONS ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :O2)))
 SubClassOf(:CorridorWONS :Corridor)
 
 # Class: :CrewMate (:CrewMate)
@@ -741,22 +722,11 @@ SubClassOf(:DivertPower :ElectricalTask)
 
 # Class: :ElecVent (:ElecVent)
 
-EquivalentClasses(:ElecVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :MedBay) ObjectAllValuesFrom(:VentLeadsToRoom :Security)))
 SubClassOf(:ElecVent :Vent)
 
 # Class: :Electrical (:Electrical)
 
-EquivalentClasses(:Electrical ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Storage)))
 SubClassOf(:Electrical :Room)
-DisjointClasses(:Electrical :LowerEngine)
-DisjointClasses(:Electrical :MedBay)
-DisjointClasses(:Electrical :Navigation)
-DisjointClasses(:Electrical :Reactor)
-DisjointClasses(:Electrical :Security)
-DisjointClasses(:Electrical :Shields)
-DisjointClasses(:Electrical :Storage)
-DisjointClasses(:Electrical :UpperEngine)
-DisjointClasses(:Electrical :Weapons)
 
 # Class: :ElectricalDownloadData (:ElectricalDownloadData)
 
@@ -794,6 +764,10 @@ SubClassOf(:ExiledImpostorMessage :Message)
 
 SubClassOf(:FixLight :Electrical_Sabotage)
 
+# Class: :FixWiring (:FixWiring)
+
+SubClassOf(:FixWiring :Task)
+
 # Class: :GuardianAngel (:GuardianAngel)
 
 SubClassOf(:GuardianAngel :CrewMateAlive)
@@ -820,21 +794,11 @@ SubClassOf(:Kill :Action)
 
 # Class: :LEngineVent (:LEngineVent)
 
-EquivalentClasses(:LEngineVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Reactor) ObjectAllValuesFrom(:VentLeadsToRoom :UpperEngine)))
 SubClassOf(:LEngineVent :EngineVent)
 
 # Class: :LowerEngine (:LowerEngine)
 
-EquivalentClasses(:LowerEngine ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:LowerEngine :Room)
-DisjointClasses(:LowerEngine :MedBay)
-DisjointClasses(:LowerEngine :Navigation)
-DisjointClasses(:LowerEngine :Reactor)
-DisjointClasses(:LowerEngine :Security)
-DisjointClasses(:LowerEngine :Shields)
-DisjointClasses(:LowerEngine :Storage)
-DisjointClasses(:LowerEngine :UpperEngine)
-DisjointClasses(:LowerEngine :Weapons)
 
 # Class: :LowerEngineAcceptDivertedPower (:LowerEngineAcceptDivertedPower)
 
@@ -854,15 +818,7 @@ SubClassOf(:LowerEngineTask :Task)
 
 # Class: :MedBay (:MedBay)
 
-EquivalentClasses(:MedBay ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:MedBay :Room)
-DisjointClasses(:MedBay :Navigation)
-DisjointClasses(:MedBay :Reactor)
-DisjointClasses(:MedBay :Security)
-DisjointClasses(:MedBay :Shields)
-DisjointClasses(:MedBay :Storage)
-DisjointClasses(:MedBay :UpperEngine)
-DisjointClasses(:MedBay :Weapons)
 
 # Class: :MedBaytask (:MedBaytask)
 
@@ -870,7 +826,6 @@ SubClassOf(:MedBaytask :Task)
 
 # Class: :MedVent (:MedVent)
 
-EquivalentClasses(:MedVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Electrical) ObjectAllValuesFrom(:VentLeadsToRoom :Security)))
 SubClassOf(:MedVent :Vent)
 
 # Class: :Message (:Message)
@@ -879,24 +834,15 @@ SubClassOf(:Message :Game)
 
 # Class: :NavVentNorth (:NavVentNorth)
 
-EquivalentClasses(:NavVentNorth ObjectAllValuesFrom(:VentLeadsToRoom :Weapons))
 SubClassOf(:NavVentNorth :NavigationVent)
 
 # Class: :NavVentSouth (:NavVentSouth)
 
-EquivalentClasses(:NavVentSouth ObjectAllValuesFrom(:VentLeadsToRoom :Shields))
 SubClassOf(:NavVentSouth :NavigationVent)
 
 # Class: :Navigation (:Navigation)
 
-EquivalentClasses(:Navigation ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Weapons)))
 SubClassOf(:Navigation :Room)
-DisjointClasses(:Navigation :Reactor)
-DisjointClasses(:Navigation :Security)
-DisjointClasses(:Navigation :Shields)
-DisjointClasses(:Navigation :Storage)
-DisjointClasses(:Navigation :UpperEngine)
-DisjointClasses(:Navigation :Weapons)
 
 # Class: :NavigationAcceptDivertedPower (:NavigationAcceptDivertedPower)
 
@@ -964,6 +910,10 @@ SubClassOf(:Player1 :Player)
 
 SubClassOf(:Player2 :Player)
 
+# Class: :Player3 (:Player3)
+
+SubClassOf(:Player3 :Player)
+
 # Class: :Player4 (:Player4)
 
 SubClassOf(:Player4 :Player)
@@ -982,18 +932,11 @@ SubClassOf(:PrimeShields :ShieldsTask)
 
 # Class: :REngineVent (:REngineVent)
 
-EquivalentClasses(:REngineVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :LowerEngine) ObjectAllValuesFrom(:VentLeadsToRoom :Reactor)))
 SubClassOf(:REngineVent :EngineVent)
 
 # Class: :Reactor (:Reactor)
 
-EquivalentClasses(:Reactor ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearR :Security) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:Reactor :Room)
-DisjointClasses(:Reactor :Security)
-DisjointClasses(:Reactor :Shields)
-DisjointClasses(:Reactor :Storage)
-DisjointClasses(:Reactor :UpperEngine)
-DisjointClasses(:Reactor :Weapons)
 
 # Class: :ReactorMeltdown (:ReactorMeltdown)
 
@@ -1005,7 +948,6 @@ SubClassOf(:ReactorTask :Task)
 
 # Class: :ReactorVent (:ReactorVent)
 
-EquivalentClasses(:ReactorVent ObjectAllValuesFrom(:VentLeadsToRoom :LowerEngine))
 SubClassOf(:ReactorVent :Vent)
 
 # Class: :Reactor_Sabotage (:Reactor_Sabotage)
@@ -1014,6 +956,7 @@ SubClassOf(:Reactor_Sabotage :Sabotage_Task)
 
 # Class: :Room (:Room)
 
+AnnotationAssertion(rdfs:comment :Room "Vedere poi di creare un legame room vent - o di sussunzione o di collegamento tramite proprietà => capire cosa è più utile nelle strategie")
 SubClassOf(:Room :Skeld)
 
 # Class: :Sabotage (:Sabotage)
@@ -1062,12 +1005,7 @@ SubClassOf(:Scientist :CrewMateAlive)
 
 # Class: :Security (:Security)
 
-EquivalentClasses(:Security ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearR :UpperEngine)))
 SubClassOf(:Security :Room)
-DisjointClasses(:Security :Shields)
-DisjointClasses(:Security :Storage)
-DisjointClasses(:Security :UpperEngine)
-DisjointClasses(:Security :Weapons)
 
 # Class: :SecurityAcceptDivertedPower (:SecurityAcceptDivertedPower)
 
@@ -1083,7 +1021,6 @@ SubClassOf(:SecurityTask :Task)
 
 # Class: :SecurityVent (:SecurityVent)
 
-EquivalentClasses(:SecurityVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Electrical) ObjectAllValuesFrom(:VentLeadsToRoom :MedBay)))
 SubClassOf(:SecurityVent :Vent)
 
 # Class: :Shapeshifter (:Shapeshifter)
@@ -1092,11 +1029,7 @@ SubClassOf(:Shapeshifter :ImpostorAlive)
 
 # Class: :Shields (:Shields)
 
-EquivalentClasses(:Shields ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Navigation) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Storage) ObjectAllValuesFrom(:IsNearR :Weapons)))
 SubClassOf(:Shields :Room)
-DisjointClasses(:Shields :Storage)
-DisjointClasses(:Shields :UpperEngine)
-DisjointClasses(:Shields :Weapons)
 
 # Class: :ShieldsAcceeptDivertedPower (:ShieldsAcceeptDivertedPower)
 
@@ -1108,7 +1041,6 @@ SubClassOf(:ShieldsTask :Task)
 
 # Class: :ShieldsVent (:ShieldsVent)
 
-EquivalentClasses(:ShieldsVent ObjectAllValuesFrom(:VentLeadsToRoom :Navigation))
 SubClassOf(:ShieldsVent :Vent)
 
 # Class: :StabilizeSteering (:StabilizeSteering)
@@ -1121,10 +1053,7 @@ SubClassOf(:StartReactor :ReactorTask)
 
 # Class: :Storage (:Storage)
 
-EquivalentClasses(:Storage ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCAS) ObjectAllValuesFrom(:IsNearC :CorridorSCS) ObjectAllValuesFrom(:IsNearC :CorridorSEL) ObjectAllValuesFrom(:IsNearR :Admin) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Communications) ObjectAllValuesFrom(:IsNearR :Electrical) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Weapons)))
 SubClassOf(:Storage :Room)
-DisjointClasses(:Storage :UpperEngine)
-DisjointClasses(:Storage :Weapons)
 
 # Class: :StorageEmptyChute (:StorageEmptyChute)
 
@@ -1162,6 +1091,10 @@ DisjointClasses(:StrategyA :StrategyC)
 SubClassOf(:StrategyB :Strategy)
 DisjointClasses(:StrategyB :StrategyC)
 
+# Class: :StrategyBA (:StrategyBA)
+
+SubClassOf(:StrategyBA :StrategyB)
+
 # Class: :StrategyC (:StrategyC)
 
 SubClassOf(:StrategyC :Strategy)
@@ -1170,9 +1103,9 @@ SubClassOf(:StrategyC :Strategy)
 
 SubClassOf(:SubmitScan :MedBaytask)
 
-# Class: :SwipeCARD (:SwipeCARD)
+# Class: :SwipeCard (:SwipeCard)
 
-SubClassOf(:SwipeCARD :AdminTask)
+SubClassOf(:SwipeCard :AdminTask)
 
 # Class: :Task (:Task)
 
@@ -1198,9 +1131,7 @@ SubClassOf(:UploadData :AdminTask)
 
 # Class: :UpperEngine (:UpperEngine)
 
-EquivalentClasses(:UpperEngine ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorLSRU) ObjectAllValuesFrom(:IsNearC :CorridorUMC) ObjectAllValuesFrom(:IsNearR :LowerEngine) ObjectAllValuesFrom(:IsNearR :MedBay) ObjectAllValuesFrom(:IsNearR :Reactor) ObjectAllValuesFrom(:IsNearR :Security)))
 SubClassOf(:UpperEngine :Room)
-DisjointClasses(:UpperEngine :Weapons)
 
 # Class: :UpperEngineAcceptDivertedPower (:UpperEngineAcceptDivertedPower)
 
@@ -1220,12 +1151,20 @@ SubClassOf(:UpperEngineTask :Task)
 
 # Class: :UpperReactorVent (:UpperReactorVent)
 
-EquivalentClasses(:UpperReactorVent ObjectAllValuesFrom(:VentLeadsToRoom :UpperEngine))
 SubClassOf(:UpperReactorVent :Vent)
 
 # Class: :Vent (:Vent)
 
+AnnotationAssertion(rdfs:comment :Vent "Vedere poi di creare un legame room vent - o di sussunzione o di collegamento tramite proprietà => capire cosa è più utile nelle strategie")
 SubClassOf(:Vent :Skeld)
+
+# Class: :VentCleaning (:VentCleaning)
+
+SubClassOf(:VentCleaning :VentTask)
+
+# Class: :VentTask (:VentTask)
+
+SubClassOf(:VentTask :Task)
 
 # Class: :WeaponDownloadData (:WeaponDownloadData)
 
@@ -1237,7 +1176,6 @@ SubClassOf(:WeaponTask :Task)
 
 # Class: :Weapons (:Weapons)
 
-EquivalentClasses(:Weapons ObjectIntersectionOf(ObjectAllValuesFrom(:IsNearC :CorridorCW) ObjectAllValuesFrom(:IsNearC :CorridorWONS) ObjectAllValuesFrom(:IsNearR :Cafeteria) ObjectAllValuesFrom(:IsNearR :Navigation) ObjectAllValuesFrom(:IsNearR :O2) ObjectAllValuesFrom(:IsNearR :Shields) ObjectAllValuesFrom(:IsNearR :Storage)))
 SubClassOf(:Weapons :Room)
 
 # Class: :WeaponsAcceptDivertedPower (:WeaponsAcceptDivertedPower)
@@ -1246,13 +1184,16 @@ SubClassOf(:WeaponsAcceptDivertedPower :WeaponTask)
 
 # Class: :WeaponsVent (:WeaponsVent)
 
-EquivalentClasses(:WeaponsVent ObjectIntersectionOf(ObjectAllValuesFrom(:VentLeadsToRoom :Cafeteria) ObjectAllValuesFrom(:VentLeadsToRoom :Navigation)))
 SubClassOf(:WeaponsVent :Vent)
 
 
 ############################
 #   Named Individuals
 ############################
+
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NotSeeSomeOne> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NotSeeSomeOne>)
+
+ClassAssertion(ObjectIntersectionOf(:StrategyB ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectExactCardinality(0 :ImpostorIsInFOV)) <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NotSeeSomeOne>)
 
 # Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy>)
 
@@ -1262,43 +1203,42 @@ AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/20
 -camera killer => è uno pseudo task che anche l'impostore può fare
 -strategie di accusa reciproca fra i crewmate , qui non uccidi ma gli spingi ad accusarsi a vicenda
 -informazioni delle videocamere da ottenere => se una telecamera lampeggia allora vuol dire che c'è qualcuno che sta guardando")
-AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Potrei modellare l'uccisione usando il passato nella ontologia in modo SOFT, solo per dire da quante foto l'impostore sta solo")
 AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Ci sono dei momenti in cui l'impostore è solo per cui potrebbe applicare delle semi strategie apposite, come cercare altri player, impostori, sabotaggi, o altro")
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Potrei modellare l'uccisione usando il passato nella ontologia in modo SOFT, solo per dire da quante foto l'impostore sta solo")
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy> "Suggerire cosa potresti fare dato lo stato delle cose => rimodernare le strategie per renderle anche più astratte:
+-p.e: se siete solo 3 vivi => cerca gli altri player non appena il cooldown è a zero")
+ClassAssertion(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyBB> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OtherStrategy>)
 
-# Individual: :CantEnterVent (:CantEnterVent)
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SeeSomeOne> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SeeSomeOne>)
 
-AnnotationAssertion(rdfs:comment :CantEnterVent "Spiegazione:
--IsInFOV: serve per negativizzare il supporto dei player nelle vicinanze dell'impostore, usando qualsiasi proprietà che faccia esplicito riferimento all'impostore non è possibile dato quel player non sa chi è l'impostore
--ImpostorIsInFOV: serve per negativizzare il supporto dell'impostore
--con il ruolo dell'ingegnere potresti pensare di attivare la strategia ventola in altri casi più specifici perchè un crewmate esterno potrebbe pensare che tu sia l'ingegnere a meno che questo sia morto")
-ClassAssertion(ObjectIntersectionOf(ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectMinCardinality(1 :IsInFOV)) :CantEnterVent)
+ClassAssertion(ObjectIntersectionOf(:StrategyA ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectMinCardinality(1 :ImpostorIsInFOV)) <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SeeSomeOne>)
 
-# Individual: :CantExitVent (:CantExitVent)
+# Individual: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SelfReportIfSeen> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SelfReportIfSeen>)
 
-ClassAssertion(ObjectIntersectionOf(ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectMinCardinality(1 :IsInFOV)) :CantExitVent)
+AnnotationAssertion(rdfs:comment <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#SelfReportIfSeen> "Se quando hai ucciso viene visto vicino al corpo da qualcuno => fai self report")
+
+# Individual: :AldoMoro (:AldoMoro)
+
+ClassAssertion(ObjectIntersectionOf(:ImpostorAlive :Player1 ObjectAllValuesFrom(:Fake :AlignEngineOutput) ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectAllValuesFrom(:NextTo :AlignEngineOutput) ObjectExactCardinality(1 :Fake) ObjectExactCardinality(4 :HasNAlivePlayers) ObjectExactCardinality(0 :ImpostorIsInFOV) ObjectExactCardinality(0 :ImpostorIsInFOVFromTask) ObjectExactCardinality(0 :VeryNear) DataAllValuesFrom(:IsFixed DataOneOf("true"^^xsd:boolean))) :AldoMoro)
+
+# Individual: :CanVent (:CanVent)
+
+ClassAssertion(ObjectIntersectionOf(:StrategyBA ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectAllValuesFrom(:SeeCamera :Player) ObjectExactCardinality(0 :ImpostorIsInFOV) ObjectExactCardinality(0 :IsInFOV) ObjectExactCardinality(0 :SeeCamera)) :CanVent)
 
 # Individual: :KillToSovrapposition (:KillToSovrapposition)
 
 AnnotationAssertion(rdfs:comment :KillToSovrapposition "Qui uccidi quando siete sovrapposti in almeno 4 player , 3 compreso chi osserva sono 4")
-ClassAssertion(ObjectIntersectionOf(:StrategyA ObjectAllValuesFrom(:VeryNear :Player) ObjectMinCardinality(3 :VeryNear)) :KillToSovrapposition)
-
-# Individual: :KillToWin (:KillToWin)
-
-AnnotationAssertion(rdfs:comment :KillToWin "Potrei anche aggiungere il suggerimento di sabotare sistemi per fare andare le persone in un luogo e poi ucciderne uno non appena lo vedi")
-AnnotationAssertion(rdfs:comment :KillToWin "Qui in questa casistica potresti anche pensare di suggerire questa cosa se il cooldown ce l'hai e c'è qualcuno nelle vicinanze. Ma se il cooldown non c'è l'hai invece potresti suggerire di sabotare i sistemi vitali per recuperare tempo e dopo ucciderne il player non appena lo vedi oppure suggerire di andare nei sistemi vitali sabotati ad attendere il player che sicuro almeno 1 verrà")
-AnnotationAssertion(rdfs:comment :KillToWin "Qui vorrei racchiudere il caso che i player di fatto non apportano nuova informazione sul matching => il loro bonus dovrebbe annullarsi in positivo o in negativo cioè sia nell'attacco che nel supporto.
-Se un player non supporta davvero ne attacca davvero allora è nullo")
-ClassAssertion(ObjectIntersectionOf(:StrategyB ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectMinCardinality(1 :ImpostorIsInFOV) ObjectExactCardinality(3 :HasNAlivePlayers) ObjectMaxCardinality(2 :ImpostorIsInFOV)) :KillToWin)
+ClassAssertion(ObjectIntersectionOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB> ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectAllValuesFrom(:VeryNear :Player) ObjectMinCardinality(3 :ImpostorIsInFOV) ObjectMinCardinality(3 :IsInFOV) ObjectMinCardinality(3 :VeryNear)) :KillToSovrapposition)
 
 # Individual: :PassTheBlame (:PassTheBlame)
 
-AnnotationAssertion(rdfs:comment :PassTheBlame "Potrei aggiunge IsInFOVFromTask anche per i crewmate")
 AnnotationAssertion(rdfs:comment :PassTheBlame "Proprietà da aggiungere:
 -HasInFOVFromTask: un player che sta facendo un task: ok
 -ImpostorIsInFOVFromTask: l'impostore viene visto da x giocatori che stanno facendo un task: ok
 -AreCamerasActive: objectproperty da inserire in tutti gli individui => Questo crea una disgiunzione generale anche se le condizioni sono soddisfatte => una disgiunzione per ogni player: Agisce come un blocco preliminare se le condizioni sono soddisfatte ma qualcuno ti potrebbe vedere
 -PlayerAlive: player vivo disgiunto da un crewmate morto => serve per evitare supporti da crewmate non più vivi: ok")
-ClassAssertion(ObjectIntersectionOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> ObjectAllValuesFrom(:Does :Task) ObjectAllValuesFrom(:HasInFOVFromTask :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:ImpostorIsInFOVFromTask :Player) ObjectAllValuesFrom(:IsInFOVFromTask :Player) ObjectExactCardinality(0 :AreCamerasActive) ObjectExactCardinality(1 :Does) ObjectExactCardinality(2 :HasInFOVFromTask) ObjectExactCardinality(2 :ImpostorIsInFOV) ObjectExactCardinality(2 :ImpostorIsInFOVFromTask) ObjectExactCardinality(1 :IsInFOVFromTask)) :PassTheBlame)
+AnnotationAssertion(rdfs:comment :PassTheBlame "Qui potresti fare un evoluzione => prima saboti le luci e poi uccidi => il sabotaggio delle luci pre uccisione è una cosa comune nelle uccisioni")
+ClassAssertion(ObjectIntersectionOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> ObjectAllValuesFrom(:Does :Task) ObjectAllValuesFrom(:HasInFOVFromTask :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:ImpostorIsInFOVFromTask :Player) ObjectAllValuesFrom(:IsInFOVFromTask :Player) ObjectAllValuesFrom(:SeeCamera :Player) ObjectExactCardinality(1 :Does) ObjectExactCardinality(2 :HasInFOVFromTask) ObjectExactCardinality(2 :ImpostorIsInFOV) ObjectExactCardinality(2 :ImpostorIsInFOVFromTask) ObjectExactCardinality(1 :IsInFOVFromTask) ObjectExactCardinality(0 :SeeCamera)) :PassTheBlame)
 
 # Individual: :SabotaggioPostKill3Vivi (:SabotaggioPostKill3Vivi)
 
@@ -1309,7 +1249,7 @@ AnnotationAssertion(rdfs:comment :SabotaggioPostKill3Vivi "Decidi di sabotare un
 AnnotationAssertion(rdfs:comment :UccidiESpegniLuci "E' una strategia generica di uccisione, quando ci siete solo tu e un altro player nella visuale puoi decidere di ucciderlo e sabotare il sistema di luci cosa che in effetti accade nelle partite reali. Qui servirebbe annotarsi anche:
 -CoolDown delle uccisioni
 -CoolDown dei sabotaggi")
-ClassAssertion(ObjectIntersectionOf(:StrategyC ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectMinCardinality(4 :HasNAlivePlayers) ObjectExactCardinality(1 :ImpostorIsInFOV) ObjectExactCardinality(1 :IsInFOV)) :UccidiESpegniLuci)
+ClassAssertion(ObjectIntersectionOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAC> ObjectAllValuesFrom(:HasNAlivePlayers :Player) ObjectAllValuesFrom(:ImpostorIsInFOV :Player) ObjectAllValuesFrom(:IsInFOV :Player) ObjectAllValuesFrom(:SeeCamera :Player) ObjectMinCardinality(4 :HasNAlivePlayers) ObjectExactCardinality(1 :ImpostorIsInFOV) ObjectExactCardinality(1 :IsInFOV) ObjectExactCardinality(0 :SeeCamera)) :UccidiESpegniLuci)
 
 
 )
