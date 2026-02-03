@@ -465,7 +465,7 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 var nCrewmatesFOV = 0;
                 var nCrewMatesHasImpostorsFOV = 0;//numero di crewmate che vedo un impostor
                 var nPlayerVeryNear = 0;
-                var nImpostorsFOV = 0;
+                // // var nImpostorsFOV = 0; // Unused variable // Unused variable
 
                 // check if player fixed or moving towards someone
 
@@ -788,6 +788,27 @@ namespace Impostor.Plugins.SemanticAnnotator.Annotator
                 player.objCardRestrictionsPlayer.Add(ExactRestrictionNPlayers);
 
             }
+
+            // ========== LOCATION ANNOTATION STEP ==========
+            try
+            {
+                string mapJsonPath = Path.Combine(
+                    Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? ".",
+                    "Data",
+                    "skeld.json"
+                );
+                
+                var locationStep = new LocationAnnotationStep(mapJsonPath);
+                locationStep.AnnotateLocations(playersInFOVImpostor, instancesToRelease);
+                
+                Console.WriteLine("[AnnotatorEngine] LocationAnnotationStep executed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AnnotatorEngine] Error in LocationAnnotationStep: {ex.Message}");
+            }
+            // ========== END LOCATION ANNOTATION STEP ==========
+
             //Inserimento dei player all'interno dell'ontologia => post iterazione su tutti i player per memorizzare informazioni codipendenti tra di loro
             foreach (var player in playersInFOVImpostor)
             {

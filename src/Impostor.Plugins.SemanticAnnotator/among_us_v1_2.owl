@@ -10,6 +10,39 @@ Ontology(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs>
 Annotation(rdfs:comment "Ontologia sulle strategie in Among Us per vincere come
 impostore")
 
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ConfidenceLevel>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HighConfidence>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsAtUndeterminedPosition>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerLeft>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerRight>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperLeft>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperRight>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsNearCenter>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#LowConfidence>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#MediumConfidence>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCAS>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCW>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorLSRU>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSCS>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSEL>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorUMC>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorWONS>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToAdmin>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCafeteria>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCommunications>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToElectrical>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToLowerEngine>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToMedBay>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToNavigation>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToO2>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToReactor>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToSecurity>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToShields>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToStorage>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToUpperEngine>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToWeapons>))
+Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OutsideMap>))
 Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>))
 Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAA>))
 Declaration(Class(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#StrategyAB>))
@@ -171,6 +204,9 @@ Declaration(Class(:WeaponTask))
 Declaration(Class(:Weapons))
 Declaration(Class(:WeaponsAcceptDivertedPower))
 Declaration(Class(:WeaponsVent))
+Declaration(ObjectProperty(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasConfidenceLevel>))
+Declaration(ObjectProperty(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasContextualPosition>))
+Declaration(ObjectProperty(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInRoom>))
 Declaration(ObjectProperty(:AreCamerasActive))
 Declaration(ObjectProperty(:Calls))
 Declaration(ObjectProperty(:CloseDoors))
@@ -242,6 +278,21 @@ Declaration(AnnotationProperty(:formatDescription))
 ############################
 #   Object Properties
 ############################
+
+# Object Property: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasConfidenceLevel> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasConfidenceLevel>)
+
+ObjectPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasConfidenceLevel> :Player)
+ObjectPropertyRange(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasConfidenceLevel> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ConfidenceLevel>)
+
+# Object Property: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasContextualPosition> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasContextualPosition>)
+
+ObjectPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasContextualPosition> :Player)
+ObjectPropertyRange(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HasContextualPosition> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Object Property: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInRoom> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInRoom>)
+
+ObjectPropertyDomain(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInRoom> :Player)
+ObjectPropertyRange(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInRoom> :Room)
 
 # Object Property: :Calls (:Calls)
 
@@ -533,6 +584,130 @@ DataPropertyRange(:VisualTasksEnabled xsd:boolean)
 ############################
 #   Classes
 ############################
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HighConfidence> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HighConfidence>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#HighConfidence> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ConfidenceLevel>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsAtUndeterminedPosition> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsAtUndeterminedPosition>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsAtUndeterminedPosition> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerLeft> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerLeft>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerLeft> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerRight> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerRight>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInLowerRight> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperLeft> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperLeft>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperLeft> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperRight> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperRight>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsInUpperRight> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsNearCenter> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsNearCenter>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#IsNearCenter> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#LowConfidence> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#LowConfidence>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#LowConfidence> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ConfidenceLevel>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#MediumConfidence> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#MediumConfidence>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#MediumConfidence> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ConfidenceLevel>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCAS> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCAS>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCAS> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCW> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCW>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorCW> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorLSRU> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorLSRU>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorLSRU> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSCS> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSCS>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSCS> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSEL> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSEL>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorSEL> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorUMC> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorUMC>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorUMC> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorWONS> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorWONS>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearCorridorWONS> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToAdmin> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToAdmin>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToAdmin> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCafeteria> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCafeteria>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCafeteria> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCommunications> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCommunications>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToCommunications> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToElectrical> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToElectrical>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToElectrical> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToLowerEngine> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToLowerEngine>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToLowerEngine> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToMedBay> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToMedBay>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToMedBay> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToNavigation> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToNavigation>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToNavigation> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToO2> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToO2>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToO2> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToReactor> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToReactor>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToReactor> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToSecurity> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToSecurity>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToSecurity> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToShields> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToShields>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToShields> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToStorage> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToStorage>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToStorage> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToUpperEngine> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToUpperEngine>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToUpperEngine> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToWeapons> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToWeapons>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#NearDoorToWeapons> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
+
+# Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OutsideMap> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OutsideMap>)
+
+SubClassOf(<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#OutsideMap> <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#ContextualPosition>)
 
 # Class: <http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive> (<http://www.semanticweb.org/giova/ontologies/2024/5/AmongUs#PlayerAlive>)
 

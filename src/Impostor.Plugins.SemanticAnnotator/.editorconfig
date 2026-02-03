@@ -1,0 +1,29 @@
+root = true
+
+[*.cs]
+# Disabilita warning "use var"
+dotnet_diagnostic.IDE0007.severity = none
+
+# Disabilita warning StyleCop non critici
+dotnet_diagnostic.SA1649.severity = none
+dotnet_diagnostic.SA1629.severity = none
+dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1313.severity = none
+
+# Disabilita warning nullable nei file copiati
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8629.severity = none
+
+# Disabilita warning nullable nei file copiati
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8629.severity = none
+
+# Disabilita warning nullable context (file esistenti PSCBoys)
+dotnet_diagnostic.CS8632.severity = none
+
+# Disabilita warning async senza await (file esistente PSCBoys)
+dotnet_diagnostic.CS1998.severity = none
