@@ -77,14 +77,12 @@ docker-compose down
 Tutti gli utenti hanno la stessa password: password
 
 Studenti
-mario.rossi@example.com
-
-luca.bianchi@example.com
-
-anna.verdi@example.com
+- mario.rossi@example.com
+- luca.bianchi@example.com
+- anna.verdi@example.com
 
 Bibliotecario
-paola.neri@example.com
+- paola.neri@example.com
 
 ## 📖 Come usare l'applicazione
 ### Come STUDENTE
@@ -146,8 +144,7 @@ Clicca su "Logout" in alto a destra.
 Ricerca e filtri nel catalogo
 Barra di ricerca per titolo/autore + checkbox "Solo disponibili"
 
-Limite prestiti
-Ogni studente può avere massimo 3 prestiti attivi contemporaneamente
+Limite prestiti: Ogni studente può avere massimo 3 prestiti attivi contemporaneamente
 
 📚 Documentazione
 La documentazione completa del progetto si trova in docs/analisi_progetto.pdf e include:
