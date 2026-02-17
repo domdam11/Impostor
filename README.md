@@ -56,7 +56,7 @@ Prima di iniziare, assicurati di avere installato:
 
 git clone https://github.com/TUO_USERNAME/bibliotech.git
 cd bibliotech
-2. Avvia i container Docker
+### 2. Avvia i container Docker
 docker-compose up -d
 Questo comando:
 
@@ -68,11 +68,11 @@ Importa automaticamente il file sql/database.sql nel database
 
 Aspetta 30-40 secondi la prima volta (MySQL deve inizializzarsi).
 
-3. Accedi all'applicazione
+###3. Accedi all'applicazione
 Apri il browser e vai su:
 
 http://localhost:8080/login.php
-4. Ferma i container (quando hai finito)
+###4. Ferma i container (quando hai finito)
 bash
 docker-compose down
 👥 Utenti di test
