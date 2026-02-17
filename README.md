@@ -53,12 +53,14 @@ Prima di iniziare, assicurati di avere installato:
 ## 🚀 Come avviare il progetto
 
 ### 1. Clona il repository
-
+```
 git clone https://github.com/TUO_USERNAME/bibliotech.git
 cd bibliotech
+```
 ### 2. Avvia i container Docker
+```
 docker-compose up -d
-
+```
 Questo comando:
 - Crea e avvia il container web (PHP + Apache)
 - Crea e avvia il container db (MySQL)
@@ -68,11 +70,13 @@ Aspetta 30-40 secondi la prima volta (MySQL deve inizializzarsi).
 
 ### 3. Accedi all'applicazione
 Apri il browser e vai su:
-
+```
 http://localhost:8080/login.php
+```
 ### 4. Ferma i container (quando hai finito)
+```
 docker-compose down
-
+```
 ## 👥 Utenti di test
 Tutti gli utenti hanno la stessa password: password
 
