@@ -6,7 +6,7 @@ Il sistema sostituisce il vecchio registro cartaceo con un'applicazione web che 
 ---
 
 ## 📁 Struttura del progetto
-
+```
 BIBLIOTECH/
 │
 ├── docker-compose.yml # Configurazione Docker per avviare web server e database
@@ -28,7 +28,7 @@ BIBLIOTECH/
 ├── presta_libro.php # Gestisce la richiesta di prestito (studente)
 ├── prestiti.php # Elenco prestiti attivi dello studente
 └── gestione_restituzioni.php # Pannello bibliotecario per restituzioni
-
+```
 ---
 
 ## 🛠️ Tecnologie utilizzate
