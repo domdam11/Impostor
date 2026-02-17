@@ -58,24 +58,22 @@ git clone https://github.com/TUO_USERNAME/bibliotech.git
 cd bibliotech
 ### 2. Avvia i container Docker
 docker-compose up -d
+
 Questo comando:
-
-Crea e avvia il container web (PHP + Apache)
-
-Crea e avvia il container db (MySQL)
-
-Importa automaticamente il file sql/database.sql nel database
+- Crea e avvia il container web (PHP + Apache)
+- Crea e avvia il container db (MySQL)
+- Importa automaticamente il file sql/database.sql nel database
 
 Aspetta 30-40 secondi la prima volta (MySQL deve inizializzarsi).
 
-###3. Accedi all'applicazione
+### 3. Accedi all'applicazione
 Apri il browser e vai su:
 
 http://localhost:8080/login.php
-###4. Ferma i container (quando hai finito)
-bash
+### 4. Ferma i container (quando hai finito)
 docker-compose down
-👥 Utenti di test
+
+## 👥 Utenti di test
 Tutti gli utenti hanno la stessa password: password
 
 Studenti
@@ -88,117 +86,81 @@ anna.verdi@example.com
 Bibliotecario
 paola.neri@example.com
 
-📖 Come usare l'applicazione
-Come STUDENTE
-Login
+## 📖 Come usare l'applicazione
+### Come STUDENTE
+1. Login
 Vai su http://localhost:8080/login.php e inserisci email e password di uno studente.
 
-Visualizza catalogo
+2. Visualizza catalogo
 Dopo il login verrai reindirizzato alla pagina libri.php dove vedi tutti i libri disponibili.
 
-Cerca libri
+3. Cerca libri
 Usa la barra di ricerca per filtrare per titolo o autore.
 Seleziona "Solo disponibili" per vedere solo i libri con copie disponibili.
 
-Richiedi prestito
+4. Richiedi prestito
 Clicca su "PRENDI IN PRESTITO" accanto al libro desiderato.
 Il sistema:
+- Registra il prestito con la data odierna
+- Decrementa le copie disponibili
+- Ti reindirizza alla pagina "I miei prestiti"
+- Limite: massimo 3 prestiti contemporanei per studente.
 
-Registra il prestito con la data odierna
-
-Decrementa le copie disponibili
-
-Ti reindirizza alla pagina "I miei prestiti"
-
-Limite: massimo 3 prestiti contemporanei per studente.
-
-Visualizza i tuoi prestiti
+5. Visualizza i tuoi prestiti
 Clicca su "→ Visualizza i miei prestiti attivi" per vedere l'elenco dei libri che hai in prestito.
 
-Logout
+6. Logout
 Clicca su "Logout" in alto a destra.
 
-Come BIBLIOTECARIO
-Login
+### Come BIBLIOTECARIO
+1. Login
 Vai su http://localhost:8080/login.php e inserisci email e password del bibliotecario.
 
-Gestione restituzioni
+2. Gestione restituzioni
 Dopo il login verrai reindirizzato alla pagina gestione_restituzioni.php.
 Qui vedi tutti i prestiti attivi con:
+- Titolo del libro
+- Nome dello studente
+- Data di inizio prestito
 
-Titolo del libro
-
-Nome dello studente
-
-Data di inizio prestito
-
-Registra restituzione
+3. Registra restituzione
 Clicca su "RESTITUISCI" accanto al prestito da chiudere.
 Il sistema:
+- Imposta la data di fine prestito
+- Incrementa le copie disponibili del libro
 
-Imposta la data di fine prestito
-
-Incrementa le copie disponibili del libro
-
-Visualizza catalogo
+4. Visualizza catalogo
 Clicca su "Vai al catalogo libri" per vedere tutti i libri.
 Come bibliotecario puoi vedere anche le note interne sui libri.
 
-Logout
+5. Logout
 Clicca su "Logout" in alto a destra.
 
-🔒 Sicurezza implementata
-Password hashate: le password sono salvate nel database solo come hash (funzione password_hash di PHP), mai in chiaro
+## 🔒 Sicurezza implementata
+- Password hashate: le password sono salvate nel database solo come hash (funzione password_hash di PHP), mai in chiaro
+- Prepared statements: tutte le query SQL usano mysqli_prepare per prevenire SQL injection
+- Controllo sessioni: ogni pagina protetta verifica che l'utente sia autenticato
+- Controllo ruoli: le pagine amministrative sono accessibili solo ai bibliotecari
 
-Prepared statements: tutte le query SQL usano mysqli_prepare per prevenire SQL injection
-
-Controllo sessioni: ogni pagina protetta verifica che l'utente sia autenticato
-
-Controllo ruoli: le pagine amministrative sono accessibili solo ai bibliotecari
-
-🎨 Funzionalità aggiuntive
+## 🎨 Funzionalità aggiuntive
 Ricerca e filtri nel catalogo
 Barra di ricerca per titolo/autore + checkbox "Solo disponibili"
-
-Note interne per bibliotecari
-Campo visibile solo ai bibliotecari per annotazioni gestionali (es. "copia danneggiata")
 
 Limite prestiti
 Ogni studente può avere massimo 3 prestiti attivi contemporaneamente
 
-Messaggi di feedback
-Conferme e errori chiari per ogni operazione (login, prestito, restituzione)
-
-🐛 Risoluzione problemi
-Errore "Connection refused"
-Aspetta 30 secondi dopo docker-compose up - MySQL ha bisogno di tempo per inizializzarsi.
-
-Le tabelle non esistono
-bash
-docker-compose down -v
-docker-compose up -d
-Il flag -v rimuove i volumi e ricrea il database da zero.
-
-Le password non funzionano
-Verifica che in sql/database.sql ci sia l'hash completo (stringa lunga tipo $2y$10$...) e non un placeholder.
-
 📚 Documentazione
 La documentazione completa del progetto si trova in docs/analisi_progetto.pdf e include:
+- Descrizione del sistema
+- Diagramma Entità-Relazioni (ER)
+- Diagramma UML delle classi
+- Specifiche di sessione e sicurezza
+- Progettazione database
 
-Descrizione del sistema
-
-Diagramma Entità-Relazioni (ER)
-
-Diagramma UML delle classi
-
-Specifiche di sessione e sicurezza
-
-Progettazione database
-
-👨‍💻 Autore
+## 👨‍💻 Autore
 Alessandro Casadibari
 Progetto realizzato per il corso di Informatica - Classe 5° Superiore
 Email: casadibari.alessandro@panettipitagora.edu.it
 
-📝 Licenza
+## 📝 Licenza
 Progetto didattico - uso educativo
